@@ -1,171 +1,128 @@
-// ------------------
-// THREE.JS SETUP
-// ------------------
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+// Player/skier
+const player = {
+  x: canvas.width/2,
+  y: canvas.height - 150,
+  size: 30,
+  color: 'red',
+  dx: 0,
+  dy: 0,
+  maxSpeed: 4
+};
 
-// ------------------
-// LIGHT
-// ------------------
-const light = new THREE.DirectionalLight(0xffffff, 1);
-light.position.set(5,10,5);
-scene.add(light);
-
-// ------------------
-// GROUND (snow)
-// ------------------
-const ground = new THREE.Mesh(
-  new THREE.PlaneGeometry(50, 50),
-  new THREE.MeshStandardMaterial({ color: 0xffffff })
-);
-ground.rotation.x = -Math.PI / 2;
-scene.add(ground);
-
-// ------------------
-// CAMERA + CONTROLS
-// ------------------
-camera.position.set(0, 2, 10);
-
-let moveForward = false;
-let moveBackward = false;
-let moveLeft = false;
-let moveRight = false;
-
-const speed = 0.15;
-
-// Track keys
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowUp") moveForward = true;
-  if (e.key === "ArrowDown") moveBackward = true;
-  if (e.key === "ArrowLeft") moveLeft = true;
-  if (e.key === "ArrowRight") moveRight = true;
-});
-
-document.addEventListener("keyup", (e) => {
-  if (e.key === "ArrowUp") moveForward = false;
-  if (e.key === "ArrowDown") moveBackward = false;
-  if (e.key === "ArrowLeft") moveLeft = false;
-  if (e.key === "ArrowRight") moveRight = false;
-});
-
-// ------------------
-// MOUSE LOOK
-// ------------------
-let yaw = 0;
-let pitch = 0;
-
-document.addEventListener("mousemove", (e) => {
-  if (document.pointerLockElement === document.body) {
-    yaw -= e.movementX * 0.002;
-    pitch -= e.movementY * 0.002;
-
-    pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
-
-    camera.rotation.set(pitch, yaw, 0);
-  }
-});
-
-// Click to lock mouse
-document.body.addEventListener("click", () => {
-  document.body.requestPointerLock();
-});
-
-// ------------------
-// GAME DATA
-// ------------------
+// Money
 let money = 0;
-let liftCost = 100;
 
-// Load save
-if (localStorage.getItem("money")) {
-  money = parseInt(localStorage.getItem("money"));
+// Input
+const keys = {};
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+// Ground buttons (buy points)
+const buttons = [
+  {x: 200, y: 300, width: 60, height: 20, cost: 50, type: 'Lift', bought: false},
+  {x: 600, y: 500, width: 60, height: 20, cost: 100, type: 'Upgrade', bought: false},
+  {x: 900, y: 250, width: 60, height: 20, cost: 200, type: 'Extra Lift', bought: false}
+];
+
+// Trees for scenery
+const trees = [
+  {x: 400, y: 400, size: 40},
+  {x: 750, y: 350, size: 50},
+  {x: 300, y: 550, size: 35}
+];
+
+// Main update loop
+function update() {
+  // Smooth movement
+  if(keys['ArrowUp']) player.dy = Math.max(player.dy - 0.2, -player.maxSpeed);
+  else if(keys['ArrowDown']) player.dy = Math.min(player.dy + 0.2, player.maxSpeed);
+  else player.dy *= 0.9;
+
+  if(keys['ArrowLeft']) player.dx = Math.max(player.dx - 0.2, -player.maxSpeed);
+  else if(keys['ArrowRight']) player.dx = Math.min(player.dx + 0.2, player.maxSpeed);
+  else player.dx *= 0.9;
+
+  player.x += player.dx;
+  player.y += player.dy;
+
+  // Keep player in bounds
+  player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+  player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+
+  // Check button interaction
+  buttons.forEach(btn => {
+    if(!btn.bought && isNear(player, btn) && keys[' ']) {
+      if(money >= btn.cost) {
+        money -= btn.cost;
+        btn.bought = true;
+        alert(`Bought ${btn.type}!`);
+      } else {
+        alert("Not enough money!");
+      }
+    }
+  });
+
+  draw();
+  requestAnimationFrame(update);
 }
 
-// ------------------
-// UPDATE UI
-// ------------------
-function updateUI() {
-  document.getElementById("money").textContent = money;
+// Check if player is near a button
+function isNear(p, btn) {
+  return p.x + p.size > btn.x &&
+         p.x < btn.x + btn.width &&
+         p.y + p.size > btn.y &&
+         p.y < btn.y + btn.height;
 }
 
-// ------------------
-// SAVE
-// ------------------
-function saveGame() {
-  localStorage.setItem("money", money);
+// Draw scene
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Snow ground
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw slopes (3D-ish gradient)
+  ctx.fillStyle = 'rgba(200,200,200,0.3)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw trees
+  trees.forEach(tree => {
+    ctx.fillStyle = 'green';
+    ctx.beginPath();
+    ctx.moveTo(tree.x, tree.y);
+    ctx.lineTo(tree.x - tree.size/2, tree.y + tree.size);
+    ctx.lineTo(tree.x + tree.size/2, tree.y + tree.size);
+    ctx.closePath();
+    ctx.fill();
+    // Tree trunk
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(tree.x - 5, tree.y + tree.size, 10, 15);
+  });
+
+  // Draw buttons
+  buttons.forEach(btn => {
+    ctx.fillStyle = btn.bought ? 'green' : 'blue';
+    ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px sans-serif';
+    ctx.fillText(`$${btn.cost}`, btn.x + 5, btn.y + 15);
+  });
+
+  // Draw player
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-// ------------------
-// BUTTONS
-// ------------------
-document.getElementById("earn").onclick = () => {
-  money += 10;
-  updateUI();
-  saveGame();
-};
+// Money increases over time
+setInterval(() => {
+  money += 1;
+  document.getElementById('money').innerText = `Money: $${money}`;
+}, 1000);
 
-document.getElementById("buildLift").onclick = () => {
-  if (money >= liftCost) {
-    money -= liftCost;
-    createLift();
-    updateUI();
-    saveGame();
-  } else {
-    alert("Not enough money!");
-  }
-};
-
-// ------------------
-// CREATE LIFT (3D object)
-// ------------------
-function createLift() {
-  const lift = new THREE.Mesh(
-    new THREE.BoxGeometry(0.5, 5, 0.5),
-    new THREE.MeshStandardMaterial({ color: 0x444444 })
-  );
-
-  lift.position.set(
-    (Math.random() - 0.5) * 20,
-    2.5,
-    (Math.random() - 0.5) * 20
-  );
-
-  scene.add(lift);
-}
-
-// ------------------
-// LOOP
-// ------------------
-function animate() {
-  function animate() {
-  requestAnimationFrame(animate);
-
-  // Movement directions
-  const forward = new THREE.Vector3();
-  camera.getWorldDirection(forward);
-  forward.y = 0;
-  forward.normalize();
-
-  const right = new THREE.Vector3();
-  right.crossVectors(camera.up, forward).normalize();
-
-  if (moveForward) camera.position.add(forward.clone().multiplyScalar(speed));
-  if (moveBackward) camera.position.add(forward.clone().multiplyScalar(-speed));
-  if (moveLeft) camera.position.add(right.clone().multiplyScalar(speed));
-  if (moveRight) camera.position.add(right.clone().multiplyScalar(-speed));
-
-  renderer.render(scene, camera);
-}
-  requestAnimationFrame(animate);
-
-  scene.rotation.y += 0.001; // slow rotate for cool effect
-
-  renderer.render(scene, camera);
-}
-
-animate();
-updateUI();
+update();
