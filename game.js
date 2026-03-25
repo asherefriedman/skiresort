@@ -1,139 +1,108 @@
-// -------------------------
-// Game variables
-// -------------------------
+// ------------------
+// THREE.JS SETUP
+// ------------------
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// ------------------
+// LIGHT
+// ------------------
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5,10,5);
+scene.add(light);
+
+// ------------------
+// GROUND (snow)
+// ------------------
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(50, 50),
+  new THREE.MeshStandardMaterial({ color: 0xffffff })
+);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+// ------------------
+// CAMERA
+// ------------------
+camera.position.set(0, 10, 15);
+
+// ------------------
+// GAME DATA
+// ------------------
 let money = 0;
-let lifts = 0;
 let liftCost = 100;
-let lodges = 0;
-let lodgeCost = 500;
-let incomePerSecond = 0;
 
-// -------------------------
-// Load saved data
-// -------------------------
+// Load save
 if (localStorage.getItem("money")) {
-  money = parseInt(localStorage.getItem("money")) || 0;
-  lifts = parseInt(localStorage.getItem("lifts")) || 0;
-  liftCost = parseInt(localStorage.getItem("liftCost")) || 100;
-  lodges = parseInt(localStorage.getItem("lodges")) || 0;
-  lodgeCost = parseInt(localStorage.getItem("lodgeCost")) || 500;
-
-  incomePerSecond = (lifts * 5) + (lodges * 20);
+  money = parseInt(localStorage.getItem("money"));
 }
 
-// -------------------------
-// Update display
-// -------------------------
-function updateDisplay() {
-  document.getElementById("money").textContent = Math.floor(money);
-  document.getElementById("lifts").textContent = lifts;
-  document.getElementById("liftCost").textContent = liftCost;
-  document.getElementById("lodges").textContent = lodges;
-  document.getElementById("lodgeCost").textContent = lodgeCost;
+// ------------------
+// UPDATE UI
+// ------------------
+function updateUI() {
+  document.getElementById("money").textContent = money;
 }
 
-// -------------------------
-// Save game
-// -------------------------
+// ------------------
+// SAVE
+// ------------------
 function saveGame() {
   localStorage.setItem("money", money);
-  localStorage.setItem("lifts", lifts);
-  localStorage.setItem("liftCost", liftCost);
-  localStorage.setItem("lodges", lodges);
-  localStorage.setItem("lodgeCost", lodgeCost);
 }
 
-// -------------------------
-// Passive income
-// -------------------------
-setInterval(() => {
-  money += incomePerSecond;
-  updateDisplay();
+// ------------------
+// BUTTONS
+// ------------------
+document.getElementById("earn").onclick = () => {
+  money += 10;
+  updateUI();
   saveGame();
-}, 1000);
-
-// -------------------------
-// Buttons
-// -------------------------
-document.addEventListener("DOMContentLoaded", () => {
-
-  document.getElementById("click").addEventListener("click", () => {
-    money += 10;
-    updateDisplay();
-    saveGame();
-  });
-
-  document.getElementById("buyLift").addEventListener("click", () => {
-    if (money >= liftCost) {
-      money -= liftCost;
-      lifts++;
-      incomePerSecond += 5;
-      liftCost = Math.floor(liftCost * 1.5);
-      updateDisplay();
-      saveGame();
-    } else {
-      alert("Not enough money!");
-    }
-  });
-
-  document.getElementById("buyLodge").addEventListener("click", () => {
-    if (money >= lodgeCost) {
-      money -= lodgeCost;
-      lodges++;
-      incomePerSecond += 20;
-      lodgeCost = Math.floor(lodgeCost * 1.7);
-      updateDisplay();
-      saveGame();
-    } else {
-      alert("Not enough money!");
-    }
-  });
-
-  document.getElementById("play-button").addEventListener("click", () => {
-    document.getElementById("home-screen").style.display = "none";
-    document.getElementById("game-screen").style.display = "block";
-    updateDisplay();
-  });
-
-});
-
-// -------------------------
-// Google Sign-In
-// -------------------------
-function handleCredentialResponse(response) {
-  const data = parseJwt(response.credential);
-  const name = data.name;
-
-  alert("Welcome " + name + "!");
-
-  localStorage.setItem("username", name);
-  document.getElementById("play-button").disabled = false;
-}
-
-// Decode token
-function parseJwt(token) {
-  const base64Url = token.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
-    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  ).join(''));
-  return JSON.parse(jsonPayload);
-}
-
-// -------------------------
-// Google init
-// -------------------------
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com",
-    callback: handleCredentialResponse
-  });
-
-  google.accounts.id.renderButton(
-    document.getElementById("g_id_signin"),
-    {
-      theme: "outline",
-      size: "large"
-    }
-  );
 };
+
+document.getElementById("buildLift").onclick = () => {
+  if (money >= liftCost) {
+    money -= liftCost;
+    createLift();
+    updateUI();
+    saveGame();
+  } else {
+    alert("Not enough money!");
+  }
+};
+
+// ------------------
+// CREATE LIFT (3D object)
+// ------------------
+function createLift() {
+  const lift = new THREE.Mesh(
+    new THREE.BoxGeometry(0.5, 5, 0.5),
+    new THREE.MeshStandardMaterial({ color: 0x444444 })
+  );
+
+  lift.position.set(
+    (Math.random() - 0.5) * 20,
+    2.5,
+    (Math.random() - 0.5) * 20
+  );
+
+  scene.add(lift);
+}
+
+// ------------------
+// LOOP
+// ------------------
+function animate() {
+  requestAnimationFrame(animate);
+
+  scene.rotation.y += 0.001; // slow rotate for cool effect
+
+  renderer.render(scene, camera);
+}
+
+animate();
+updateUI();
