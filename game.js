@@ -26,9 +26,53 @@ ground.rotation.x = -Math.PI / 2;
 scene.add(ground);
 
 // ------------------
-// CAMERA
+// CAMERA + CONTROLS
 // ------------------
-camera.position.set(0, 10, 15);
+camera.position.set(0, 2, 10);
+
+let moveForward = false;
+let moveBackward = false;
+let moveLeft = false;
+let moveRight = false;
+
+const speed = 0.15;
+
+// Track keys
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp") moveForward = true;
+  if (e.key === "ArrowDown") moveBackward = true;
+  if (e.key === "ArrowLeft") moveLeft = true;
+  if (e.key === "ArrowRight") moveRight = true;
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key === "ArrowUp") moveForward = false;
+  if (e.key === "ArrowDown") moveBackward = false;
+  if (e.key === "ArrowLeft") moveLeft = false;
+  if (e.key === "ArrowRight") moveRight = false;
+});
+
+// ------------------
+// MOUSE LOOK
+// ------------------
+let yaw = 0;
+let pitch = 0;
+
+document.addEventListener("mousemove", (e) => {
+  if (document.pointerLockElement === document.body) {
+    yaw -= e.movementX * 0.002;
+    pitch -= e.movementY * 0.002;
+
+    pitch = Math.max(-Math.PI/2, Math.min(Math.PI/2, pitch));
+
+    camera.rotation.set(pitch, yaw, 0);
+  }
+});
+
+// Click to lock mouse
+document.body.addEventListener("click", () => {
+  document.body.requestPointerLock();
+});
 
 // ------------------
 // GAME DATA
