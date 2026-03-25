@@ -138,17 +138,27 @@ function saveGame() {
   localStorage.setItem("lodgeCost", lodgeCost);
 }
 
-window.onload = function() {
+function handleCredentialResponse(response) {
+  const decoded = parseJwt(response.credential);
+  const userName = decoded.name;
+
+  alert("Welcome, " + userName + "!");
+
+  document.getElementById("play-button").disabled = false;
+}
+window.onload = function () {
   google.accounts.id.initialize({
-    client_id: "google.accounts.id.initialize({
-  client_id: "1234567890-abcdefg.apps.googleusercontent.com",
-  callback: handleCredentialResponse
-});",
+    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com",
     callback: handleCredentialResponse
   });
+
   google.accounts.id.renderButton(
     document.getElementById("g_id_signin"),
-    { theme: "outline", size: "large", shape: "rectangular", text: "signin_with" }
+    {
+      theme: "filled_blue",
+      size: "large",
+      shape: "rectangular",
+      text: "signin_with"
+    }
   );
-  google.accounts.id.prompt(); // optional, shows prompt automatically
 };
