@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCq9pz49uAjIL12MeY9vWWNEZq8kqJ_2Ck",
   authDomain: "ski-resort-tycoon-545fb.firebaseapp.com",
   projectId: "ski-resort-tycoon-545fb",
-  storageBucket: "ski-resort-tycoon-545fb.firebasestorage.app",
+  storageBucket: "ski-resort-tycoon-545fb.appspot.com",
   messagingSenderId: "358545799127",
   appId: "1:358545799127:web:6953dadd5604c3b631fd92",
   measurementId: "G-J10KDH8V7D"
