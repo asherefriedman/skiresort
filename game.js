@@ -141,6 +141,25 @@ function createLift() {
 // LOOP
 // ------------------
 function animate() {
+  function animate() {
+  requestAnimationFrame(animate);
+
+  // Movement directions
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+  forward.y = 0;
+  forward.normalize();
+
+  const right = new THREE.Vector3();
+  right.crossVectors(camera.up, forward).normalize();
+
+  if (moveForward) camera.position.add(forward.clone().multiplyScalar(speed));
+  if (moveBackward) camera.position.add(forward.clone().multiplyScalar(-speed));
+  if (moveLeft) camera.position.add(right.clone().multiplyScalar(speed));
+  if (moveRight) camera.position.add(right.clone().multiplyScalar(-speed));
+
+  renderer.render(scene, camera);
+}
   requestAnimationFrame(animate);
 
   scene.rotation.y += 0.001; // slow rotate for cool effect
