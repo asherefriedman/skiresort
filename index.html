@@ -2,22 +2,26 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ski Resort Tycoon</title>
+<title>Ski Resort Tycoon 3D</title>
 <style>
   body {
     margin: 0;
-    background: linear-gradient(to top, #87cefa, #fff); /* sky to snow */
     overflow: hidden;
     font-family: sans-serif;
+    background: #87cefa; /* sky color */
   }
   #money {
     position: absolute;
     top: 10px;
     left: 10px;
-    font-size: 20px;
-    background: rgba(255,255,255,0.7);
-    padding: 5px 10px;
-    border-radius: 5px;
+    font-size: 22px;
+    background: rgba(255,255,255,0.8);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+  canvas {
+    display: block;
   }
 </style>
 </head>
@@ -31,62 +35,123 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// Skier object
-const skier = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  width: 30,
-  height: 30,
+// Player/skier
+const player = {
+  x: canvas.width/2,
+  y: canvas.height - 150,
+  size: 30,
   color: 'red',
-  speed: 0,
-  maxSpeed: 5,
   dx: 0,
-  dy: 0
+  dy: 0,
+  maxSpeed: 4
 };
 
-// Key input
+// Money
+let money = 0;
+
+// Input
 const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
-let money = 0;
+// Ground buttons (buy points)
+const buttons = [
+  {x: 200, y: 300, width: 60, height: 20, cost: 50, type: 'Lift', bought: false},
+  {x: 600, y: 500, width: 60, height: 20, cost: 100, type: 'Upgrade', bought: false},
+  {x: 900, y: 250, width: 60, height: 20, cost: 200, type: 'Extra Lift', bought: false}
+];
 
-// Game loop
+// Trees for scenery
+const trees = [
+  {x: 400, y: 400, size: 40},
+  {x: 750, y: 350, size: 50},
+  {x: 300, y: 550, size: 35}
+];
+
+// Main update loop
 function update() {
-  // Movement logic with smooth acceleration
-  if (keys['ArrowUp']) skier.dy = Math.max(skier.dy - 0.2, -skier.maxSpeed);
-  else if (keys['ArrowDown']) skier.dy = Math.min(skier.dy + 0.2, skier.maxSpeed);
-  else skier.dy *= 0.9; // friction
+  // Smooth movement
+  if(keys['ArrowUp']) player.dy = Math.max(player.dy - 0.2, -player.maxSpeed);
+  else if(keys['ArrowDown']) player.dy = Math.min(player.dy + 0.2, player.maxSpeed);
+  else player.dy *= 0.9;
 
-  if (keys['ArrowLeft']) skier.dx = Math.max(skier.dx - 0.2, -skier.maxSpeed);
-  else if (keys['ArrowRight']) skier.dx = Math.min(skier.dx + 0.2, skier.maxSpeed);
-  else skier.dx *= 0.9; // friction
+  if(keys['ArrowLeft']) player.dx = Math.max(player.dx - 0.2, -player.maxSpeed);
+  else if(keys['ArrowRight']) player.dx = Math.min(player.dx + 0.2, player.maxSpeed);
+  else player.dx *= 0.9;
 
-  skier.x += skier.dx;
-  skier.y += skier.dy;
+  player.x += player.dx;
+  player.y += player.dy;
 
-  // Keep skier on screen
-  skier.x = Math.max(0, Math.min(canvas.width - skier.width, skier.x));
-  skier.y = Math.max(0, Math.min(canvas.height - skier.height, skier.y));
+  // Keep player in bounds
+  player.x = Math.max(0, Math.min(canvas.width - player.size, player.x));
+  player.y = Math.max(0, Math.min(canvas.height - player.size, player.y));
+
+  // Check button interaction
+  buttons.forEach(btn => {
+    if(!btn.bought && isNear(player, btn) && keys[' ']) {
+      if(money >= btn.cost) {
+        money -= btn.cost;
+        btn.bought = true;
+        alert(`Bought ${btn.type}!`);
+      } else {
+        alert("Not enough money!");
+      }
+    }
+  });
 
   draw();
   requestAnimationFrame(update);
 }
 
-// Draw everything
+// Check if player is near a button
+function isNear(p, btn) {
+  return p.x + p.size > btn.x &&
+         p.x < btn.x + btn.width &&
+         p.y + p.size > btn.y &&
+         p.y < btn.y + btn.height;
+}
+
+// Draw scene
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Background snow
+  // Snow ground
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Skier
-  ctx.fillStyle = skier.color;
-  ctx.fillRect(skier.x, skier.y, skier.width, skier.height);
+  // Draw slopes (3D-ish gradient)
+  ctx.fillStyle = 'rgba(200,200,200,0.3)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw trees
+  trees.forEach(tree => {
+    ctx.fillStyle = 'green';
+    ctx.beginPath();
+    ctx.moveTo(tree.x, tree.y);
+    ctx.lineTo(tree.x - tree.size/2, tree.y + tree.size);
+    ctx.lineTo(tree.x + tree.size/2, tree.y + tree.size);
+    ctx.closePath();
+    ctx.fill();
+    // Tree trunk
+    ctx.fillStyle = '#8B4513';
+    ctx.fillRect(tree.x - 5, tree.y + tree.size, 10, 15);
+  });
+
+  // Draw buttons
+  buttons.forEach(btn => {
+    ctx.fillStyle = btn.bought ? 'green' : 'blue';
+    ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px sans-serif';
+    ctx.fillText(`$${btn.cost}`, btn.x + 5, btn.y + 15);
+  });
+
+  // Draw player
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-// Money simulation
+// Money increases over time
 setInterval(() => {
   money += 1;
   document.getElementById('money').innerText = `Money: $${money}`;
