@@ -137,3 +137,18 @@ function saveGame() {
   localStorage.setItem("lodges", lodges);
   localStorage.setItem("lodgeCost", lodgeCost);
 }
+
+window.onload = function() {
+  google.accounts.id.initialize({
+    client_id: "google.accounts.id.initialize({
+  client_id: "1234567890-abcdefg.apps.googleusercontent.com",
+  callback: handleCredentialResponse
+});",
+    callback: handleCredentialResponse
+  });
+  google.accounts.id.renderButton(
+    document.getElementById("g_id_signin"),
+    { theme: "outline", size: "large", shape: "rectangular", text: "signin_with" }
+  );
+  google.accounts.id.prompt(); // optional, shows prompt automatically
+};
