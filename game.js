@@ -4,14 +4,21 @@
 let money = 0;
 let lifts = 0;
 let liftCost = 100;
+let lodges = 0;
+let lodgeCost = 500;
 let incomePerSecond = 0;
 
+// -------------------------
 // Load saved data
+// -------------------------
 if (localStorage.getItem("money")) {
-  money = parseInt(localStorage.getItem("money"));
-  lifts = parseInt(localStorage.getItem("lifts"));
-  liftCost = parseInt(localStorage.getItem("liftCost"));
-  incomePerSecond = lifts * 5;
+  money = parseInt(localStorage.getItem("money")) || 0;
+  lifts = parseInt(localStorage.getItem("lifts")) || 0;
+  liftCost = parseInt(localStorage.getItem("liftCost")) || 100;
+  lodges = parseInt(localStorage.getItem("lodges")) || 0;
+  lodgeCost = parseInt(localStorage.getItem("lodgeCost")) || 500;
+
+  incomePerSecond = (lifts * 5) + (lodges * 20);
 }
 
 // -------------------------
@@ -21,6 +28,19 @@ function updateDisplay() {
   document.getElementById("money").textContent = Math.floor(money);
   document.getElementById("lifts").textContent = lifts;
   document.getElementById("liftCost").textContent = liftCost;
+  document.getElementById("lodges").textContent = lodges;
+  document.getElementById("lodgeCost").textContent = lodgeCost;
+}
+
+// -------------------------
+// Save game
+// -------------------------
+function saveGame() {
+  localStorage.setItem("money", money);
+  localStorage.setItem("lifts", lifts);
+  localStorage.setItem("liftCost", liftCost);
+  localStorage.setItem("lodges", lodges);
+  localStorage.setItem("lodgeCost", lodgeCost);
 }
 
 // -------------------------
@@ -33,50 +53,64 @@ setInterval(() => {
 }, 1000);
 
 // -------------------------
-// Button actions
+// Buttons
 // -------------------------
-document.getElementById("click")?.addEventListener("click", () => {
-  money += 10;
-  updateDisplay();
-  saveGame();
-});
+document.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("buyLift")?.addEventListener("click", () => {
-  if (money >= liftCost) {
-    money -= liftCost;
-    lifts++;
-    incomePerSecond += 5;
-    liftCost = Math.floor(liftCost * 1.5);
+  document.getElementById("click").addEventListener("click", () => {
+    money += 10;
     updateDisplay();
     saveGame();
-  } else {
-    alert("Not enough money!");
-  }
-});
+  });
 
-// -------------------------
-// Save & Load
-// -------------------------
-function saveGame() {
-  localStorage.setItem("money", money);
-  localStorage.setItem("lifts", lifts);
-  localStorage.setItem("liftCost", liftCost);
-}
+  document.getElementById("buyLift").addEventListener("click", () => {
+    if (money >= liftCost) {
+      money -= liftCost;
+      lifts++;
+      incomePerSecond += 5;
+      liftCost = Math.floor(liftCost * 1.5);
+      updateDisplay();
+      saveGame();
+    } else {
+      alert("Not enough money!");
+    }
+  });
+
+  document.getElementById("buyLodge").addEventListener("click", () => {
+    if (money >= lodgeCost) {
+      money -= lodgeCost;
+      lodges++;
+      incomePerSecond += 20;
+      lodgeCost = Math.floor(lodgeCost * 1.7);
+      updateDisplay();
+      saveGame();
+    } else {
+      alert("Not enough money!");
+    }
+  });
+
+  document.getElementById("play-button").addEventListener("click", () => {
+    document.getElementById("home-screen").style.display = "none";
+    document.getElementById("game-screen").style.display = "block";
+    updateDisplay();
+  });
+
+});
 
 // -------------------------
 // Google Sign-In
 // -------------------------
 function handleCredentialResponse(response) {
-  const decoded = parseJwt(response.credential);
-  const userName = decoded.name;
-  alert(`Welcome, ${userName}! You can now play the game.`);
+  const data = parseJwt(response.credential);
+  const name = data.name;
 
-  // Enable play button
+  alert("Welcome " + name + "!");
+
+  localStorage.setItem("username", name);
   document.getElementById("play-button").disabled = false;
-  localStorage.setItem("username", userName);
 }
 
-// Decode JWT helper
+// Decode token
 function parseJwt(token) {
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -87,69 +121,11 @@ function parseJwt(token) {
 }
 
 // -------------------------
-// Home screen Play button
+// Google init
 // -------------------------
-document.getElementById("play-button").addEventListener("click", () => {
-  document.getElementById("home-screen").style.display = "none";
-  document.getElementById("game-screen").style.display = "block";
-  updateDisplay();
-});
-
-// Lodges variables
-let lodges = 0;
-let lodgeCost = 500;
-
-// Load saved lodges
-if (localStorage.getItem("lodges")) {
-  lodges = parseInt(localStorage.getItem("lodges"));
-  lodgeCost = parseInt(localStorage.getItem("lodgeCost"));
-  incomePerSecond += lodges * 20;
-}
-
-// UpdateDisplay: add lodges
-function updateDisplay() {
-  document.getElementById("money").textContent = Math.floor(money);
-  document.getElementById("lifts").textContent = lifts;
-  document.getElementById("liftCost").textContent = liftCost;
-  document.getElementById("lodges").textContent = lodges;
-  document.getElementById("lodgeCost").textContent = lodgeCost;
-}
-
-// Buy Lodge button
-document.getElementById("buyLodge")?.addEventListener("click", () => {
-  if (money >= lodgeCost) {
-    money -= lodgeCost;
-    lodges++;
-    incomePerSecond += 20; // each lodge adds $20/sec
-    lodgeCost = Math.floor(lodgeCost * 1.7);
-    updateDisplay();
-    saveGame();
-  } else {
-    alert("Not enough money for a lodge!");
-  }
-});
-
-// Save lodges
-function saveGame() {
-  localStorage.setItem("money", money);
-  localStorage.setItem("lifts", lifts);
-  localStorage.setItem("liftCost", liftCost);
-  localStorage.setItem("lodges", lodges);
-  localStorage.setItem("lodgeCost", lodgeCost);
-}
-
-function handleCredentialResponse(response) {
-  const decoded = parseJwt(response.credential);
-  const userName = decoded.name;
-
-  alert("Welcome, " + userName + "!");
-
-  document.getElementById("play-button").disabled = false;
-}
-
 window.onload = function () {
   google.accounts.id.initialize({
-    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com", // ← replace with YOUR real one
+    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com",
     callback: handleCredentialResponse
   });
 
@@ -157,11 +133,7 @@ window.onload = function () {
     document.getElementById("g_id_signin"),
     {
       theme: "outline",
-      size: "large",
-      shape: "rectangular",
-      text: "signin_with"
+      size: "large"
     }
   );
-
-  google.accounts.id.prompt();
 };
