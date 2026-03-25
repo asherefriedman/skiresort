@@ -56,3 +56,16 @@ function saveGame() {
 
 // Optional: load game manually on page load
 updateDisplay();
+
+document.getElementById("saveGame").onclick = saveGame;
+
+document.getElementById("resetGame").onclick = () => {
+  if (confirm("Are you sure you want to reset your game?")) {
+    money = 0;
+    lifts = 0;
+    liftCost = 100;
+    incomePerSecond = 0;
+    saveGame();
+    updateDisplay();
+  }
+};
