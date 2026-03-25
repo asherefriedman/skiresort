@@ -62,3 +62,12 @@ button:hover {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+#buyLodge {
+  background-color: #ff5500;
+  color: #fff;
+}
+
+#buyLodge:hover {
+  transform: scale(1.1);
+}
