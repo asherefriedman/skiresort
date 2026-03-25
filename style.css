@@ -1,57 +1,19 @@
-<style>
-  body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-  }
-
-  canvas {
-    display: block;
-  }
-
-  /* UI PANEL */
-  #ui {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 15px;
-    border-radius: 12px;
-    width: 200px;
-  }
-
-  /* TITLE */
-  #ui h2 {
-    margin: 0 0 10px 0;
-    font-size: 18px;
-  }
-
-  /* MONEY TEXT */
-  #money {
-    font-weight: bold;
-    color: #4cff4c;
-  }
-
-  /* BUTTONS */
-  button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    border: none;
-    border-radius: 8px;
-    background: #4da6ff;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    background: #1a8cff;
-  }
-
-  button:active {
-    transform: scale(0.97);
-  }
-</style>
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: sans-serif;
+  background: #87cefa; /* sky color */
+}
+#money {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 22px;
+  background: rgba(255,255,255,0.8);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+canvas {
+  display: block;
+}
