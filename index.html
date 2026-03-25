@@ -1,18 +1,39 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Ski Resort Tycoon</title>
+
   <link rel="stylesheet" href="style.css">
+
+  <!-- Makes sure JS runs after page loads -->
+  <script src="game.js" defer></script>
 </head>
+
 <body>
-  <div id="ui">
-    <h1>🎿 Ski Resort Tycoon</h1>
-    <p>Money: $<span id="money">0</span></p>
-    <button id="buyLift">Buy Ski Lift ($100)</button>
+
+  <div class="game-container">
+    <h1>🏔️ Ski Resort Tycoon</h1>
+
+    <!-- Stats -->
+    <div class="stats">
+      <p>💰 Money: $<span id="money">0</span></p>
+      <p>🎿 Ski Lifts: <span id="lifts">0</span></p>
+      <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button id="click">Sell Lift Tickets (+$10)</button>
+      <button id="buyLift">Buy Ski Lift</button>
+    </div>
+
+    <!-- Future upgrades (you can add more later) -->
+    <div class="upgrades">
+      <h2>Upgrades</h2>
+      <p>(More coming soon...)</p>
+    </div>
   </div>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-  <script src="game.js"></script>
 </body>
 </html>
