@@ -1,92 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Ski Resort Tycoon</title>
-
-  <!-- Google Sign-In -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+  <title>3D Ski Resort Tycoon</title>
   <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      background: #e8f4ff;
-    }
-
-    h1 {
-      margin-top: 40px;
-    }
-
-    button {
-      padding: 15px 25px;
-      font-size: 18px;
-      margin: 10px;
+    body { margin: 0; overflow: hidden; }
+    #ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.8);
+      padding: 10px;
       border-radius: 10px;
-      border: none;
-      background-color: #6bb3e6;
-      color: white;
-      cursor: pointer;
     }
-
-    button:disabled {
-      background-color: #aaa;
-      cursor: not-allowed;
-    }
-
-    #game-screen {
-      display: none;
-    }
-
-    #g_id_signin {
-      margin-top: 20px;
+    button {
+      padding: 10px;
+      margin: 5px;
     }
   </style>
 </head>
-
 <body>
 
-<!-- HOME SCREEN -->
-<div id="home-screen">
-  <h1>🏔 Ski Resort Tycoon</h1>
-
-  <button id="play-button" disabled>▶ Play Game</button>
-
-  <div id="g_id_signin"></div>
+<div id="ui">
+  <div>💰 Money: $<span id="money">0</span></div>
+  <button id="earn">Earn $10</button>
+  <button id="buildLift">Build Lift ($100)</button>
 </div>
 
-<!-- GAME SCREEN -->
-<div id="game-screen">
-  <h1>🏔 Ski Resort Tycoon</h1>
-
-  <p>💰 Money: $<span id="money">0</span></p>
-  <p>🎿 Lifts: <span id="lifts">0</span></p>
-  <p>🏨 Lodges: <span id="lodges">0</span></p>
-
-  <button id="click">Earn $10</button><br>
-
-  <button id="buyLift">Buy Lift ($<span id="liftCost">100</span>)</button><br>
-
-  <button id="buyLodge">Buy Lodge ($<span id="lodgeCost">500</span>)</button>
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="game.js"></script>
-
-</body>
-</html>        <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
-      </div>
-      <p>🏨 Lodges: <span id="lodges">0</span></p>
-<p>🏨 Lodge Cost: $<span id="lodgeCost">500</span></p>
-
-<button id="buyLodge">Buy Lodge</button>
-
-      <!-- Actions -->
-      <div class="actions">
-        <button id="click">Sell Lift Tickets (+$10)</button>
-        <button id="buyLift">Buy Ski Lift</button>
-      </div>
-    </div>
-  </div>
 
 </body>
 </html>
