@@ -2,8 +2,9 @@ body {
   margin: 0;
   overflow: hidden;
   font-family: sans-serif;
-  background: #87cefa; /* sky color */
+  background: #87cefa; /* sky */
 }
+
 #money {
   position: absolute;
   top: 10px;
@@ -14,6 +15,7 @@ body {
   border-radius: 6px;
   font-weight: bold;
 }
+
 canvas {
   display: block;
 }
