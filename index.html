@@ -1,59 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <meta charset="UTF-8">
   <title>🏔️ Ski Resort Tycoon</title>
+
+  <!-- Google Identity Services -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <link rel="stylesheet" href="style.css">
   <script src="game.js" defer></script>
 </head>
 <body>
-  <div id="g_id_onload"
-     data-client_id="<div id="g_id_onload"
-     data-client_id="1234567890-abcdefg.apps.googleusercontent.com"
-     data-callback="handleCredentialResponse">
-</div>"
-     data-callback="handleCredentialResponse">
-</div>
 
-<div class="google-button">
-  <div id="g_id_signin"></div>
-</div>
-  <div class="game-container">
-
+  <!-- Home Screen -->
+  <div id="home-screen" class="screen">
     <h1>🏔️ Ski Resort Tycoon</h1>
+    <div class="buttons">
+      <!-- Google Sign-In -->
+      <div id="g_id_signin"
+           data-type="standard"
+           data-shape="rectangular"
+           data-theme="filled_blue"
+           data-text="signin_with"
+           data-size="large"
+           data-logo_alignment="left"
+           data-callback="handleCredentialResponse"
+           data-client_id="YOUR_GOOGLE_CLIENT_ID">
+      </div>
 
-    <!-- Stats -->
-    <div class="stats">
-      <p>💰 Money: $<span id="money">0</span></p>
-      <p>🎿 Ski Lifts: <span id="lifts">0</span></p>
-      <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
+      <!-- Play button -->
+      <button id="play-button" disabled>▶ Play Game</button>
     </div>
-
-    <!-- Actions -->
-    <div class="actions">
-      <button id="click">Sell Lift Tickets (+$10)</button>
-      <button id="buyLift">Buy Ski Lift</button>
-    </div>
-
-    <!-- Future Upgrades -->
-    <div class="upgrades">
-      <h2>Upgrades</h2>
-      <p>More buildings coming soon…</p>
-    </div>
-
   </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen" style="display:none;">
+    <div class="game-container">
+      <h1>🏔️ Ski Resort Tycoon</h1>
+
+      <!-- Stats -->
+      <div class="stats">
+        <p>💰 Money: $<span id="money">0</span></p>
+        <p>🎿 Ski Lifts: <span id="lifts">0</span></p>
+        <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button id="click">Sell Lift Tickets (+$10)</button>
+        <button id="buyLift">Buy Ski Lift</button>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
-document.getElementById("saveGame").onclick = saveGame;
-
-document.getElementById("resetGame").onclick = () => {
-  if (confirm("Are you sure you want to reset your game?")) {
-    money = 0;
-    lifts = 0;
-    liftCost = 100;
-    incomePerSecond = 0;
-    saveGame();
-    updateDisplay();
-  }
-};
