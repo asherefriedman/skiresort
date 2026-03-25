@@ -14,19 +14,26 @@ const player = {
   maxSpeed: 4
 };
 
-// Money
+// Money system
 let money = 0;
+let incomePerSecond = 0; // Base income starts at 0
 
 // Input
 const keys = {};
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
-// Ground buttons (buy points)
+// Ground buttons (first is free)
 const buttons = [
-  {x: 200, y: 300, width: 60, height: 20, cost: 50, type: 'Lift', bought: false},
-  {x: 600, y: 500, width: 60, height: 20, cost: 100, type: 'Upgrade', bought: false},
-  {x: 900, y: 250, width: 60, height: 20, cost: 200, type: 'Extra Lift', bought: false}
+  {x: 200, y: 300, width: 60, height: 20, cost: 0, type: 'Small Lift', bought: false, income: 1},
+  {x: 600, y: 500, width: 60, height: 20, cost: 100, type: 'Ski Upgrade', bought: false, speedUpgrade: 1.5},
+  {x: 900, y: 250, width: 60, height: 20, cost: 200, type: 'Medium Lift', bought: false, income: 3}
+];
+
+// Moving lifts for decoration
+const lifts = [
+  {x: 100, y: 100, width: 40, height: 10, speed: 1},
+  {x: 400, y: 200, width: 40, height: 10, speed: 1.2}
 ];
 
 // Trees for scenery
@@ -60,7 +67,13 @@ function update() {
       if(money >= btn.cost) {
         money -= btn.cost;
         btn.bought = true;
+        if(btn.income) incomePerSecond += btn.income;
+        if(btn.speedUpgrade) player.maxSpeed *= btn.speedUpgrade;
         alert(`Bought ${btn.type}!`);
+      } else if(btn.cost === 0) { // free button
+        btn.bought = true;
+        if(btn.income) incomePerSecond += btn.income;
+        alert(`Received free ${btn.type}!`);
       } else {
         alert("Not enough money!");
       }
@@ -100,9 +113,16 @@ function draw() {
     ctx.lineTo(tree.x + tree.size/2, tree.y + tree.size);
     ctx.closePath();
     ctx.fill();
-    // Tree trunk
-    ctx.fillStyle = '#8B4513';
+    ctx.fillStyle = '#8B4513'; // trunk
     ctx.fillRect(tree.x - 5, tree.y + tree.size, 10, 15);
+  });
+
+  // Draw lifts
+  lifts.forEach(lift => {
+    ctx.fillStyle = 'grey';
+    ctx.fillRect(lift.x, lift.y, lift.width, lift.height);
+    lift.y += lift.speed;
+    if(lift.y > canvas.height) lift.y = -lift.height;
   });
 
   // Draw buttons
@@ -119,9 +139,9 @@ function draw() {
   ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
-// Money increases over time
+// Money generation from purchased items
 setInterval(() => {
-  money += 1;
+  money += incomePerSecond;
   document.getElementById('money').innerText = `Money: $${money}`;
 }, 1000);
 
