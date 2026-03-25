@@ -146,19 +146,22 @@ function handleCredentialResponse(response) {
 
   document.getElementById("play-button").disabled = false;
 }
+
 window.onload = function () {
   google.accounts.id.initialize({
-    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com",
+    client_id: "722724267613-jr2k1u6l9npv8riulkdrf1sgg2t739pm.apps.googleusercontent.com", // ← replace with YOUR real one
     callback: handleCredentialResponse
   });
 
   google.accounts.id.renderButton(
     document.getElementById("g_id_signin"),
     {
-      theme: "filled_blue",
+      theme: "outline",
       size: "large",
       shape: "rectangular",
       text: "signin_with"
     }
   );
+
+  google.accounts.id.prompt();
 };
