@@ -2,39 +2,78 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🏔️ Ski Resort Tycoon</title>
+  <title>Ski Resort Tycoon</title>
 
-  <!-- Google Identity Services -->
+  <!-- Google Sign-In -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <link rel="stylesheet" href="style.css">
-  <script src="game.js" defer></script>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #e8f4ff;
+    }
+
+    h1 {
+      margin-top: 40px;
+    }
+
+    button {
+      padding: 15px 25px;
+      font-size: 18px;
+      margin: 10px;
+      border-radius: 10px;
+      border: none;
+      background-color: #6bb3e6;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+
+    #game-screen {
+      display: none;
+    }
+
+    #g_id_signin {
+      margin-top: 20px;
+    }
+  </style>
 </head>
+
 <body>
 
-  <!-- Home Screen -->
-  <div id="home-screen" class="screen">
-    <h1>🏔️ Ski Resort Tycoon</h1>
-    <div class="buttons">
+<!-- HOME SCREEN -->
+<div id="home-screen">
+  <h1>🏔 Ski Resort Tycoon</h1>
 
-  <!-- Play button -->
   <button id="play-button" disabled>▶ Play Game</button>
-  
-  <!-- Google button goes here -->
+
   <div id="g_id_signin"></div>
 </div>
-    
-  <!-- Game Screen -->
-  <div id="game-screen" class="screen" style="display:none;">
-    <div class="game-container">
-      <h1>🏔️ Ski Resort Tycoon</h1>
 
-      <!-- Stats -->
-      <div class="stats">
-        <p>💰 Money: $<span id="money">0</span></p>
-        <p>🎿 Ski Lifts: <span id="lifts">0</span></p>
-        <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
+<!-- GAME SCREEN -->
+<div id="game-screen">
+  <h1>🏔 Ski Resort Tycoon</h1>
+
+  <p>💰 Money: $<span id="money">0</span></p>
+  <p>🎿 Lifts: <span id="lifts">0</span></p>
+  <p>🏨 Lodges: <span id="lodges">0</span></p>
+
+  <button id="click">Earn $10</button><br>
+
+  <button id="buyLift">Buy Lift ($<span id="liftCost">100</span>)</button><br>
+
+  <button id="buyLodge">Buy Lodge ($<span id="lodgeCost">500</span>)</button>
+</div>
+
+<script src="game.js"></script>
+
+</body>
+</html>        <p>💵 Lift Cost: $<span id="liftCost">100</span></p>
       </div>
       <p>🏨 Lodges: <span id="lodges">0</span></p>
 <p>🏨 Lodge Cost: $<span id="lodgeCost">500</span></p>
