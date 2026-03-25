@@ -4,10 +4,28 @@
 <meta charset="UTF-8">
 <title>Ski Resort Tycoon 3D</title>
 <link rel="stylesheet" href="style.css">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-<div id="money">Money: $0</div>
-<canvas id="gameCanvas"></canvas>
+
+<div id="loginScreen">
+  <h2>Sign In / Sign Up</h2>
+  <input type="email" id="email" placeholder="Email"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button id="emailSignIn">Sign In / Sign Up</button><br><br>
+  <button id="googleSignIn">Sign In with Google</button>
+  <div id="loginError" style="color:red;margin-top:10px;"></div>
+</div>
+
+<div id="gameScreen" style="display:none;">
+  <div id="money">Money: $0</div>
+  <canvas id="gameCanvas"></canvas>
+  <button id="signOutBtn" style="position:absolute; top:10px; right:10px;">Sign Out</button>
+</div>
+
 <script src="game.js"></script>
 </body>
 </html>
