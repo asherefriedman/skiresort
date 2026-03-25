@@ -1,10 +1,12 @@
+// -------------------------
 // Game variables
+// -------------------------
 let money = 0;
 let lifts = 0;
 let liftCost = 100;
 let incomePerSecond = 0;
 
-// Load saved data (if any)
+// Load saved data
 if (localStorage.getItem("money")) {
   money = parseInt(localStorage.getItem("money"));
   lifts = parseInt(localStorage.getItem("lifts"));
@@ -12,80 +14,83 @@ if (localStorage.getItem("money")) {
   incomePerSecond = lifts * 5;
 }
 
-// Update the HTML display
+// -------------------------
+// Update display
+// -------------------------
 function updateDisplay() {
   document.getElementById("money").textContent = Math.floor(money);
   document.getElementById("lifts").textContent = lifts;
   document.getElementById("liftCost").textContent = liftCost;
 }
 
-// Passive income every second
+// -------------------------
+// Passive income
+// -------------------------
 setInterval(() => {
   money += incomePerSecond;
   updateDisplay();
-  saveGame(); // auto-save every second
+  saveGame();
 }, 1000);
 
-// Button: Sell lift tickets (click)
-document.getElementById("click").onclick = () => {
+// -------------------------
+// Button actions
+// -------------------------
+document.getElementById("click")?.addEventListener("click", () => {
   money += 10;
   updateDisplay();
   saveGame();
-};
+});
 
-// Button: Buy a ski lift
-document.getElementById("buyLift").onclick = () => {
+document.getElementById("buyLift")?.addEventListener("click", () => {
   if (money >= liftCost) {
     money -= liftCost;
-    lifts += 1;
-    incomePerSecond += 5; // each lift adds $5/sec
-    liftCost = Math.floor(liftCost * 1.5); // price increases
+    lifts++;
+    incomePerSecond += 5;
+    liftCost = Math.floor(liftCost * 1.5);
     updateDisplay();
     saveGame();
   } else {
     alert("Not enough money!");
   }
-};
+});
 
-// Save game function
+// -------------------------
+// Save & Load
+// -------------------------
 function saveGame() {
   localStorage.setItem("money", money);
   localStorage.setItem("lifts", lifts);
   localStorage.setItem("liftCost", liftCost);
 }
 
-// Optional: load game manually on page load
-updateDisplay();
-
-document.getElementById("saveGame").onclick = saveGame;
-
-document.getElementById("resetGame").onclick = () => {
-  if (confirm("Are you sure you want to reset your game?")) {
-    money = 0;
-    lifts = 0;
-    liftCost = 100;
-    incomePerSecond = 0;
-    saveGame();
-    updateDisplay();
-  }
-};
-
+// -------------------------
+// Google Sign-In
+// -------------------------
 function handleCredentialResponse(response) {
-  // Google returns a JWT credential
   const decoded = parseJwt(response.credential);
-  const userName = decoded.name; // user’s name
-  alert("Welcome, " + userName + "! Your progress will be saved locally.");
+  const userName = decoded.name;
+  alert(`Welcome, ${userName}! You can now play the game.`);
 
-  // Optionally, store user info locally
+  // Enable play button
+  document.getElementById("play-button").disabled = false;
   localStorage.setItem("username", userName);
 }
 
-// Helper function to decode JWT
-function parseJwt (token) {
+// Decode JWT helper
+function parseJwt(token) {
   const base64Url = token.split('.')[1];
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-  }).join(''));
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''));
   return JSON.parse(jsonPayload);
 }
+
+// -------------------------
+// Home screen Play button
+// -------------------------
+document.getElementById("play-button").addEventListener("click", () => {
+  document.getElementById("home-screen").style.display = "none";
+  document.getElementById("game-screen").style.display = "block";
+  updateDisplay();
+});
