@@ -137,3 +137,47 @@ function draw() {
 
 function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
 setInterval(() => { money += (incomePerSecond/10); }, 100);
+
+// --- MOD PANEL LOGIC ---
+
+// 1. Toggle Panel Visibility
+document.getElementById('toggleMod').onclick = () => {
+    document.getElementById('modPanel').classList.toggle('active');
+};
+
+// 2. Add New Building Function
+document.getElementById('addBuildBtn').onclick = () => {
+    // Generate a unique ID (just use current timestamp)
+    const newId = Date.now();
+    
+    const newStep = {
+        id: newId,
+        x: parseInt(document.getElementById('modX').value),
+        y: parseInt(document.getElementById('modY').value),
+        cost: parseInt(document.getElementById('modCost').value),
+        label: document.getElementById('modLabel').value || "New Item",
+        type: document.getElementById('modType').value,
+        bought: false,
+        unlocked: false, // Will unlock when the "Needs ID" item is bought
+        income: parseInt(document.getElementById('modIncome').value),
+        needs: parseInt(document.getElementById('modNeeds').value)
+    };
+
+    // Add it to the main game array
+    buildSteps.push(newStep);
+
+    // Alert for confirmation
+    console.log("Mod Added:", newStep);
+    alert("Added " + newStep.label + " to the build list!");
+    
+    // Auto-unlock if the requirement is already met
+    const requirement = buildSteps.find(s => s.id === newStep.needs);
+    if (requirement && requirement.bought) {
+        newStep.unlocked = true;
+    }
+};
+
+// --- MOD TIP ---
+// To see the ID of an item you just bought, you can add this line 
+// inside your update() function where s.bought = true:
+// console.log("Just bought ID: " + s.id);
