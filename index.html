@@ -2,30 +2,43 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ski Resort Tycoon 3D</title>
-<link rel="stylesheet" href="style.css">
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+<title>Ski Resort Tycoon</title>
+<style>
+  body { margin:0; font-family:sans-serif; background:#E0F7FA; }
+  #title { text-align:center; font-size:40px; margin:20px 0; color:#333; }
+  #loginScreen { text-align:center; margin-top:20px; }
+  #loginScreen input { padding:5px; margin:5px; font-size:16px; }
+  #loginScreen button { padding:8px 16px; margin:5px; font-size:16px; cursor:pointer; }
+  #gameScreen { display:none; position:relative; }
+  #money { position:absolute; top:10px; left:10px; font-size:20px; background:rgba(255,255,255,0.7); padding:5px 10px; border-radius:5px; }
+  canvas { display:block; margin:0 auto; background:#E0F7FA; }
+</style>
 </head>
 <body>
 
+<div id="title">❄ Ski Resort Tycoon ❄</div>
+
 <div id="loginScreen">
-  <h2>Sign In / Sign Up</h2>
-  <input type="email" id="email" placeholder="Email"><br>
-  <input type="password" id="password" placeholder="Password"><br>
-  <button id="emailSignIn">Sign In / Sign Up</button><br><br>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <br>
+  <button id="emailSignIn">Sign In / Register</button>
   <button id="googleSignIn">Sign In with Google</button>
-  <div id="loginError" style="color:red;margin-top:10px;"></div>
+  <p id="loginError" style="color:red;"></p>
 </div>
 
-<div id="gameScreen" style="display:none;">
+<div id="gameScreen">
   <div id="money">Money: $0</div>
   <canvas id="gameCanvas"></canvas>
   <button id="signOutBtn" style="position:absolute; top:10px; right:10px;">Sign Out</button>
 </div>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <script src="game.js"></script>
+
 </body>
 </html>
