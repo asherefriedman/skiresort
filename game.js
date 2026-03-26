@@ -1,36 +1,20 @@
-// --- Configuration & State ---
-let canvas, ctx;
-let money = 0;
-let moneyInSafe = 0;
-
-const player = { 
-    x: 400, 
-    y: 400, 
-    size: 30, 
-    color: '#e74c3c', 
-    speed: 5 
-};
-
-// This array holds the moving chairs (the "droppers")
+let canvas, ctx, money = 0, moneyInSafe = 0, incomePerSecond = 0;
+const keys = {};
 const chairs = [];
 
-// --- Tycoon Buttons (Progression System) ---
+// Player starts as a 3D Red Cube
+const player = { x: 400, y: 400, size: 30, color: '#ff7675', speed: 5 };
+
+// Tycoon Buttons with "Next Button" logic
 const tycoonButtons = [
-  { id: 1, x: 300, y: 300, cost: 0, label: "Starter Lift", bought: false, unlocked: true, income: 5 },
-  { id: 2, x: 600, y: 400, cost: 50, label: "Ski Rack", bought: false, unlocked: false, income: 15 },
-  { id: 3, x: 400, y: 150, cost: 250, label: "Main Lodge", bought: false, unlocked: false, income: 50 },
-  { id: 4, x: 700, y: 150, cost: 1000, label: "Luxury Gondola", bought: false, unlocked: false, income: 200 }
+  { id: 1, x: 300, y: 400, cost: 0, label: "Starter Lift", bought: false, unlocked: true, income: 5, color: '#55efc4' },
+  { id: 2, x: 500, y: 400, cost: 50, label: "Ski Rack", bought: false, unlocked: false, income: 15, color: '#fab1a0' },
+  { id: 3, x: 400, y: 250, cost: 250, label: "Main Lodge", bought: false, unlocked: false, income: 50, color: '#a29bfe' }
 ];
 
 window.onload = () => {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
-    
-    // Set size and handle resizing
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
@@ -41,141 +25,115 @@ window.onload = () => {
     };
 };
 
-// Input Handling
-const keys = {};
 document.onkeydown = e => keys[e.key] = true;
 document.onkeyup = e => keys[e.key] = false;
 
-// --- Core Logic ---
+// --- 3D RENDER ENGINE ---
+function draw3DBox(x, y, w, h, depth, color) {
+    // Front Face
+    ctx.fillStyle = color;
+    ctx.fillRect(x - w/2, y - h - depth, w, h);
+    
+    // Side Face (Darker)
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(x + w/2, y - h - depth);
+    ctx.lineTo(x + w/2 + 10, y - h - depth + 5);
+    ctx.lineTo(x + w/2 + 10, y - depth + 5);
+    ctx.lineTo(x + w/2, y - depth);
+    ctx.fill();
 
-function spawnChair(startX, startY, value) {
-    chairs.push({
-        x: startX,
-        y: startY,
-        targetX: 50, // The Vault position
-        targetY: 50,
-        value: value,
-        speed: 3
-    });
+    // Bottom thickness
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(x - w/2, y - depth, w, 5);
 }
 
 function update() {
-    // 1. Movement
-    if (keys['ArrowUp'] || keys['w']) player.y -= player.speed;
-    if (keys['ArrowDown'] || keys['s']) player.y += player.speed;
-    if (keys['ArrowLeft'] || keys['a']) player.x -= player.speed;
-    if (keys['ArrowRight'] || keys['d']) player.x += player.speed;
+    // 3D Perspective movement: Y moves a bit slower than X
+    if (keys['w'] || keys['ArrowUp']) player.y -= player.speed * 0.7;
+    if (keys['s'] || keys['ArrowDown']) player.y += player.speed * 0.7;
+    if (keys['a'] || keys['ArrowLeft']) player.x -= player.speed;
+    if (keys['d'] || keys['ArrowRight']) player.x += player.speed;
 
-    // 2. Collection Vault (The Gold Pad)
-    let distToVault = Math.hypot(player.x - 50, player.y - 50);
-    if (distToVault < 60) {
-        if (moneyInSafe > 0) {
-            money += Math.floor(moneyInSafe);
-            moneyInSafe = 0;
-        }
+    // Collect Money
+    let distToSafe = Math.hypot(player.x - 70, player.y - 70);
+    if (distToSafe < 50) {
+        money += Math.floor(moneyInSafe);
+        moneyInSafe = 0;
     }
 
-    // 3. Moving the Chairs ("Droppers")
-    for (let i = chairs.length - 1; i >= 0; i--) {
-        let c = chairs[i];
-        let dx = c.targetX - c.x;
-        let dy = c.targetY - c.y;
-        let angle = Math.atan2(dy, dx);
-
-        c.x += Math.cos(angle) * c.speed;
-        c.y += Math.sin(angle) * c.speed;
-
-        // If chair reaches the vault
-        if (Math.hypot(c.x - c.targetX, c.y - c.targetY) < 10) {
-            moneyInSafe += c.value;
-            chairs.splice(i, 1);
-        }
-    }
-
-    // 4. Tycoon Button Logic
-    tycoonButtons.forEach((btn, index) => {
+    // Buy Buttons
+    tycoonButtons.forEach((btn, i) => {
         if (btn.unlocked && !btn.bought) {
-            let distToPad = Math.hypot(player.x - btn.x, player.y - btn.y);
-            if (distToPad < 40) {
+            if (Math.hypot(player.x - btn.x, player.y - btn.y) < 40) {
                 if (money >= btn.cost) {
                     money -= btn.cost;
                     btn.bought = true;
-                    // Unlock the next button
-                    if (tycoonButtons[index + 1]) {
-                        tycoonButtons[index + 1].unlocked = true;
-                    }
+                    incomePerSecond += btn.income;
+                    if (tycoonButtons[i+1]) tycoonButtons[i+1].unlocked = true;
                 }
             }
         }
     });
+
+    // Move Money Chairs
+    for (let i = chairs.length - 1; i >= 0; i--) {
+        let c = chairs[i];
+        c.x += (70 - c.x) * 0.03;
+        c.y += (70 - c.y) * 0.03;
+        if (Math.hypot(c.x - 70, c.y - 70) < 10) {
+            moneyInSafe += c.value;
+            chairs.splice(i, 1);
+        }
+    }
 }
 
 function draw() {
-    // Background (Snow)
-    ctx.fillStyle = "#f0f8ff";
+    // Clear & Snow Background
+    ctx.fillStyle = "#f0faff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw the "ATM / Safe" Vault
+    // Draw Collection Safe (Gold 3D Disk)
+    ctx.fillStyle = "rgba(0,0,0,0.1)"; // Shadow
+    ctx.beginPath(); ctx.ellipse(70, 75, 50, 25, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = "#f1c40f";
-    ctx.beginPath();
-    ctx.arc(50, 50, 50, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = "black";
-    ctx.font = "bold 12px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("COLLECT", 50, 45);
-    ctx.fillText("$" + Math.floor(moneyInSafe), 50, 65);
+    ctx.beginPath(); ctx.ellipse(70, 70, 45, 20, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = "black"; ctx.textAlign = "center";
+    ctx.fillText("SAFE: $" + Math.floor(moneyInSafe), 70, 75);
 
-    // Draw Purchase Pads
-    tycoonButtons.forEach(btn => {
-        if (btn.unlocked && !btn.bought) {
-            // Shadow
-            ctx.fillStyle = "rgba(0,0,0,0.1)";
-            ctx.beginPath();
-            ctx.ellipse(btn.x, btn.y + 5, 40, 20, 0, 0, Math.PI*2);
-            ctx.fill();
+    // Sort objects by Y so the player can walk behind buildings
+    const renderList = [...tycoonButtons, player].sort((a,b) => a.y - b.y);
 
-            // The Pad
-            ctx.fillStyle = "#00d2ff";
-            ctx.beginPath();
-            ctx.arc(btn.x, btn.y, 35, 0, Math.PI*2);
-            ctx.fill();
-            
-            // Text labels
-            ctx.fillStyle = "black";
-            ctx.fillText(btn.label, btn.x, btn.y - 50);
-            ctx.fillText("$" + btn.cost, btn.x, btn.y - 35);
-        }
-
-        // Draw the Building if bought
-        if (btn.bought) {
-            ctx.fillStyle = "#2c3e50";
-            ctx.fillRect(btn.x - 30, btn.y - 80, 60, 40);
-            ctx.fillStyle = "white";
-            ctx.font = "10px Arial";
-            ctx.fillText("LVL 1", btn.x, btn.y - 55);
+    renderList.forEach(obj => {
+        if (obj.label) { // It's a Building/Button
+            if (obj.unlocked && !obj.bought) {
+                // Draw 3D Pad
+                ctx.fillStyle = "rgba(0,0,0,0.1)";
+                ctx.beginPath(); ctx.ellipse(obj.x, obj.y + 5, 40, 20, 0, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#00d2ff";
+                ctx.beginPath(); ctx.ellipse(obj.x, obj.y, 35, 18, 0, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "black";
+                ctx.fillText(obj.label + " $" + obj.cost, obj.x, obj.y - 40);
+            }
+            if (obj.bought) {
+                // Draw Building as a 3D block
+                draw3DBox(obj.x, obj.y, 60, 40, 0, "#bdc3c7");
+            }
+        } else {
+            // It's the Player (Red 3D Cube)
+            ctx.fillStyle = "rgba(0,0,0,0.2)"; // Player Shadow
+            ctx.beginPath(); ctx.ellipse(obj.x, obj.y + 5, 20, 10, 0, 0, Math.PI*2); ctx.fill();
+            draw3DBox(obj.x, obj.y, 30, 30, 0, obj.color);
         }
     });
 
-    // Draw Moving Chairs
+    // Draw Floating Money
     chairs.forEach(c => {
-        ctx.fillStyle = "#34495e";
-        ctx.fillRect(c.x - 10, c.y - 5, 20, 10); // The Chair
         ctx.fillStyle = "gold";
-        ctx.beginPath();
-        ctx.arc(c.x, c.y, 4, 0, Math.PI*2); // The Money on the chair
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(c.x, c.y - 30, 6, 0, Math.PI*2); ctx.fill();
     });
 
-    // Draw Player
-    ctx.fillStyle = player.color;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "rgba(0,0,0,0.2)";
-    ctx.fillRect(player.x - 15, player.y - 15, player.size, player.size);
-    ctx.shadowBlur = 0;
-
-    // HUD Update
-    document.getElementById('moneyDisplay').innerText = money;
+    document.getElementById('moneyDisplay').innerText = Math.floor(money);
 }
 
 function gameLoop() {
@@ -184,11 +142,11 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Every 2 seconds, buildings send a "money chair" to the vault
+// Spawner logic
 setInterval(() => {
     tycoonButtons.forEach(btn => {
-        if (btn.bought && btn.income > 0) {
-            spawnChair(btn.x, btn.y, btn.income);
+        if (btn.bought) {
+            chairs.push({ x: btn.x, y: btn.y, value: btn.income });
         }
     });
-}, 2000);
+}, 2500);
