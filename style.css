@@ -1,66 +1,15 @@
-body, html {
-    margin: 0; padding: 0;
-    overflow: hidden;
-    background-color: #2d3436;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-#hud {
-    position: fixed; top: 20px; width: 100%;
-    display: flex; flex-direction: column; align-items: center;
-    pointer-events: none; z-index: 100;
-}
-
+body, html { margin: 0; padding: 0; overflow: hidden; background: #2d3436; font-family: sans-serif; }
+#hud { position: fixed; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; pointer-events: none; }
 .stat-container { display: flex; gap: 15px; }
+.stat-box, .zone-box { background: white; padding: 12px 30px; border-radius: 50px; border: 4px solid #0984e3; font-size: 24px; font-weight: bold; box-shadow: 0 5px 0 #0652dd; }
+.income-tag { margin-top: 10px; color: #55efc4; font-weight: bold; text-shadow: 1px 1px 2px black; }
 
-.stat-box, .zone-box {
-    background: white; padding: 12px 30px;
-    border-radius: 50px; border: 4px solid #0984e3;
-    font-size: 24px; font-weight: bold; box-shadow: 0 6px 0 #074a81;
-}
-
-.income-tag {
-    margin-top: 10px; color: #00cec9;
-    font-weight: bold; font-size: 18px;
-    text-shadow: 1px 1px 2px black;
-}
-
-.login-card {
-    background: white; padding: 60px; border-radius: 40px;
-    text-align: center; border: 8px solid #74b9ff;
-}
-
-.blue-text { color: #0984e3; }
-
-.start-btn {
-    padding: 20px 60px; font-size: 24px; border-radius: 20px;
-    border: none; background: #00cec9; color: white;
-    cursor: pointer; font-weight: bold; box-shadow: 0 8px 0 #00b894;
-    transition: 0.1s;
-}
-
-.start-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 #00b894; }
-
-#modPanel {
-    position: fixed; left: -300px; top: 0; width: 250px; height: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px; z-index: 200;
-    box-shadow: 5px 0 15px rgba(0,0,0,0.3);
-    transition: 0.3s; display: flex; flex-direction: column; gap: 10px;
-}
-
+#modPanel { position: fixed; left: -320px; top: 0; width: 280px; height: 100%; background: rgba(255,255,255,0.95); padding: 20px; z-index: 100; transition: 0.3s; display: flex; flex-direction: column; gap: 8px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); overflow-y: auto; }
 #modPanel.active { left: 0; }
+#modPanel input, #modPanel select, #modPanel textarea { padding: 8px; border: 1px solid #dfe6e9; border-radius: 5px; font-size: 12px; }
+#exportBox { height: 100px; background: #2d3436; color: #55efc4; }
 
-#modPanel label { font-size: 12px; font-weight: bold; color: #2d3436; }
-#modPanel input, #modPanel select { padding: 5px; border: 1px solid #dfe6e9; border-radius: 5px; }
-
-#addBuildBtn {
-    margin-top: 15px; padding: 10px; background: #00b894;
-    color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
-}
-
-#toggleMod {
-    position: fixed; left: 10px; bottom: 10px; z-index: 201;
-    padding: 10px 20px; border-radius: 50px; border: none;
-    background: #2d3436; color: white; cursor: pointer;
-}
+#toggleMod { position: fixed; left: 10px; bottom: 10px; z-index: 101; padding: 10px; border-radius: 5px; background: #0984e3; color: white; border: none; cursor: pointer; }
+.start-btn { padding: 20px 50px; background: #00cec9; color: white; border-radius: 15px; border: none; cursor: pointer; font-size: 20px; font-weight: bold; box-shadow: 0 6px 0 #00b894; }
+.login-card { background: white; padding: 50px; border-radius: 30px; text-align: center; }
+#loginScreen { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #74b9ff; z-index: 1000; }
