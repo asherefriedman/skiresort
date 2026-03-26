@@ -1,23 +1,38 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Ski Resort Tycoon</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div id="loginScreen">
-        <h1 style="color: #2980b9;">❄ Ski Resort Tycoon ❄</h1>
-        <button id="guestPlay" style="padding: 20px; font-size: 20px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 10px;">PLAY AS GUEST</button>
-        <p>School Chromebook Mode Active</p>
-    </div>
+body, html {
+    margin: 0; padding: 0;
+    overflow: hidden;
+    font-family: 'Arial Rounded MT Bold', sans-serif;
+    background-color: #dff9fb;
+}
 
-    <div id="gameScreen" style="display: none;">
-        <div id="hud" style="position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border: 2px solid black; z-index: 10;">
-            Money: $<span id="moneyDisplay">0</span>
-        </div>
-        <canvas id="gameCanvas"></canvas>
-    </div>
+#loginScreen {
+    position: absolute; width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    background: linear-gradient(135deg, #74b9ff, #81ecec);
+    z-index: 100;
+}
 
-    <script src="game.js"></script>
-</body>
-</html>
+.login-box {
+    background: white; padding: 40px;
+    border-radius: 20px; text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+#guestPlay {
+    padding: 15px 30px; font-size: 20px;
+    background: #0984e3; color: white;
+    border: none; border-radius: 50px; cursor: pointer;
+}
+
+#hud {
+    position: absolute; top: 20px; width: 100%;
+    display: flex; justify-content: center; pointer-events: none;
+}
+
+#moneyLabel {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 30px; border-radius: 50px;
+    font-size: 24px; border: 3px solid #00cec9;
+}
+
+canvas { display: block; }
