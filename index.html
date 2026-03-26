@@ -2,62 +2,49 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mega Ski Resort Tycoon</title>
+    <title>Ski Resort Tycoon 3D</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="loginScreen">
         <div class="login-card">
-            <h1>🏔️ MEGA SKI <span class="blue-text">RESORT</span></h1>
-            <p>10 Areas • 600+ Upgrades</p>
-            <button id="guestPlay" class="start-btn">ENTER RESORT</button>
+            <h1>🏔️ SKI RESORT <span class="blue-text">3D</span></h1>
+            <p>Reverse-Engineered Engine v1.2</p>
+            <button id="guestPlay" class="start-btn">PLAY GAME</button>
         </div>
     </div>
 
     <div id="gameScreen" style="display: none;">
         <div id="hud">
             <div class="stat-container">
-                <div class="stat-box">💰 <span id="moneyDisplay">0</span></div>
-                <div class="zone-box">📍 <span id="zoneDisplay">Starter Lodge</span></div>
+                <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
+                <div class="zone-box">📍 <span id="zoneDisplay">Lodge</span></div>
             </div>
             <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
         </div>
+
+        <div id="modPanel">
+            <h3>🛠️ MOD DEVELOPER</h3>
+            <input type="text" id="modLabel" placeholder="Item Name">
+            <select id="modType">
+                <option value="floor">Foundation</option>
+                <option value="walls">Structure</option>
+                <option value="glass">Windows</option>
+                <option value="roof">Snow Roof</option>
+            </select>
+            <input type="number" id="modCost" placeholder="Cost">
+            <input type="number" id="modX" placeholder="X Pos">
+            <input type="number" id="modY" placeholder="Y Pos">
+            <input type="number" id="modIncome" placeholder="Income">
+            <input type="number" id="modNeeds" placeholder="Previous ID">
+            <button id="addBuildBtn">➕ ADD PAD</button>
+            <button id="exportCodeBtn">💾 EXPORT CODE</button>
+            <textarea id="exportBox" readonly></textarea>
+        </div>
+        <button id="toggleMod">🛠️ DEVELOPER TOOLS</button>
+
         <canvas id="gameCanvas"></canvas>
     </div>
     <script src="game.js"></script>
-    <div id="modPanel">
-    <h3>🛠️ MOD PANEL</h3>
-    <label>Label:</label>
-    <input type="text" id="modLabel" placeholder="e.g. Luxury Bed">
-    
-    <label>Type:</label>
-    <select id="modType">
-        <option value="floor">Floor/Furniture</option>
-        <option value="walls">Walls</option>
-        <option value="roof">Roof</option>
-        <option value="glass">Windows</option>
-    </select>
-
-    <label>Cost:</label>
-    <input type="number" id="modCost" value="1000">
-
-    <label>X Coord (0-5000):</label>
-    <input type="number" id="modX" value="400">
-
-    <label>Y Coord (0-5000):</label>
-    <input type="number" id="modY" value="600">
-
-    <label>Income/sec:</label>
-    <input type="number" id="modIncome" value="50">
-
-    <label>Needs ID (Previous Item):</label>
-    <input type="number" id="modNeeds" value="1">
-
-    <button id="addBuildBtn">➕ ADD TO GAME</button>
-    <p style="font-size: 10px; color: #636e72;">Note: New items appear instantly!</p>
-</div>
-
-<button id="toggleMod">🛠️ MODS</button>
 </body>
 </html>
