@@ -26,5 +26,38 @@
         <canvas id="gameCanvas"></canvas>
     </div>
     <script src="game.js"></script>
+    <div id="modPanel">
+    <h3>🛠️ MOD PANEL</h3>
+    <label>Label:</label>
+    <input type="text" id="modLabel" placeholder="e.g. Luxury Bed">
+    
+    <label>Type:</label>
+    <select id="modType">
+        <option value="floor">Floor/Furniture</option>
+        <option value="walls">Walls</option>
+        <option value="roof">Roof</option>
+        <option value="glass">Windows</option>
+    </select>
+
+    <label>Cost:</label>
+    <input type="number" id="modCost" value="1000">
+
+    <label>X Coord (0-5000):</label>
+    <input type="number" id="modX" value="400">
+
+    <label>Y Coord (0-5000):</label>
+    <input type="number" id="modY" value="600">
+
+    <label>Income/sec:</label>
+    <input type="number" id="modIncome" value="50">
+
+    <label>Needs ID (Previous Item):</label>
+    <input type="number" id="modNeeds" value="1">
+
+    <button id="addBuildBtn">➕ ADD TO GAME</button>
+    <p style="font-size: 10px; color: #636e72;">Note: New items appear instantly!</p>
+</div>
+
+<button id="toggleMod">🛠️ MODS</button>
 </body>
 </html>
