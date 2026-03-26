@@ -2,33 +2,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ski Resort Tycoon</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="title">❄ Ski Resort Tycoon ❄</div>
+  <div id="loginScreen">
+    <div class="login-box">
+      <div id="title">❄ Ski Resort Tycoon ❄</div>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
+      <div class="auth-buttons">
+        <button id="emailSignIn">Sign In / Register</button>
+        <button id="googleSignIn">Google Sign In</button>
+      </div>
+      <p id="loginError"></p>
+    </div>
+  </div>
 
-<div id="loginScreen">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <br>
-  <button id="emailSignIn">Sign In / Register</button>
-  <button id="googleSignIn">Sign In with Google</button>
-  <p id="loginError"></p>
-</div>
+  <div id="gameScreen" style="display: none;">
+    <div id="hud">
+      <div id="moneyLabel">💰 Money: <span id="money">$0</span></div>
+      <button id="signOutBtn">Sign Out</button>
+    </div>
 
-<div id="gameScreen">
-  <div id="money">Money: $0</div>
-  <canvas id="gameCanvas"></canvas>
-  <button id="signOutBtn">Sign Out</button>
-</div>
+    <canvas id="gameCanvas"></canvas>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <div id="controls-hint">Use Arrows to move • Space to interact</div>
+  </div>
 
-<script src="game.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script src="game.js"></script>
 </body>
 </html>
