@@ -35,30 +35,29 @@ let money = 0;
 let incomePerSecond = 0;
 
 const keys = {};
-document.addEventListener('keydown', e => keys[e.key] = true);
-document.addEventListener('keyup', e => keys[e.key] = false);
+document.addEventListener('keydown', e => keys[e.key]=true);
+document.addEventListener('keyup', e => keys[e.key]=false);
 
 // ---------------- Buttons ----------------
 const buttons = [
-  {x:200, y:300, width:60, height:20, cost:0, type:'Small Lift', bought:false, income:1},
-  {x:600, y:500, width:60, height:20, cost:100, type:'Ski Upgrade', bought:false, speedUpgrade:1.5},
-  {x:900, y:250, width:60, height:20, cost:200, type:'Medium Lift', bought:false, income:3}
+  {x:200, y:300, width:80, height:30, cost:0, type:'Small Lift', bought:false, income:1},
+  {x:600, y:500, width:80, height:30, cost:100, type:'Ski Upgrade', bought:false, speedUpgrade:1.5},
+  {x:900, y:250, width:80, height:30, cost:200, type:'Medium Lift', bought:false, income:3}
 ];
 
 // ---------------- Lifts & Trees ----------------
 const lifts = [
-  {x:100, y:100, width:40, height:10, speed:1},
-  {x:400, y:200, width:40, height:10, speed:1.2}
+  {x:100, y:100, width:60, height:15, speed:1},
+  {x:400, y:200, width:60, height:15, speed:1.2}
 ];
 
 const trees = [
-  {x:400, y:400, size:40},
-  {x:750, y:350, size:50},
-  {x:300, y:550, size:35}
+  {x:400, y:400, size:50},
+  {x:750, y:350, size:60},
+  {x:300, y:550, size:45}
 ];
 
 // ---------------- Authentication ----------------
-// Email/password login
 emailSignInBtn.addEventListener('click', async () => {
   const email = emailInput.value;
   const pass = passwordInput.value;
@@ -66,32 +65,19 @@ emailSignInBtn.addEventListener('click', async () => {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(err) {
     if(err.code === 'auth/user-not-found') {
-      try {
-        await auth.createUserWithEmailAndPassword(email, pass);
-      } catch(innerErr) {
-        loginError.textContent = innerErr.message;
-        return;
-      }
-    } else {
-      loginError.textContent = err.message;
-      return;
-    }
+      try { await auth.createUserWithEmailAndPassword(email, pass); } 
+      catch(innerErr){ loginError.textContent = innerErr.message; return; }
+    } else { loginError.textContent = err.message; return; }
   }
   loginSuccess(auth.currentUser);
 });
 
-// Google login
 googleSignInBtn.addEventListener('click', async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
-  try {
-    await auth.signInWithPopup(provider);
-    loginSuccess(auth.currentUser);
-  } catch(err) {
-    loginError.textContent = err.message;
-  }
+  try { await auth.signInWithPopup(provider); loginSuccess(auth.currentUser); } 
+  catch(err){ loginError.textContent = err.message; }
 });
 
-// Sign out
 signOutBtn.addEventListener('click', async () => {
   await auth.signOut();
   loginScreen.style.display = 'block';
@@ -99,37 +85,37 @@ signOutBtn.addEventListener('click', async () => {
 });
 
 // ---------------- Login Success ----------------
-async function loginSuccess(user) {
+async function loginSuccess(user){
   loginScreen.style.display = 'none';
   gameScreen.style.display = 'block';
   await loadGame(user.uid);
   update();
-  setInterval(() => saveGame(user.uid), 5000); // auto-save every 5 seconds
+  setInterval(()=>saveGame(user.uid),5000);
 }
 
 // ---------------- Save / Load ----------------
-async function saveGame(uid) {
+async function saveGame(uid){
   const saveData = {
     money,
     incomePerSecond,
     playerX: player.x,
     playerY: player.y,
     playerSpeed: player.maxSpeed,
-    buttons: buttons.map(btn => btn.bought)
+    buttons: buttons.map(btn=>btn.bought)
   };
   await db.collection('users').doc(uid).set(saveData);
 }
 
-async function loadGame(uid) {
+async function loadGame(uid){
   const doc = await db.collection('users').doc(uid).get();
-  if(doc.exists) {
+  if(doc.exists){
     const data = doc.data();
     money = data.money || 0;
     incomePerSecond = data.incomePerSecond || 0;
     player.x = data.playerX || canvas.width/2;
     player.y = data.playerY || canvas.height-150;
     player.maxSpeed = data.playerSpeed || 4;
-    buttons.forEach((btn, i) => btn.bought = data.buttons[i] || false);
+    buttons.forEach((btn,i)=>btn.bought=data.buttons[i]||false);
   }
 }
 
@@ -138,29 +124,29 @@ function isNear(p, btn){
   return p.x+p.size>btn.x && p.x<btn.x+btn.width && p.y+p.size>btn.y && p.y<btn.y+btn.height;
 }
 
-function update() {
+function update(){
   // Smooth movement
-  if(keys['ArrowUp']) player.dy = Math.max(player.dy-0.2, -player.maxSpeed);
-  else if(keys['ArrowDown']) player.dy = Math.min(player.dy+0.2, player.maxSpeed);
-  else player.dy *= 0.9;
+  if(keys['ArrowUp']) player.dy=Math.max(player.dy-0.2,-player.maxSpeed);
+  else if(keys['ArrowDown']) player.dy=Math.min(player.dy+0.2,player.maxSpeed);
+  else player.dy*=0.9;
 
-  if(keys['ArrowLeft']) player.dx = Math.max(player.dx-0.2, -player.maxSpeed);
-  else if(keys['ArrowRight']) player.dx = Math.min(player.dx+0.2, player.maxSpeed);
-  else player.dx *= 0.9;
+  if(keys['ArrowLeft']) player.dx=Math.max(player.dx-0.2,-player.maxSpeed);
+  else if(keys['ArrowRight']) player.dx=Math.min(player.dx+0.2,player.maxSpeed);
+  else player.dx*=0.9;
 
-  player.x += player.dx;
-  player.y += player.dy;
-  player.x = Math.max(0, Math.min(canvas.width-player.size, player.x));
-  player.y = Math.max(0, Math.min(canvas.height-player.size, player.y));
+  player.x+=player.dx;
+  player.y+=player.dy;
+  player.x=Math.max(0,Math.min(canvas.width-player.size,player.x));
+  player.y=Math.max(0,Math.min(canvas.height-player.size,player.y));
 
   // Interact with buttons
-  buttons.forEach(btn => {
-    if(!btn.bought && isNear(player, btn) && keys[' ']) {
-      if(money >= btn.cost || btn.cost === 0){
-        money -= btn.cost;
-        btn.bought = true;
-        if(btn.income) incomePerSecond += btn.income;
-        if(btn.speedUpgrade) player.maxSpeed *= btn.speedUpgrade;
+  buttons.forEach(btn=>{
+    if(!btn.bought && isNear(player,btn) && keys[' ']){
+      if(money>=btn.cost || btn.cost===0){
+        money-=btn.cost;
+        btn.bought=true;
+        if(btn.income) incomePerSecond+=btn.income;
+        if(btn.speedUpgrade) player.maxSpeed*=btn.speedUpgrade;
       }
     }
   });
@@ -173,47 +159,59 @@ function update() {
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // Background
-  ctx.fillStyle = '#87CEFA';
+  // Background gradient for depth
+  const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+  grad.addColorStop(0,'#ccefff'); // sky
+  grad.addColorStop(1,'#e0f7fa'); // snow
+  ctx.fillStyle = grad;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // Trees
+  // Trees with 3D layering
   trees.forEach(tree=>{
     ctx.fillStyle='green';
     ctx.beginPath();
-    ctx.moveTo(tree.x, tree.y);
-    ctx.lineTo(tree.x-tree.size/2, tree.y+tree.size);
-    ctx.lineTo(tree.x+tree.size/2, tree.y+tree.size);
+    ctx.moveTo(tree.x,tree.y);
+    ctx.lineTo(tree.x-tree.size/2,tree.y+tree.size);
+    ctx.lineTo(tree.x+tree.size/2,tree.y+tree.size);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle='#8B4513';
-    ctx.fillRect(tree.x-5, tree.y+tree.size, 10, 15);
+    ctx.fillRect(tree.x-5,tree.y+tree.size,10,15);
   });
 
-  // Lifts
+  // Lifts with 3D shading
   lifts.forEach(lift=>{
-    ctx.fillStyle='grey';
-    ctx.fillRect(lift.x, lift.y, lift.width, lift.height);
+    const gradLift = ctx.createLinearGradient(lift.x,lift.y,lift.x,lift.y+lift.height);
+    gradLift.addColorStop(0,'#888'); // top
+    gradLift.addColorStop(1,'#555'); // bottom
+    ctx.fillStyle = gradLift;
+    ctx.fillRect(lift.x,lift.y,lift.width,lift.height);
     lift.y += lift.speed;
-    if(lift.y > canvas.height) lift.y = -lift.height;
+    if(lift.y>canvas.height) lift.y=-lift.height;
   });
 
-  // Buttons
+  // Buttons with 3D shading
   buttons.forEach(btn=>{
-    ctx.fillStyle = btn.bought ? 'green' : 'blue';
-    ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
+    const gradBtn = ctx.createLinearGradient(btn.x,btn.y,btn.x,btn.y+btn.height);
+    gradBtn.addColorStop(0, btn.bought?'#00aa00':'#3399ff'); // top
+    gradBtn.addColorStop(1, btn.bought?'#007700':'#0066cc'); // bottom
+    ctx.fillStyle = gradBtn;
+    ctx.fillRect(btn.x,btn.y,btn.width,btn.height);
+
     ctx.fillStyle='#fff';
     ctx.font='14px sans-serif';
-    ctx.fillText(btn.cost===0 ? 'FREE' : `$${btn.cost}`, btn.x+5, btn.y+15);
+    ctx.fillText(btn.cost===0?'FREE':`$${btn.cost}`,btn.x+5,btn.y+18);
   });
 
-  // Player
-  ctx.fillStyle = player.color;
-  ctx.fillRect(player.x, player.y, player.size, player.size);
+  // Player with shadow
+  ctx.fillStyle='rgba(0,0,0,0.2)';
+  ctx.fillRect(player.x+2,player.y+player.size-5,player.size,5); // shadow
+  ctx.fillStyle=player.color;
+  ctx.fillRect(player.x,player.y,player.size,player.size);
 }
 
 // ---------------- Money Timer ----------------
 setInterval(()=>{
-  money += incomePerSecond;
-  moneyDisplay.innerText = `Money: $${money}`;
+  money+=incomePerSecond;
+  moneyDisplay.innerText=`Money: $${money}`;
 },1000);
