@@ -3,42 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <title>Ski Resort Tycoon</title>
-<style>
-  body { margin:0; font-family:sans-serif; background:#E0F7FA; }
-  #title { text-align:center; font-size:40px; margin:20px 0; color:#333; }
-  #loginScreen { text-align:center; margin-top:20px; }
-  #loginScreen input { padding:5px; margin:5px; font-size:16px; }
-  #loginScreen button { padding:8px 16px; margin:5px; font-size:16px; cursor:pointer; }
-  #gameScreen { display:none; position:relative; }
-  #money { position:absolute; top:10px; left:10px; font-size:20px; background:rgba(255,255,255,0.7); padding:5px 10px; border-radius:5px; }
-  canvas { display:block; margin:0 auto; background:#E0F7FA; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div id="title">❄ Ski Resort Tycoon ❄</div>
-
-<div id="loginScreen">
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <br>
-  <button id="emailSignIn">Sign In / Register</button>
-  <button id="googleSignIn">Sign In with Google</button>
-  <p id="loginError" style="color:red;"></p>
+<!-- SIGN IN -->
+<div id="loginScreen" class="screen center">
+    <h1>Ski Resort Tycoon</h1>
+    <input type="text" id="username" placeholder="Enter username"><br><br>
+    <button onclick="login()">Sign In</button>
 </div>
 
-<div id="gameScreen">
-  <div id="money">Money: $0</div>
-  <canvas id="gameCanvas"></canvas>
-  <button id="signOutBtn" style="position:absolute; top:10px; right:10px;">Sign Out</button>
+<!-- HOME -->
+<div id="homeScreen" class="screen center">
+    <div class="title">Ski Resort Tycoon</div>
+    <button onclick="startGame()">Play</button>
 </div>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- GAME -->
+<div id="gameScreen" class="screen">
 
-<script src="game.js"></script>
+    <div id="gameUI">
+        💰 Money: <span id="money">0</span><br>
+        🎿 Lifts: <span id="lifts">0</span>
+    </div>
 
+    <div class="center">
+        <h1>Your Resort</h1>
+
+        <button onclick="earnMoney()">Sell Tickets (+10)</button><br>
+
+        <button onclick="buyLift()">Buy Lift (Cost: <span id="liftCost">100</span>)</button>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
