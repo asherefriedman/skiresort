@@ -1,91 +1,46 @@
 body {
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: #e0f7fa;
   overflow: hidden;
-  color: #2c3e50;
 }
 
-/* Login Styling */
+/* Screen Management */
 #loginScreen {
-  display: flex;
-  height: 100vh;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex; /* We change this to 'none' in JS */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+  z-index: 100;
 }
 
-.login-box {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-  text-align: center;
+#gameScreen {
+  display: none; /* We change this to 'block' in JS */
+  width: 100vw;
+  height: 100vh;
 }
 
-#title {
-  font-size: 36px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #2980b9;
-}
-
-input {
-  display: block;
-  width: 260px;
-  padding: 12px;
-  margin: 10px auto;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-}
-
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
-
-button:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-#emailSignIn { background: #3498db; color: white; }
-#googleSignIn { background: #f1f1f1; color: #555; margin-top: 10px; }
-
-/* Game UI */
 #hud {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  padding: 20px;
+  top: 10px;
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  pointer-events: none; /* Allows clicking through HUD to game */
+  justify-content: space-around;
+  pointer-events: none;
 }
 
 #moneyLabel {
-  pointer-events: auto;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(5px);
-  padding: 10px 25px;
-  border-radius: 50px;
-  font-size: 22px;
-  font-weight: bold;
+  background: white;
+  padding: 10px;
+  border-radius: 20px;
   border: 2px solid #3498db;
+  pointer-events: auto;
 }
 
-#signOutBtn { pointer-events: auto; background: #e74c3c; color: white; }
-
-#controls-hint {
-  position: absolute;
-  bottom: 20px;
-  width: 100%;
-  text-align: center;
-  color: #7f8c8d;
-  font-size: 14px;
+canvas {
+  display: block;
 }
-
-canvas { display: block; background: #fff; }
