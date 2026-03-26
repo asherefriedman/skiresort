@@ -1,45 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ski Resort Tycoon</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Ski Resort Tycoon</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <div id="loginScreen">
-    <div class="login-box">
-      <div id="title">❄ Ski Resort Tycoon ❄</div>
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
-      <div class="auth-buttons">
-        <button id="emailSignIn">Sign In / Register</button>
-        <button id="googleSignIn">Google Sign In</button>
-      </div>
-      <p id="loginError"></p>
-    </div>
-  </div>
-<div class="auth-buttons">
-  <button id="emailSignIn">Sign In / Register</button>
-  <button id="googleSignIn">Google Sign In</button>
-  <button id="guestPlay" style="background: #95a5a6; color: white;">Play Offline (Guest)</button>
-</div>
-  <div id="gameScreen" style="display: none;">
-    <div id="hud">
-      <div id="moneyLabel">💰 Money: <span id="money">$0</span></div>
-      <button id="signOutBtn">Sign Out</button>
+    <div id="loginScreen">
+        <h1 style="color: #2980b9;">❄ Ski Resort Tycoon ❄</h1>
+        <button id="guestPlay" style="padding: 20px; font-size: 20px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 10px;">PLAY AS GUEST</button>
+        <p>School Chromebook Mode Active</p>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <div id="gameScreen" style="display: none;">
+        <div id="hud" style="position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border: 2px solid black; z-index: 10;">
+            Money: $<span id="moneyDisplay">0</span>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
 
-    <div id="controls-hint">Use Arrows to move • Space to interact</div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-  <script src="game.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
