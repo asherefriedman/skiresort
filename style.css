@@ -1,46 +1,23 @@
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #e0f7fa;
-  overflow: hidden;
-}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ski Resort Tycoon</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginScreen">
+        <h1 style="color: #2980b9;">❄ Ski Resort Tycoon ❄</h1>
+        <button id="guestPlay" style="padding: 20px; font-size: 20px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 10px;">PLAY AS GUEST</button>
+        <p>School Chromebook Mode Active</p>
+    </div>
 
-/* Screen Management */
-#loginScreen {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: white;
-  display: flex; /* We change this to 'none' in JS */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
+    <div id="gameScreen" style="display: none;">
+        <div id="hud" style="position: absolute; top: 10px; left: 10px; background: white; padding: 10px; border: 2px solid black; z-index: 10;">
+            Money: $<span id="moneyDisplay">0</span>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
 
-#gameScreen {
-  display: none; /* We change this to 'block' in JS */
-  width: 100vw;
-  height: 100vh;
-}
-
-#hud {
-  position: absolute;
-  top: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  pointer-events: none;
-}
-
-#moneyLabel {
-  background: white;
-  padding: 10px;
-  border-radius: 20px;
-  border: 2px solid #3498db;
-  pointer-events: auto;
-}
-
-canvas {
-  display: block;
-}
+    <script src="game.js"></script>
+</body>
+</html>
