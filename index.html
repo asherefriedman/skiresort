@@ -1,48 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Ski Resort Tycoon</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Ski Resort Tycoon</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen" class="screen center">
-    <h1>Ski Resort Tycoon</h1>
-    <input type="text" id="username" placeholder="Enter username"><br><br>
-    <button onclick="login()">Sign In</button>
+<div id="title">❄ Ski Resort Tycoon ❄</div>
+
+<div id="loginScreen">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+  <br>
+  <button id="emailSignIn">Sign In / Register</button>
+  <button id="googleSignIn">Sign In with Google</button>
+  <p id="loginError"></p>
 </div>
 
-<!-- HOME -->
-<div id="homeScreen" class="screen center">
-    <div class="title">Ski Resort Tycoon</div>
-    <button onclick="startGame()">Play</button>
+<div id="gameScreen">
+  <div id="money">Money: $0</div>
+  <canvas id="gameCanvas"></canvas>
+  <button id="signOutBtn">Sign Out</button>
 </div>
 
-<!-- GAME -->
-<div id="gameScreen" class="screen">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <!-- UI -->
-    <div id="gameUI">
-        💰 Money: <span id="money">0</span><br>
-        🎿 Lifts: <span id="lifts">0</span>
-    </div>
-
-    <!-- GAME WORLD -->
-    <div id="gameWorld">
-        <div id="player"></div>
-    </div>
-
-    <!-- ACTIONS -->
-    <div class="center">
-        <button onclick="earnMoney()">Sell Tickets (+10)</button>
-        <button onclick="buyLift()">Buy Lift (<span id="liftCost">100</span>)</button>
-    </div>
-
-</div>
-
-<script src="script.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
