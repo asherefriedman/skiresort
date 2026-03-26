@@ -21,6 +21,7 @@ const emailSignInBtn = document.getElementById('emailSignIn');
 const googleSignInBtn = document.getElementById('googleSignIn');
 const loginError = document.getElementById('loginError');
 const signOutBtn = document.getElementById('signOutBtn');
+const moneyDisplay = document.getElementById('money');
 
 // ---------------- Canvas ----------------
 const canvas = document.getElementById('gameCanvas');
@@ -34,15 +35,17 @@ let money = 0;
 let incomePerSecond = 0;
 
 const keys = {};
-document.addEventListener('keydown', e => keys[e.key]=true);
-document.addEventListener('keyup', e => keys[e.key]=false);
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
 
+// ---------------- Buttons ----------------
 const buttons = [
   {x:200, y:300, width:60, height:20, cost:0, type:'Small Lift', bought:false, income:1},
   {x:600, y:500, width:60, height:20, cost:100, type:'Ski Upgrade', bought:false, speedUpgrade:1.5},
   {x:900, y:250, width:60, height:20, cost:200, type:'Medium Lift', bought:false, income:3}
 ];
 
+// ---------------- Lifts & Trees ----------------
 const lifts = [
   {x:100, y:100, width:40, height:10, speed:1},
   {x:400, y:200, width:40, height:10, speed:1.2}
@@ -55,6 +58,7 @@ const trees = [
 ];
 
 // ---------------- Authentication ----------------
+// Email/password login
 emailSignInBtn.addEventListener('click', async () => {
   const email = emailInput.value;
   const pass = passwordInput.value;
@@ -76,16 +80,18 @@ emailSignInBtn.addEventListener('click', async () => {
   loginSuccess(auth.currentUser);
 });
 
+// Google login
 googleSignInBtn.addEventListener('click', async () => {
   const provider = new firebase.auth.GoogleAuthProvider();
   try {
-    const userCredential = await auth.signInWithPopup(provider);
-    loginSuccess(userCredential.user);
+    await auth.signInWithPopup(provider);
+    loginSuccess(auth.currentUser);
   } catch(err) {
     loginError.textContent = err.message;
   }
 });
 
+// Sign out
 signOutBtn.addEventListener('click', async () => {
   await auth.signOut();
   loginScreen.style.display = 'block';
@@ -98,7 +104,7 @@ async function loginSuccess(user) {
   gameScreen.style.display = 'block';
   await loadGame(user.uid);
   update();
-  setInterval(() => saveGame(user.uid), 5000);
+  setInterval(() => saveGame(user.uid), 5000); // auto-save every 5 seconds
 }
 
 // ---------------- Save / Load ----------------
@@ -109,7 +115,7 @@ async function saveGame(uid) {
     playerX: player.x,
     playerY: player.y,
     playerSpeed: player.maxSpeed,
-    buttons: buttons.map(btn=>btn.bought)
+    buttons: buttons.map(btn => btn.bought)
   };
   await db.collection('users').doc(uid).set(saveData);
 }
@@ -118,12 +124,12 @@ async function loadGame(uid) {
   const doc = await db.collection('users').doc(uid).get();
   if(doc.exists) {
     const data = doc.data();
-    money = data.money;
-    incomePerSecond = data.incomePerSecond;
-    player.x = data.playerX;
-    player.y = data.playerY;
-    player.maxSpeed = data.playerSpeed;
-    buttons.forEach((btn,i)=>btn.bought = data.buttons[i]);
+    money = data.money || 0;
+    incomePerSecond = data.incomePerSecond || 0;
+    player.x = data.playerX || canvas.width/2;
+    player.y = data.playerY || canvas.height-150;
+    player.maxSpeed = data.playerSpeed || 4;
+    buttons.forEach((btn, i) => btn.bought = data.buttons[i] || false);
   }
 }
 
@@ -133,26 +139,28 @@ function isNear(p, btn){
 }
 
 function update() {
-  if(keys['ArrowUp']) player.dy=Math.max(player.dy-0.2,-player.maxSpeed);
-  else if(keys['ArrowDown']) player.dy=Math.min(player.dy+0.2,player.maxSpeed);
-  else player.dy*=0.9;
+  // Smooth movement
+  if(keys['ArrowUp']) player.dy = Math.max(player.dy-0.2, -player.maxSpeed);
+  else if(keys['ArrowDown']) player.dy = Math.min(player.dy+0.2, player.maxSpeed);
+  else player.dy *= 0.9;
 
-  if(keys['ArrowLeft']) player.dx=Math.max(player.dx-0.2,-player.maxSpeed);
-  else if(keys['ArrowRight']) player.dx=Math.min(player.dx+0.2,player.maxSpeed);
-  else player.dx*=0.9;
+  if(keys['ArrowLeft']) player.dx = Math.max(player.dx-0.2, -player.maxSpeed);
+  else if(keys['ArrowRight']) player.dx = Math.min(player.dx+0.2, player.maxSpeed);
+  else player.dx *= 0.9;
 
-  player.x+=player.dx;
-  player.y+=player.dy;
-  player.x=Math.max(0,Math.min(canvas.width-player.size,player.x));
-  player.y=Math.max(0,Math.min(canvas.height-player.size,player.y));
+  player.x += player.dx;
+  player.y += player.dy;
+  player.x = Math.max(0, Math.min(canvas.width-player.size, player.x));
+  player.y = Math.max(0, Math.min(canvas.height-player.size, player.y));
 
-  buttons.forEach(btn=>{
-    if(!btn.bought && isNear(player,btn) && keys[' ']){
-      if(money>=btn.cost || btn.cost===0){
-        money-=btn.cost;
-        btn.bought=true;
-        if(btn.income) incomePerSecond+=btn.income;
-        if(btn.speedUpgrade) player.maxSpeed*=btn.speedUpgrade;
+  // Interact with buttons
+  buttons.forEach(btn => {
+    if(!btn.bought && isNear(player, btn) && keys[' ']) {
+      if(money >= btn.cost || btn.cost === 0){
+        money -= btn.cost;
+        btn.bought = true;
+        if(btn.income) incomePerSecond += btn.income;
+        if(btn.speedUpgrade) player.maxSpeed *= btn.speedUpgrade;
       }
     }
   });
@@ -161,44 +169,51 @@ function update() {
   requestAnimationFrame(update);
 }
 
+// ---------------- Draw ----------------
 function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='rgba(200,200,200,0.3)'; ctx.fillRect(0,0,canvas.width,canvas.height);
 
+  // Background
+  ctx.fillStyle = '#87CEFA';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Trees
   trees.forEach(tree=>{
     ctx.fillStyle='green';
     ctx.beginPath();
-    ctx.moveTo(tree.x,tree.y);
-    ctx.lineTo(tree.x-tree.size/2,tree.y+tree.size);
-    ctx.lineTo(tree.x+tree.size/2,tree.y+tree.size);
+    ctx.moveTo(tree.x, tree.y);
+    ctx.lineTo(tree.x-tree.size/2, tree.y+tree.size);
+    ctx.lineTo(tree.x+tree.size/2, tree.y+tree.size);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle='#8B4513';
-    ctx.fillRect(tree.x-5,tree.y+tree.size,10,15);
+    ctx.fillRect(tree.x-5, tree.y+tree.size, 10, 15);
   });
 
+  // Lifts
   lifts.forEach(lift=>{
     ctx.fillStyle='grey';
-    ctx.fillRect(lift.x,lift.y,lift.width,lift.height);
-    lift.y+=lift.speed;
-    if(lift.y>canvas.height) lift.y=-lift.height;
+    ctx.fillRect(lift.x, lift.y, lift.width, lift.height);
+    lift.y += lift.speed;
+    if(lift.y > canvas.height) lift.y = -lift.height;
   });
 
+  // Buttons
   buttons.forEach(btn=>{
-    ctx.fillStyle=btn.bought?'green':'blue';
-    ctx.fillRect(btn.x,btn.y,btn.width,btn.height);
+    ctx.fillStyle = btn.bought ? 'green' : 'blue';
+    ctx.fillRect(btn.x, btn.y, btn.width, btn.height);
     ctx.fillStyle='#fff';
     ctx.font='14px sans-serif';
-    ctx.fillText(`$${btn.cost}`,btn.x+5,btn.y+15);
+    ctx.fillText(btn.cost===0 ? 'FREE' : `$${btn.cost}`, btn.x+5, btn.y+15);
   });
 
-  ctx.fillStyle=player.color;
-  ctx.fillRect(player.x,player.y,player.size,player.size);
+  // Player
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.size, player.size);
 }
 
 // ---------------- Money Timer ----------------
 setInterval(()=>{
-  money+=incomePerSecond;
-  document.getElementById('money').innerText=`Money: $${money}`;
+  money += incomePerSecond;
+  moneyDisplay.innerText = `Money: $${money}`;
 },1000);
