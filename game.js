@@ -33,8 +33,9 @@ canvas.height = window.innerHeight;
 const player = { x: canvas.width/2, y: canvas.height-150, size:30, color:'red', dx:0, dy:0, maxSpeed:4 };
 let money = 0;
 let incomePerSecond = 0;
-
 const keys = {};
+
+// ---------------- Event Listeners ----------------
 document.addEventListener('keydown', e => keys[e.key]=true);
 document.addEventListener('keyup', e => keys[e.key]=false);
 
@@ -64,8 +65,8 @@ emailSignInBtn.addEventListener('click', async () => {
   try {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(err) {
-    if(err.code === 'auth/user-not-found') {
-      try { await auth.createUserWithEmailAndPassword(email, pass); } 
+    if(err.code === 'auth/user-not-found'){
+      try { await auth.createUserWithEmailAndPassword(email, pass); }
       catch(innerErr){ loginError.textContent = innerErr.message; return; }
     } else { loginError.textContent = err.message; return; }
   }
@@ -80,14 +81,14 @@ googleSignInBtn.addEventListener('click', async () => {
 
 signOutBtn.addEventListener('click', async () => {
   await auth.signOut();
-  loginScreen.style.display = 'block';
-  gameScreen.style.display = 'none';
+  loginScreen.style.display='block';
+  gameScreen.style.display='none';
 });
 
 // ---------------- Login Success ----------------
 async function loginSuccess(user){
-  loginScreen.style.display = 'none';
-  gameScreen.style.display = 'block';
+  loginScreen.style.display='none';
+  gameScreen.style.display='block';
   await loadGame(user.uid);
   update();
   setInterval(()=>saveGame(user.uid),5000);
@@ -120,9 +121,7 @@ async function loadGame(uid){
 }
 
 // ---------------- Game Functions ----------------
-function isNear(p, btn){
-  return p.x+p.size>btn.x && p.x<btn.x+btn.width && p.y+p.size>btn.y && p.y<btn.y+btn.height;
-}
+function isNear(p, btn){ return p.x+p.size>btn.x && p.x<btn.x+btn.width && p.y+p.size>btn.y && p.y<btn.y+btn.height; }
 
 function update(){
   // Smooth movement
@@ -166,7 +165,7 @@ function draw(){
   ctx.fillStyle = grad;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // Trees with 3D layering
+  // Trees
   trees.forEach(tree=>{
     ctx.fillStyle='green';
     ctx.beginPath();
@@ -179,33 +178,32 @@ function draw(){
     ctx.fillRect(tree.x-5,tree.y+tree.size,10,15);
   });
 
-  // Lifts with 3D shading
+  // Lifts
   lifts.forEach(lift=>{
     const gradLift = ctx.createLinearGradient(lift.x,lift.y,lift.x,lift.y+lift.height);
-    gradLift.addColorStop(0,'#888'); // top
-    gradLift.addColorStop(1,'#555'); // bottom
-    ctx.fillStyle = gradLift;
+    gradLift.addColorStop(0,'#888');
+    gradLift.addColorStop(1,'#555');
+    ctx.fillStyle=gradLift;
     ctx.fillRect(lift.x,lift.y,lift.width,lift.height);
     lift.y += lift.speed;
     if(lift.y>canvas.height) lift.y=-lift.height;
   });
 
-  // Buttons with 3D shading
+  // Buttons
   buttons.forEach(btn=>{
     const gradBtn = ctx.createLinearGradient(btn.x,btn.y,btn.x,btn.y+btn.height);
-    gradBtn.addColorStop(0, btn.bought?'#00aa00':'#3399ff'); // top
-    gradBtn.addColorStop(1, btn.bought?'#007700':'#0066cc'); // bottom
-    ctx.fillStyle = gradBtn;
+    gradBtn.addColorStop(0, btn.bought?'#00aa00':'#3399ff');
+    gradBtn.addColorStop(1, btn.bought?'#007700':'#0066cc');
+    ctx.fillStyle=gradBtn;
     ctx.fillRect(btn.x,btn.y,btn.width,btn.height);
-
     ctx.fillStyle='#fff';
     ctx.font='14px sans-serif';
     ctx.fillText(btn.cost===0?'FREE':`$${btn.cost}`,btn.x+5,btn.y+18);
   });
 
-  // Player with shadow
-  ctx.fillStyle='rgba(0,0,0,0.2)';
-  ctx.fillRect(player.x+2,player.y+player.size-5,player.size,5); // shadow
+  // Player
+  ctx.fillStyle='rgba(0,0,0,0.2)'; // shadow
+  ctx.fillRect(player.x+2,player.y+player.size-5,player.size,5);
   ctx.fillStyle=player.color;
   ctx.fillRect(player.x,player.y,player.size,player.size);
 }
