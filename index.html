@@ -2,20 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ski Resort Tycoon: World Expansion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Ski Resort Tycoon</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="loginScreen">
         <div class="login-card">
-            <h1>❄️ SKI RESORT <span class="subtitle">3D</span></h1>
-            <button id="guestPlay" class="primary-btn">START TYCOON</button>
+            <h1>🏔️ MEGA SKI <span class="blue-text">RESORT</span></h1>
+            <p>10 Areas • 600+ Upgrades</p>
+            <button id="guestPlay" class="start-btn">ENTER RESORT</button>
         </div>
     </div>
 
     <div id="gameScreen" style="display: none;">
         <div id="hud">
-            <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
+            <div class="stat-container">
+                <div class="stat-box">💰 <span id="moneyDisplay">0</span></div>
+                <div class="zone-box">📍 <span id="zoneDisplay">Starter Lodge</span></div>
+            </div>
+            <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
         </div>
         <canvas id="gameCanvas"></canvas>
     </div>
