@@ -59,16 +59,21 @@ emailSignInBtn.addEventListener('click', async () => {
   const email = emailInput.value;
   const pass = passwordInput.value;
   try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, pass)
-      .catch(async err => {
-        if(err.code === 'auth/user-not-found') {
-          return await auth.createUserWithEmailAndPassword(email, pass);
-        } else throw err;
-      });
-    loginSuccess(userCredential.user);
+    await auth.signInWithEmailAndPassword(email, pass);
   } catch(err) {
-    loginError.textContent = err.message;
+    if(err.code === 'auth/user-not-found') {
+      try {
+        await auth.createUserWithEmailAndPassword(email, pass);
+      } catch(innerErr) {
+        loginError.textContent = innerErr.message;
+        return;
+      }
+    } else {
+      loginError.textContent = err.message;
+      return;
+    }
   }
+  loginSuccess(auth.currentUser);
 });
 
 googleSignInBtn.addEventListener('click', async () => {
