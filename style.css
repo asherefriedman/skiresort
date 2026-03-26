@@ -1,61 +1,91 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #dff6ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #e0f7fa;
   overflow: hidden;
+  color: #2c3e50;
+}
+
+/* Login Styling */
+#loginScreen {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+}
+
+.login-box {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  text-align: center;
 }
 
 #title {
-  text-align: center;
-  font-size: 42px;
-  margin: 15px 0;
-  color: #222;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2980b9;
 }
 
-#loginScreen {
-  text-align: center;
-}
-
-#loginScreen input {
-  padding: 8px;
-  margin: 5px;
-  font-size: 16px;
-}
-
-#loginScreen button {
-  padding: 10px 18px;
-  margin: 5px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-#loginError {
-  color: red;
-}
-
-#gameScreen {
-  display: none;
-  position: relative;
-}
-
-#money {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 20px;
-  background: rgba(255,255,255,0.7);
-  padding: 5px 10px;
-  border-radius: 5px;
-  z-index: 2;
-}
-
-#signOutBtn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-}
-
-canvas {
+input {
   display: block;
+  width: 260px;
+  padding: 12px;
+  margin: 10px auto;
+  border: 2px solid #ddd;
+  border-radius: 8px;
 }
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+#emailSignIn { background: #3498db; color: white; }
+#googleSignIn { background: #f1f1f1; color: #555; margin-top: 10px; }
+
+/* Game UI */
+#hud {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none; /* Allows clicking through HUD to game */
+}
+
+#moneyLabel {
+  pointer-events: auto;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(5px);
+  padding: 10px 25px;
+  border-radius: 50px;
+  font-size: 22px;
+  font-weight: bold;
+  border: 2px solid #3498db;
+}
+
+#signOutBtn { pointer-events: auto; background: #e74c3c; color: white; }
+
+#controls-hint {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+canvas { display: block; background: #fff; }
