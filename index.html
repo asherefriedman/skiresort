@@ -8,7 +8,7 @@
 
 <body>
 
-<!-- SIGN IN -->
+<!-- LOGIN -->
 <div id="loginScreen" class="screen center">
     <h1>Ski Resort Tycoon</h1>
     <input type="text" id="username" placeholder="Enter username"><br><br>
@@ -24,17 +24,21 @@
 <!-- GAME -->
 <div id="gameScreen" class="screen">
 
+    <!-- UI -->
     <div id="gameUI">
         💰 Money: <span id="money">0</span><br>
         🎿 Lifts: <span id="lifts">0</span>
     </div>
 
+    <!-- GAME WORLD -->
+    <div id="gameWorld">
+        <div id="player"></div>
+    </div>
+
+    <!-- ACTIONS -->
     <div class="center">
-        <h1>Your Resort</h1>
-
-        <button onclick="earnMoney()">Sell Tickets (+10)</button><br>
-
-        <button onclick="buyLift()">Buy Lift (Cost: <span id="liftCost">100</span>)</button>
+        <button onclick="earnMoney()">Sell Tickets (+10)</button>
+        <button onclick="buyLift()">Buy Lift (<span id="liftCost">100</span>)</button>
     </div>
 
 </div>
