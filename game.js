@@ -1,10 +1,10 @@
-// --- CORE VARIABLES ---
+// --- CORE GLOBALS ---
 let scene, camera, renderer, player, wallet = 200, income = 0;
 let activePad = null, gps, isJumping = false, yVel = 0;
 let moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 1. THE MASSIVE BUILD LIST (25+ STEPS) ---
+// --- 1. THE FULL 28-STEP LIST (Restored & Verified) ---
 const buildSteps = [
     { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 5, w: 40, d: 40 },
     { id: 2, x: 12, z: 8, cost: 100, label: "Reception Desk", type: "furniture", mat: 0x34495e, inc: 8, w: 10, d: 3, needs: 1 },
@@ -36,143 +36,109 @@ const buildSteps = [
     { id: 28, x: 200, z: 0, cost: 200000, label: "Mountain Sign", type: "furniture", mat: 0xf1c40f, inc: 8000, w: 10, d: 2, needs: 27 }
 ];
 
-// --- 2. INITIALIZATION ---
+// --- 2. STARTUP LOGIC ---
 function startGame() {
-    document.getElementById('startScreen').style.display = 'none';
+    const screen = document.getElementById('startScreen');
+    if(screen) screen.style.display = 'none';
     document.getElementById('gui').style.display = 'block';
     init();
 }
 
 function init() {
+    // Basic Scene Setup
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
-    scene.fog = new THREE.Fog(0x81ecec, 10, 1200);
+    scene.fog = new THREE.Fog(0x81ecec, 1, 2000);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 5000);
     renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-    let sun = new THREE.DirectionalLight(0xffffff, 1.2);
-    sun.position.set(50, 100, 50);
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+    sun.position.set(100, 200, 100);
     scene.add(sun);
 
-    // Island Base
-    const island = new THREE.Mesh(new THREE.CylinderGeometry(600, 620, 3, 64), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
-    island.position.y = -1.5;
+    // Static Island
+    const islandGeo = new THREE.CylinderGeometry(800, 820, 5, 32);
+    const islandMat = new THREE.MeshStandardMaterial({ color: 0x2ecc71 });
+    const island = new THREE.Mesh(islandGeo, islandMat);
+    island.position.y = -2.5;
     scene.add(island);
 
-    // Sea Base
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(20000, 20000), new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.7 }));
-    sea.rotation.x = -Math.PI/2;
-    sea.position.y = -2.5;
-    scene.add(sea);
-
-    // Player Setup
+    // Player
     player = new THREE.Group();
-    const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
-    pMesh.position.y = 1.75;
-    player.add(pMesh);
+    const pBody = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
+    pBody.position.y = 1.75;
+    player.add(pBody);
     scene.add(player);
-    player.position.set(0, 5, 40); 
+    player.position.set(0, 10, 40); // High spawn to avoid falling through
 
-    gps = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5 }));
+    // GPS Beam
+    gps = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5 }));
     scene.add(gps);
 
+    // Load Data
     initSaveSystem();
 
-    // Force build the first item if starting fresh
-    if (!buildSteps.find(s => s.bought)) {
-        let first = buildSteps[0];
-        first.bought = true;
-        spawnObject(first);
-        income = first.inc;
+    // Force First Build if empty
+    const anyBought = buildSteps.some(s => s.bought);
+    if (!anyBought) {
+        buildSteps[0].bought = true;
+        spawnObject(buildSteps[0]);
     }
 
     refreshPads();
     animate();
 }
 
-// --- 3. PHYSICS & COLLISIONS ---
-function checkCollision(nx, nz) {
-    if (player.position.y > 2.8) return false; // Allowed to jump over stuff
-    for (let b of buildings) {
-        if (b.type === "walls" || b.type === "furniture" || b.type === "palm" || b.type === "nature") {
-            let buffer = 1.3;
-            if (nx > b.x - (b.w/2 + buffer) && nx < b.x + (b.w/2 + buffer) &&
-                nz > b.z - (b.d/2 + buffer) && nz < b.z + (b.d/2 + buffer)) return true;
-        }
-    }
-    return false;
-}
-
-// --- 4. ADVANCED SPAWNER (THE RESTORED LOGIC) ---
+// --- 3. THE "ALL-IN-ONE" SPAWNER ---
 function spawnObject(s) {
+    if (!s) return;
     const group = new THREE.Group();
     let mesh;
     const isGlass = s.mat === 0x81ecec;
-    const mat = new THREE.MeshStandardMaterial({ color: s.mat, roughness: 0.8, transparent: isGlass, opacity: isGlass ? 0.4 : 1.0 });
+    const mat = new THREE.MeshStandardMaterial({ color: s.mat, transparent: isGlass, opacity: isGlass ? 0.4 : 1.0 });
 
-    if (s.type === "floor") {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 1.2, s.d), mat);
-        mesh.position.y = 0.6;
-    } else if (s.type === "bridge") {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 2.5, s.d), mat);
-        mesh.position.y = 1.25;
+    if (s.type === "floor" || s.type === "bridge") {
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.type === "bridge" ? 2.5 : 1.2, s.d), mat);
     } else if (s.type === "palm") {
-        // Build a proper tree
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 8, 8), new THREE.MeshStandardMaterial({ color: 0x5d4037 }));
-        trunk.position.y = 4;
-        group.add(trunk);
-        mesh = new THREE.Mesh(new THREE.SphereGeometry(s.w * 2.5, 8, 8), mat);
-        mesh.position.y = 9;
-    } else if (s.type === "nature") {
-        mesh = new THREE.Mesh(new THREE.SphereGeometry(s.w, 8, 8), mat);
-        mesh.position.y = s.w;
+        const t = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 8), new THREE.MeshStandardMaterial({ color: 0x5d4037 }));
+        t.position.y = 4; group.add(t);
+        mesh = new THREE.Mesh(new THREE.SphereGeometry(s.w * 2), mat);
+        mesh.position.y = 8;
     } else if (s.type === "rock") {
-        mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(s.w, 0), mat);
-        mesh.position.y = s.w/2;
-    } else if (s.type === "furniture") {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/3 + 1, s.d), mat);
-        mesh.position.y = (s.w/6) + 1.2;
+        mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(s.w), mat);
     } else {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 15, s.d), mat);
-        mesh.position.y = 7.5;
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/3 + 1, s.d), mat);
     }
 
-    if (mesh) group.add(mesh);
-    group.position.set(s.x, 0, s.z);
-    group.scale.set(0.01, 0.01, 0.01);
+    group.add(mesh);
+    group.position.set(s.x, (s.type === "floor" ? 0.6 : 1), s.z);
     scene.add(group);
     s.obj = group;
     if (!buildings.includes(s)) buildings.push(s);
-
-    // Bounce player out of the way
-    if (player.position.distanceTo(group.position) < 6) player.position.z += 10;
 }
 
-// --- 5. ANIMATION LOOP ---
+// --- 4. GAME ENGINE ---
 function animate() {
     requestAnimationFrame(animate);
 
+    // Movement
     let targetSpeed = 0;
-    if (keys['w']) targetSpeed = 0.85;
-    if (keys['s']) targetSpeed = -0.45;
-    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
+    if (keys['w']) targetSpeed = 0.8;
+    if (keys['s']) targetSpeed = -0.4;
+    moveSpeed += (targetSpeed - moveSpeed) * 0.1;
 
-    let nx = player.position.x + Math.sin(player.rotation.y) * -moveSpeed;
-    let nz = player.position.z + Math.cos(player.rotation.y) * -moveSpeed;
+    player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
+    player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
 
-    if (!checkCollision(nx, nz)) {
-        player.position.x = nx;
-        player.position.z = nz;
-    } else { moveSpeed *= 0.2; }
+    if (keys['a']) player.rotation.y += 0.05;
+    if (keys['d']) player.rotation.y -= 0.05;
 
-    if (keys['a']) player.rotation.y += 0.06;
-    if (keys['d']) player.rotation.y -= 0.06;
-
+    // Jump
     if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
@@ -180,25 +146,22 @@ function animate() {
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    // Camera Smoothing
-    const camOffset = new THREE.Vector3(0, 10, 22).applyMatrix4(player.matrixWorld);
-    camera.position.lerp(camOffset, 0.12);
-    camera.lookAt(player.position.x, player.position.y + 3.5, player.position.z);
+    // Camera
+    const offset = new THREE.Vector3(0, 12, 25).applyMatrix4(player.matrixWorld);
+    camera.position.lerp(offset, 0.1);
+    camera.lookAt(player.position.x, player.position.y + 2, player.position.z);
 
-    // Unlock Animation
-    buildSteps.forEach(b => { if(b.obj && b.obj.scale.x < 1) b.obj.scale.lerp(new THREE.Vector3(1,1,1), 0.1); });
-
-    // GPS & Purchasing
+    // Pads & Purchasing
     if (activePad) {
         let dist = player.position.distanceTo(activePad.position);
-        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1.2, player.position.z + (activePad.position.z - player.position.z)/2);
-        gps.scale.set(1.2, 1, dist);
+        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1, player.position.z + (activePad.position.z - player.position.z)/2);
+        gps.scale.set(1, 1, dist);
         gps.lookAt(activePad.position);
         
         if (dist < 5 && wallet >= activePad.data.cost) {
             wallet -= activePad.data.cost;
             activePad.data.bought = true;
-            income += activePad.data.inc;
+            income += (activePad.data.inc || 0);
             spawnObject(activePad.data);
             refreshPads();
         }
@@ -209,32 +172,39 @@ function animate() {
     document.getElementById('i-val').innerText = income;
 }
 
-// --- 6. UTILITY FUNCTIONS ---
 function refreshPads() {
     scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
+    
     if (next) {
         activePad = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.5, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x003300 }));
-        activePad.position.set(next.x, 0.8, next.z); 
+        activePad.position.set(next.x, 0.5, next.z); 
         activePad.isPad = true; activePad.data = next;
         scene.add(activePad);
         document.getElementById('hint').innerText = `Next: ${next.label} ($${next.cost})`;
+    } else {
+        document.getElementById('hint').innerText = "Resort Complete!";
     }
 }
 
+// --- 5. SAVE SYSTEM ---
 function initSaveSystem() {
     const raw = localStorage.getItem('MegaResort_Save');
     if (raw) {
-        const data = JSON.parse(raw);
-        wallet = data.wallet; income = data.income;
-        data.bought.forEach(id => {
-            const s = buildSteps.find(x => x.id === id);
-            if(s) { s.bought = true; spawnObject(s); }
-        });
+        try {
+            const data = JSON.parse(raw);
+            wallet = data.wallet || 200;
+            income = data.income || 0;
+            if(data.bought) {
+                data.bought.forEach(id => {
+                    const s = buildSteps.find(x => x.id === id);
+                    if(s) { s.bought = true; spawnObject(s); }
+                });
+            }
+        } catch(e) { console.error("Save Corrupt"); }
     }
 }
 
-// Persistent Save Timer
 setInterval(() => {
     wallet += income;
     localStorage.setItem('MegaResort_Save', JSON.stringify({ 
@@ -244,3 +214,8 @@ setInterval(() => {
 
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
