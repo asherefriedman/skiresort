@@ -4,7 +4,7 @@ let activePad = null, gps, isJumping = false, yVel = 0;
 let moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 1. THE GRANULAR BUILD LIST (25 STEPS) ---
+// --- 1. THE GRANULAR BUILD LIST ---
 const buildSteps = [
     { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 10, w: 40, d: 40 },
     { id: 2, x: 12, z: 8, cost: 250, label: "Reception Marble Desk", type: "furniture", mat: 0x34495e, inc: 15, w: 10, d: 3, needs: 1 },
@@ -47,7 +47,7 @@ function init() {
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 5000);
     renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Good for Chromebooks
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -55,25 +55,21 @@ function init() {
     sun.position.set(50, 100, 50);
     scene.add(sun, new THREE.HemisphereLight(0xddeeff, 0x202020, 0.5));
 
-    // LAYER -2: OCEAN
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshPhongMaterial({ color: 0x0984e3, shininess: 90, transparent: true, opacity: 0.8 }));
     sea.rotation.x = -Math.PI/2; sea.position.y = -2;
     scene.add(sea);
 
-    // LAYER -0.5: ISLAND GRASS
     const island = new THREE.Mesh(new THREE.CylinderGeometry(250, 260, 2, 64), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
     island.position.y = -1; 
     scene.add(island);
 
-    // PLAYER (Capsule for realism)
     player = new THREE.Group();
     const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
     pMesh.position.y = 1.75; 
     player.add(pMesh);
     scene.add(player);
 
-    // GPS (Y=1.5 to stay at waist height)
-    gps = new THREE.Mesh(new THREE.BoxGeometry(1, 0.2, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.4 }));
+    gps = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.4 }));
     scene.add(gps);
 
     initSaveSystem();
@@ -81,11 +77,14 @@ function init() {
     animate();
 }
 
-// --- 3. PHYSICS & COLLISION ---
+// --- 3. PHYSICS (JUMPING ALLOWED OVER OBJECTS) ---
 function checkCollision(nx, nz) {
+    // If player is high in the air (jumping), ignore furniture collisions
+    if (player.position.y > 2.5) return false; 
+
     for (let b of buildings) {
         if (b.type === "walls" || b.type === "furniture") {
-            let buffer = 1.2;
+            let buffer = 1.1;
             if (nx > b.x - (b.w/2 + buffer) && nx < b.x + (b.w/2 + buffer) &&
                 nz > b.z - (b.d/2 + buffer) && nz < b.z + (b.d/2 + buffer)) return true;
         }
@@ -93,7 +92,7 @@ function checkCollision(nx, nz) {
     return false;
 }
 
-// --- 4. BUILDING LOGIC (THE Y-AXIS STACK) ---
+// --- 4. BUILDING LOGIC (ANTI-STUCK POP-OUT) ---
 function spawnObject(s) {
     const group = new THREE.Group();
     let mesh;
@@ -102,13 +101,13 @@ function spawnObject(s) {
 
     if (s.type === "floor") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 1.2, s.d), mat);
-        mesh.position.y = 0.6; // Sits on grass
+        mesh.position.y = 0.6;
     } else if (s.type === "bridge") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 2.5, s.d), mat);
-        mesh.position.y = 1.25; // Raised for water
+        mesh.position.y = 1.25;
     } else if (s.type === "furniture") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/2, s.d), mat);
-        mesh.position.y = (s.w/4) + 1.0; // Sits on floors
+        mesh.position.y = (s.w/4) + 1.0;
     } else if (s.type === "walls") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 15, s.d), mat);
         mesh.position.y = 8;
@@ -120,6 +119,13 @@ function spawnObject(s) {
     scene.add(group);
     s.obj = group;
     if (!buildings.includes(s)) buildings.push(s);
+
+    // ANTI-STUCK: If player is inside the new object, push them back
+    let dist = player.position.distanceTo(group.position);
+    if (dist < 5) {
+        player.position.x -= Math.sin(player.rotation.y) * 8;
+        player.position.z -= Math.cos(player.rotation.y) * 8;
+    }
 }
 
 // --- 5. MAIN LOOP ---
@@ -127,8 +133,8 @@ function animate() {
     requestAnimationFrame(animate);
 
     let targetSpeed = 0;
-    if (keys['arrowup'] || keys['w']) targetSpeed = 0.8;
-    if (keys['arrowdown'] || keys['s']) targetSpeed = -0.4;
+    if (keys['arrowup'] || keys['w']) targetSpeed = 0.85;
+    if (keys['arrowdown'] || keys['s']) targetSpeed = -0.45;
     moveSpeed += (targetSpeed - moveSpeed) * 0.15;
 
     let nx = player.position.x + Math.sin(player.rotation.y) * -moveSpeed;
@@ -137,33 +143,31 @@ function animate() {
     if (!checkCollision(nx, nz)) {
         player.position.x = nx;
         player.position.z = nz;
-    } else { moveSpeed = 0; }
+    } else { moveSpeed *= 0.2; }
 
-    if (keys['arrowleft'] || keys['a']) player.rotation.y += 0.05;
-    if (keys['arrowright'] || keys['d']) player.rotation.y -= 0.05;
+    if (keys['arrowleft'] || keys['a']) player.rotation.y += 0.06;
+    if (keys['arrowright'] || keys['d']) player.rotation.y -= 0.06;
 
-    // JUMPING
-    if (keys[' '] && !isJumping) { yVel = 0.4; isJumping = true; }
+    if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
-        yVel -= 0.02;
+        yVel -= 0.025;
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    // LIFE-SIZE CAMERA
-    const camOffset = new THREE.Vector3(0, 8, 18).applyMatrix4(player.matrixWorld);
-    camera.position.lerp(camOffset, 0.1);
-    camera.lookAt(player.position.x, player.position.y + 3, player.position.z);
+    const camOffset = new THREE.Vector3(0, 9, 20).applyMatrix4(player.matrixWorld);
+    camera.position.lerp(camOffset, 0.12);
+    camera.lookAt(player.position.x, player.position.y + 3.5, player.position.z);
 
     buildSteps.forEach(b => { if(b.obj && b.obj.scale.x < 1) b.obj.scale.lerp(new THREE.Vector3(1,1,1), 0.1); });
 
     if (activePad) {
         let dist = player.position.distanceTo(activePad.position);
-        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1.5, player.position.z + (activePad.position.z - player.position.z)/2);
-        gps.scale.set(1.5, 1, dist);
+        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1.2, player.position.z + (activePad.position.z - player.position.z)/2);
+        gps.scale.set(1.2, 1, dist);
         gps.lookAt(activePad.position);
         
-        if (dist < 6 && wallet >= activePad.data.cost) {
+        if (dist < 5 && wallet >= activePad.data.cost) {
             wallet -= activePad.data.cost;
             activePad.data.bought = true;
             income += activePad.data.inc;
@@ -182,8 +186,9 @@ function refreshPads() {
     scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
     if (next) {
-        activePad = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.5, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x002200 }));
-        activePad.position.set(next.x, 1.2, next.z); // High Y to prevent eating
+        // SMALLER BUTTON (Radius 3 instead of 4)
+        activePad = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 0.6, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x002200 }));
+        activePad.position.set(next.x, 1.1, next.z); 
         activePad.isPad = true; activePad.data = next;
         scene.add(activePad);
         document.getElementById('hint').innerText = `NEXT: ${next.label} ($${next.cost})`;
@@ -208,7 +213,6 @@ function initSaveSystem() {
     }
 }
 
-// --- 7. INPUTS ---
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 setInterval(() => { wallet += income; }, 1000);
