@@ -1,126 +1,135 @@
-let canvas, ctx, money = 100, incomePerSecond = 0;
+// Global Variables
+let scene, camera, renderer, player, money = 100, income = 0;
 const keys = {};
 
-const world = { width: 5000, height: 5000 };
-const camera = { x: 0, y: 0 };
-const player = { x: 400, y: 400, speed: 8, color: '#ff7675' };
-
-// BUILD DATA (The "Master List")
-let buildSteps = [
-    { id: 1, x: 400, y: 600, cost: 0, label: "Lodge Floor", type: "floor", bought: false, unlocked: true, income: 5, needs: 0 },
-    { id: 2, x: 400, y: 600, cost: 50, label: "Lodge Walls", type: "walls", bought: false, unlocked: false, income: 10, needs: 1 },
-    { id: 3, x: 400, y: 600, cost: 200, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, income: 20, needs: 2 }
+// Building Data - Ensure X and Z are always present
+const buildSteps = [
+    { id: 1, x: 0, z: -5, cost: 0, label: "Lodge Floor", type: "floor", bought: false, unlocked: true, inc: 5, needs: 0 },
+    { id: 2, x: 0, z: -5, cost: 50, label: "Lodge Walls", type: "walls", bought: false, unlocked: false, inc: 10, needs: 1 },
+    { id: 3, x: 0, z: -5, cost: 250, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, inc: 20, needs: 2 },
+    { id: 4, x: 15, z: -15, cost: 1000, label: "Cocoa Shop", type: "floor", bought: false, unlocked: false, inc: 100, needs: 3 }
 ];
 
+// Wait for the window to fully load before attaching the button
 window.onload = () => {
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    window.addEventListener('resize', resize); resize();
-
-    document.getElementById('guestPlay').onclick = () => {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('gameScreen').style.display = 'block';
-        requestAnimationFrame(gameLoop);
-    };
+    const playBtn = document.getElementById('guestPlay');
+    
+    if (playBtn) {
+        playBtn.onclick = () => {
+            console.log("Starting 3D Engine...");
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            // Check if Three.js loaded
+            if (typeof THREE !== 'undefined') {
+                init();
+            } else {
+                alert("Three.js library failed to load. Check your internet connection!");
+            }
+        };
+    }
 };
 
-document.onkeydown = e => keys[e.key] = true;
-document.onkeyup = e => keys[e.key] = false;
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x81ecec);
 
-// MOD PANEL ACTIONS
-document.getElementById('toggleMod').onclick = () => document.getElementById('modPanel').classList.toggle('active');
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    // Append to the gameScreen div
+    document.getElementById('gameScreen').appendChild(renderer.domElement);
 
-document.getElementById('addBuildBtn').onclick = () => {
-    const newStep = {
-        id: buildSteps.length + 1,
-        x: parseInt(document.getElementById('modX').value) || 400,
-        y: parseInt(document.getElementById('modY').value) || 600,
-        cost: parseInt(document.getElementById('modCost').value) || 0,
-        label: document.getElementById('modLabel').value || "New Item",
-        type: document.getElementById('modType').value,
-        bought: false,
-        unlocked: false,
-        income: parseInt(document.getElementById('modIncome').value) || 10,
-        needs: parseInt(document.getElementById('modNeeds').value) || 1
-    };
-    buildSteps.push(newStep);
-    alert("Added " + newStep.label + "! ID: " + newStep.id);
-};
+    // Lights
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(10, 20, 10);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
-document.getElementById('exportCodeBtn').onclick = () => {
-    let code = "let buildSteps = [\n" + buildSteps.map(s => 
-        `    { id: ${s.id}, x: ${s.x}, y: ${s.y}, cost: ${s.cost}, label: "${s.label}", type: "${s.type}", bought: ${s.bought}, unlocked: ${s.unlocked}, income: ${s.income}, needs: ${s.needs} }`
-    ).join(",\n") + "\n];";
-    document.getElementById('exportBox').value = code;
-    document.getElementById('exportBox').select();
-};
+    // Snow Ground
+    const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(2000, 2000),
+        new THREE.MeshPhongMaterial({ color: 0xffffff })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    // Player (Red Cube)
+    player = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 2, 1),
+        new THREE.MeshPhongMaterial({ color: 0xff7675 })
+    );
+    player.position.y = 1;
+    scene.add(player);
+
+    // Controls
+    window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+    window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+    update();
+}
+
+function spawnObject(step) {
+    let geo, mat, mesh;
+    
+    if (step.type === "floor") {
+        geo = new THREE.BoxGeometry(8, 0.5, 8);
+        mat = new THREE.MeshPhongMaterial({ color: 0x95a5a6 });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 0.25, step.z);
+    } else if (step.type === "walls") {
+        geo = new THREE.BoxGeometry(7.5, 5, 7.5);
+        mat = new THREE.MeshPhongMaterial({ color: 0x5d4037 });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 2.75, step.z);
+    } else if (step.type === "roof") {
+        geo = new THREE.ConeGeometry(6, 4, 4);
+        mat = new THREE.MeshPhongMaterial({ color: 0xfafafa });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 7, step.z);
+        mesh.rotation.y = Math.PI / 4;
+    }
+
+    scene.add(mesh);
+}
 
 function update() {
-    // Player Movement
-    if (keys['w'] || keys['ArrowUp']) player.y -= player.speed;
-    if (keys['s'] || keys['ArrowDown']) player.y += player.speed;
-    if (keys['a'] || keys['ArrowLeft']) player.x -= player.speed;
-    if (keys['d'] || keys['ArrowRight']) player.x += player.speed;
+    requestAnimationFrame(update);
 
-    camera.x = player.x - canvas.width / 2;
-    camera.y = player.y - canvas.height / 2;
+    // Movement
+    const speed = 0.2;
+    if (keys['w']) player.position.z -= speed;
+    if (keys['s']) player.position.z += speed;
+    if (keys['a']) player.position.x -= speed;
+    if (keys['d']) player.position.x += speed;
 
-    // Tycoon Logic (Check buttons)
+    // Camera follow logic
+    camera.position.set(player.position.x, player.position.y + 15, player.position.z + 15);
+    camera.lookAt(player.position);
+
+    // Tycoon Logic
     buildSteps.forEach(s => {
         if (s.unlocked && !s.bought) {
-            if (Math.hypot(player.x - s.x, player.y - s.y) < 45 && money >= s.cost) {
+            // Check if player is near the X, Z coordinate
+            let dist = player.position.distanceTo(new THREE.Vector3(s.x, 1, s.z));
+            if (dist < 3 && money >= s.cost) {
                 money -= s.cost;
                 s.bought = true;
-                incomePerSecond += s.income;
-                // Unlock the next item
-                buildSteps.forEach(n => { if (n.needs === s.id) n.unlocked = true; });
+                income += s.inc;
+                spawnObject(s);
+                
+                // Unlock the item that needs this one
+                let next = buildSteps.find(n => n.needs === s.id);
+                if (next) next.unlocked = true;
             }
         }
     });
 
-    // Update HUD Zone
-    if (player.x > 2000) document.getElementById('zoneDisplay').innerText = "Upper Mountain";
-    else document.getElementById('zoneDisplay').innerText = "Resort Village";
-}
-
-function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.save();
-    ctx.translate(-camera.x, -camera.y);
-
-    // World Background
-    ctx.fillStyle = "#cad3d8"; ctx.fillRect(0,0,world.width,world.height);
-
-    // Paths
-    ctx.strokeStyle = "#95a5a6"; ctx.lineWidth = 40; ctx.lineJoin = "round"; ctx.beginPath();
-    ctx.moveTo(400, 400);
-    buildSteps.filter(s => s.bought && s.type === "floor").forEach(s => ctx.lineTo(s.x, s.y));
-    ctx.stroke();
-
-    // Render Buildings
-    buildSteps.forEach(s => {
-        if (s.bought) {
-            ctx.fillStyle = s.type === "floor" ? "#7f8c8d" : s.type === "walls" ? "#5d4037" : s.type === "glass" ? "#81ecec" : "white";
-            if (s.type === "floor") ctx.fillRect(s.x-80, s.y-60, 160, 120);
-            if (s.type === "walls") ctx.fillRect(s.x-75, s.y-115, 150, 90);
-            if (s.type === "glass") { ctx.fillRect(s.x-50, s.y-90, 30, 30); ctx.fillRect(s.x+20, s.y-90, 30, 30); }
-            if (s.type === "roof") { ctx.beginPath(); ctx.moveTo(s.x-90, s.y-115); ctx.lineTo(s.x+90, s.y-115); ctx.lineTo(s.x, s.y-190); ctx.fill(); }
-        } else if (s.unlocked) {
-            ctx.fillStyle = "#00d2ff"; ctx.beginPath(); ctx.ellipse(s.x, s.y, 40, 20, 0, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "black"; ctx.font = "bold 12px Arial"; ctx.textAlign = "center";
-            ctx.fillText(s.label.toUpperCase(), s.x, s.y-50);
-            ctx.fillText("$"+s.cost, s.x, s.y-35);
-        }
-    });
-
-    // Player
-    ctx.fillStyle = player.color; ctx.fillRect(player.x-15, player.y-45, 30, 30);
-    ctx.restore();
-
+    renderer.render(scene, camera);
     document.getElementById('moneyDisplay').innerText = Math.floor(money);
-    document.getElementById('incomeDisplay').innerText = incomePerSecond;
+    document.getElementById('incomeDisplay').innerText = income;
 }
 
-function gameLoop() { update(); draw(); requestAnimationFrame(gameLoop); }
-setInterval(() => { money += (incomePerSecond/10); }, 100);
+// Money ticker
+setInterval(() => { money += income; }, 1000);
