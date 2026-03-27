@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Ski Resort Tycoon 3D</title>
+    <title>Ski Resort Tycoon Pro 3D</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
     <div id="loginScreen">
         <div class="login-card">
-            <h1>🏔️ SKI RESORT <span class="blue-text">3D</span></h1>
-            <p id="engineStatus">Loading 3D Assets...</p>
-            <button id="guestPlay" class="start-btn" style="display:none;">START GAME</button>
+            <h1>🏔️ SKI RESORT <span class="blue-text">PRO</span></h1>
+            <p id="engineStatus">Downloading Realistic Assets...</p>
+            <button id="guestPlay" class="start-btn" style="display:none;">LAUNCH RESORT</button>
         </div>
     </div>
-
     <div id="gameScreen" style="display: none;">
         <div id="hud">
             <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
-            <div id="zoneDisplay">Next: Lodge Floor ($0)</div>
+            <div id="zoneDisplay">Next: Lodge Foundation ($0)</div>
             <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
         </div>
     </div>
