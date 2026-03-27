@@ -3,33 +3,33 @@ let activePad = null, gps, isJumping = false, yVel = 0;
 let moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 1. FULL RESTORED BUILD LIST (25+ STEPS) ---
+// --- 1. BALANCED BUILD LIST (Lower Costs & Lower Income) ---
 const buildSteps = [
-    { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 10, w: 40, d: 40 },
-    { id: 2, x: 12, z: 8, cost: 250, label: "Reception Desk", type: "furniture", mat: 0x34495e, inc: 15, w: 10, d: 3, needs: 1 },
-    { id: 3, x: 14, z: 10, cost: 400, label: "Computers & Phones", type: "furniture", mat: 0x2d3436, inc: 20, w: 2, d: 2, needs: 2 },
-    { id: 4, x: 0, z: 25, cost: 500, label: "Entrance Palm Tree L", type: "nature", mat: 0x2ecc71, inc: 5, w: 2, d: 2, needs: 3 },
-    { id: 5, x: 10, z: 25, cost: 500, label: "Entrance Palm Tree R", type: "nature", mat: 0x2ecc71, inc: 5, w: 2, d: 2, needs: 4 },
-    { id: 6, x: -10, z: -10, cost: 600, label: "Waiting Sofa 1", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 5 },
-    { id: 7, x: -10, z: -4, cost: 600, label: "Waiting Sofa 2", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 6 },
-    { id: 8, x: 0, z: 19, cost: 1500, label: "Lobby Glass Wall", type: "walls", mat: 0x81ecec, inc: 40, w: 40, d: 1, needs: 7 },
-    { id: 9, x: 0, z: -40, cost: 5000, label: "Suite 101 Floor", type: "floor", mat: 0xecf0f1, inc: 100, w: 30, d: 30, needs: 8 },
-    { id: 10, x: 0, z: -45, cost: 2500, label: "King Bed Frame", type: "furniture", mat: 0x3e2723, inc: 150, w: 10, d: 12, needs: 9 },
-    { id: 11, x: 0, z: -45, cost: 1200, label: "Luxury Mattress", type: "furniture", mat: 0xffffff, inc: 100, w: 9, d: 11, needs: 10 },
-    { id: 12, x: -8, z: -48, cost: 800, label: "Left Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 11 },
-    { id: 13, x: 8, z: -48, cost: 800, label: "Right Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 12 },
-    { id: 14, x: 0, z: -30, cost: 3500, label: "Large Smart TV", type: "furniture", mat: 0x1a1a1a, inc: 200, w: 8, d: 1, needs: 13 },
-    { id: 15, x: 50, z: 0, cost: 15000, label: "Poolside Tiling", type: "floor", mat: 0xbdc3c7, inc: 500, w: 50, d: 60, needs: 14 },
-    { id: 16, x: 50, z: 0, cost: 25000, label: "Heated Water", type: "floor", mat: 0x00d2ff, inc: 1000, w: 30, d: 40, needs: 15 },
-    { id: 17, x: 38, z: 15, cost: 2000, label: "Pool Lounge Chair", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 16 },
-    { id: 18, x: 75, z: 25, cost: 3000, label: "Tropical Plants", type: "nature", mat: 0x27ae60, inc: 50, w: 4, d: 4, needs: 17 },
-    { id: 19, x: 70, z: -10, cost: 12000, label: "Outdoor Tiki Bar", type: "furniture", mat: 0xe67e22, inc: 800, w: 8, d: 8, needs: 18 },
-    { id: 20, x: 70, z: -18, cost: 5000, label: "Tiki Palm Tree", type: "nature", mat: 0x2ecc71, inc: 150, w: 2, d: 2, needs: 19 },
-    { id: 21, x: 100, z: 0, cost: 50000, label: "Bridge Pier", type: "floor", mat: 0x7f8c8d, inc: 2000, w: 15, d: 15, needs: 20 },
-    { id: 22, x: 140, z: 0, cost: 100000, label: "Suspension Cables", type: "walls", mat: 0x34495e, inc: 3000, w: 1, d: 80, needs: 21 },
-    { id: 23, x: 140, z: 0, cost: 150000, label: "Bridge Tarmac", type: "bridge", mat: 0x2d3436, inc: 5000, w: 80, d: 15, needs: 22 },
+    { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 5, w: 40, d: 40 },
+    { id: 2, x: 12, z: 8, cost: 100, label: "Reception Desk", type: "furniture", mat: 0x34495e, inc: 8, w: 10, d: 3, needs: 1 },
+    { id: 3, x: 14, z: 10, cost: 150, label: "Computers & Phones", type: "furniture", mat: 0x2d3436, inc: 10, w: 2, d: 2, needs: 2 },
+    { id: 4, x: 0, z: 25, cost: 200, label: "Entrance Palm Tree L", type: "nature", mat: 0x2ecc71, inc: 2, w: 2, d: 2, needs: 3 },
+    { id: 5, x: 10, z: 25, cost: 200, label: "Entrance Palm Tree R", type: "nature", mat: 0x2ecc71, inc: 2, w: 2, d: 2, needs: 4 },
+    { id: 6, x: -10, z: -10, cost: 300, label: "Waiting Sofa 1", type: "furniture", mat: 0xc0392b, inc: 12, w: 6, d: 3, needs: 5 },
+    { id: 7, x: -10, z: -4, cost: 300, label: "Waiting Sofa 2", type: "furniture", mat: 0xc0392b, inc: 12, w: 6, d: 3, needs: 6 },
+    { id: 8, x: 0, z: 19, cost: 800, label: "Lobby Glass Wall", type: "walls", mat: 0x81ecec, inc: 20, w: 40, d: 1, needs: 7 },
+    { id: 9, x: 0, z: -40, cost: 2500, label: "Suite 101 Floor", type: "floor", mat: 0xecf0f1, inc: 50, w: 30, d: 30, needs: 8 },
+    { id: 10, x: 0, z: -45, cost: 1200, label: "King Bed Frame", type: "furniture", mat: 0x3e2723, inc: 40, w: 10, d: 12, needs: 9 },
+    { id: 11, x: 0, z: -45, cost: 600, label: "Luxury Mattress", type: "furniture", mat: 0xffffff, inc: 30, w: 9, d: 11, needs: 10 },
+    { id: 12, x: -8, z: -48, cost: 400, label: "Left Nightstand", type: "furniture", mat: 0x5d4037, inc: 15, w: 3, d: 3, needs: 11 },
+    { id: 13, x: 8, z: -48, cost: 400, label: "Right Nightstand", type: "furniture", mat: 0x5d4037, inc: 15, w: 3, d: 3, needs: 12 },
+    { id: 14, x: 0, z: -30, cost: 1800, label: "Large Smart TV", type: "furniture", mat: 0x1a1a1a, inc: 80, w: 8, d: 1, needs: 13 },
+    { id: 15, x: 50, z: 0, cost: 8000, label: "Poolside Tiling", type: "floor", mat: 0xbdc3c7, inc: 200, w: 50, d: 60, needs: 14 },
+    { id: 16, x: 50, z: 0, cost: 15000, label: "Heated Water", type: "floor", mat: 0x00d2ff, inc: 500, w: 30, d: 40, needs: 15 },
+    { id: 17, x: 38, z: 15, cost: 1000, label: "Pool Lounge Chair", type: "furniture", mat: 0xffffff, inc: 40, w: 3, d: 6, needs: 16 },
+    { id: 18, x: 75, z: 25, cost: 1500, label: "Tropical Plants", type: "nature", mat: 0x27ae60, inc: 20, w: 4, d: 4, needs: 17 },
+    { id: 19, x: 70, z: -10, cost: 10000, label: "Outdoor Tiki Bar", type: "furniture", mat: 0xe67e22, inc: 400, w: 8, d: 8, needs: 18 },
+    { id: 20, x: 70, z: -18, cost: 4000, label: "Tiki Palm Tree", type: "nature", mat: 0x2ecc71, inc: 100, w: 2, d: 2, needs: 19 },
+    { id: 21, x: 100, z: 0, cost: 40000, label: "Bridge Pier", type: "floor", mat: 0x7f8c8d, inc: 1000, w: 15, d: 15, needs: 20 },
+    { id: 22, x: 140, z: 0, cost: 80000, label: "Suspension Cables", type: "walls", mat: 0x34495e, inc: 1500, w: 1, d: 80, needs: 21 },
+    { id: 23, x: 140, z: 0, cost: 120000, label: "Bridge Tarmac", type: "bridge", mat: 0x2d3436, inc: 2500, w: 80, d: 15, needs: 22 },
     { id: 24, x: 185, z: 12, cost: 20000, label: "Cliff Pine Tree", type: "nature", mat: 0x013220, inc: 500, w: 3, d: 3, needs: 23 },
-    { id: 25, x: 200, z: 0, cost: 250000, label: "Mountain Sign", type: "furniture", mat: 0xf1c40f, inc: 10000, w: 10, d: 2, needs: 24 }
+    { id: 25, x: 200, z: 0, cost: 200000, label: "Mountain Sign", type: "furniture", mat: 0xf1c40f, inc: 8000, w: 10, d: 2, needs: 24 }
 ];
 
 function startGame() {
@@ -66,7 +66,7 @@ function init() {
     pMesh.position.y = 1.75;
     player.add(pMesh);
     scene.add(player);
-    player.position.set(0, 2, 25); // Start on grass
+    player.position.set(0, 2, 25); // Safe Start
 
     gps = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.4 }));
     scene.add(gps);
@@ -76,9 +76,9 @@ function init() {
     animate();
 }
 
-// --- 2. PHYSICS & PARKOUR ---
+// --- 2. PARKOUR PHYSICS ---
 function checkCollision(nx, nz) {
-    if (player.position.y > 2.8) return false; // Can jump over furniture
+    if (player.position.y > 2.8) return false; // Allowed to jump over stuff
     for (let b of buildings) {
         if (b.type === "walls" || b.type === "furniture" || b.type === "nature") {
             let buffer = 1.3;
@@ -89,7 +89,7 @@ function checkCollision(nx, nz) {
     return false;
 }
 
-// --- 3. BUILDING LOGIC (NATURE & ANTI-STUCK) ---
+// --- 3. DYNAMIC SPAWNING ---
 function spawnObject(s) {
     const group = new THREE.Group();
     let mesh;
@@ -122,12 +122,13 @@ function spawnObject(s) {
     s.obj = group;
     if (!buildings.includes(s)) buildings.push(s);
 
-    // Anti-Stuck Pop-out
+    // Anti-Stuck Bump
     if (player.position.distanceTo(group.position) < 5) {
         player.position.z += 8; 
     }
 }
 
+// --- 4. ANIMATION & CAMERA ---
 function animate() {
     requestAnimationFrame(animate);
 
@@ -154,6 +155,7 @@ function animate() {
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
+    // Zoomed-in Camera (Eye level)
     const camOffset = new THREE.Vector3(0, 10, 22).applyMatrix4(player.matrixWorld);
     camera.position.lerp(camOffset, 0.12);
     camera.lookAt(player.position.x, player.position.y + 3.5, player.position.z);
@@ -192,7 +194,7 @@ function refreshPads() {
     }
 }
 
-// --- 4. SAVE SYSTEM ---
+// --- 5. THE SAVE SYSTEM (RESTORED) ---
 function initSaveSystem() {
     const raw = localStorage.getItem('MegaResort_Save');
     if (raw) {
@@ -207,7 +209,12 @@ function initSaveSystem() {
 
 setInterval(() => {
     wallet += income;
-    localStorage.setItem('MegaResort_Save', JSON.stringify({ wallet, income, bought: buildSteps.filter(s => s.bought).map(s => s.id) }));
+    // Auto-save every second
+    localStorage.setItem('MegaResort_Save', JSON.stringify({ 
+        wallet, 
+        income, 
+        bought: buildSteps.filter(s => s.bought).map(s => s.id) 
+    }));
 }, 1000);
 
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
