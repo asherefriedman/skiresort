@@ -3,10 +3,21 @@ let activePad = null, gpsLine = null;
 const keys = {};
 
 const buildSteps = [
+    /* --- THE MAIN LODGE --- */
     { id: 1, x: 0, z: -10, cost: 0, label: "Lodge Floor", type: "floor", bought: false, unlocked: true, inc: 5, needs: 0 },
     { id: 2, x: 0, z: -10, cost: 50, label: "Lodge Walls", type: "walls", bought: false, unlocked: false, inc: 10, needs: 1 },
-    { id: 3, x: 0, z: -10, cost: 250, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, inc: 20, needs: 2 },
-    { id: 4, x: 25, z: -25, cost: 1000, label: "Cocoa Shop", type: "floor", bought: false, unlocked: false, inc: 100, needs: 3 }
+    { id: 3, x: 0, z: -10, cost: 200, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, inc: 15, needs: 2 },
+
+    /* --- COCOA SHOP --- */
+    { id: 4, x: 20, z: -5, cost: 500, label: "Cocoa Floor", type: "floor", bought: false, unlocked: false, inc: 30, needs: 3 },
+    { id: 5, x: 20, z: -5, cost: 800, label: "Cocoa Walls", type: "walls", bought: false, unlocked: false, inc: 40, needs: 4 },
+    { id: 6, x: 20, z: -5, cost: 1200, label: "Cocoa Roof", type: "roof", bought: false, unlocked: false, inc: 60, needs: 5 },
+
+    /* --- SKI LIFT ENTRANCE --- */
+    { id: 7, x: -20, z: -30, cost: 2500, label: "Lift Base", type: "floor", bought: false, unlocked: false, inc: 100, needs: 6 },
+    { id: 8, x: -20, z: -30, cost: 3500, label: "Lift Tower 1", type: "pole", bought: false, unlocked: false, inc: 150, needs: 7 },
+    { id: 9, x: -20, z: -60, cost: 5000, label: "Lift Tower 2", type: "pole", bought: false, unlocked: false, inc: 200, needs: 8 },
+    { id: 10, x: -20, z: -45, cost: 7500, label: "Main Cable", type: "cable", bought: false, unlocked: false, inc: 500, needs: 9 }
 ];
 
 function init() {
@@ -67,6 +78,42 @@ function spawnObject(step) {
     mesh.position.set(step.x, y, step.z);
     if (step.type === "roof") mesh.rotation.y = Math.PI / 4;
     scene.add(mesh);
+    function spawnObject(step) {
+    let geo, mat, mesh;
+    
+    if (step.type === "floor") {
+        geo = new THREE.BoxGeometry(10, 0.5, 10);
+        mat = new THREE.MeshPhongMaterial({ color: 0x95a5a6 });
+    } else if (step.type === "walls") {
+        geo = new THREE.BoxGeometry(9.5, 6, 9.5);
+        mat = new THREE.MeshPhongMaterial({ color: 0x5d4037 });
+    } else if (step.type === "roof") {
+        geo = new THREE.ConeGeometry(8, 5, 4);
+        mat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+    } else if (step.type === "pole") {
+        // High-tech metal pole for the ski lift
+        geo = new THREE.CylinderGeometry(0.8, 1, 15, 8);
+        mat = new THREE.MeshPhongMaterial({ color: 0x636e72 });
+    } else if (step.type === "cable") {
+        // Long horizontal cable connecting towers
+        geo = new THREE.BoxGeometry(1, 0.2, 60);
+        mat = new THREE.MeshPhongMaterial({ color: 0x2d3436 });
+    }
+
+    mesh = new THREE.Mesh(geo, mat);
+    
+    // Set heights correctly based on type
+    let y = 0.25;
+    if (step.type === "walls") y = 3;
+    if (step.type === "roof") y = 8.5;
+    if (step.type === "pole") y = 7.5;
+    if (step.type === "cable") y = 14;
+
+    mesh.position.set(step.x, y, step.z);
+    if (step.type === "roof") mesh.rotation.y = Math.PI / 4;
+    
+    scene.add(mesh);
+}
 }
 
 function update() {
