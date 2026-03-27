@@ -1,5 +1,6 @@
 let scene, camera, renderer, player, wallet = 150, banked = 0, income = 0;
 let activePad = null, gps, isDriving = false, safePad;
+let currentSpeed = 0; // Added for smooth acceleration
 const keys = {}, buildings = [];
 
 const buildSteps = [
@@ -9,7 +10,7 @@ const buildSteps = [
     { id: 3, x: 0, z: 0, cost: 1500, label: "Blue Slate Roof", type: "roof", inc: 100, needs: 2 },
     { id: 4, x: 45, z: 15, cost: 6000, label: "Island Bridge", type: "bridge", inc: 200, needs: 3 },
     
-    // ISLAND 2: THE GARAGE & VEHICLE
+    // ISLAND 2: THE GARAGE
     { id: 5, x: 110, z: 20, cost: 20000, label: "Vehicle Bay", type: "floor", inc: 800, needs: 4 },
     { id: 6, x: 110, z: 20, cost: 50000, label: "Snowmobile", type: "vehicle", inc: 2000, needs: 5 },
     
@@ -39,20 +40,22 @@ function init() {
     sun.position.set(100, 200, 100);
     scene.add(sun, new THREE.AmbientLight(0xffffff, 0.4));
 
-    // Snowy Water/Ground
+    // Snowy Ocean (Base layer) lowered to avoid Z-fighting
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(8000, 8000), new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 80 }));
     ground.rotation.x = -Math.PI / 2;
+    ground.position.y = -1; 
     scene.add(ground);
 
     createIslands();
     createPlayer();
     
-    // THE SAFE (TRT2 Style Money Collector)
-    safePad = new THREE.Mesh(new THREE.BoxGeometry(8, 0.5, 8), new THREE.MeshPhongMaterial({ color: 0xf1c40f, emissive: 0x333300 }));
-    safePad.position.set(-15, 0.1, 10);
+    // THE SAFE (Banked Money Collector)
+    safePad = new THREE.Mesh(new THREE.CylinderGeometry(4, 4, 0.8, 32), new THREE.MeshPhongMaterial({ color: 0xf1c40f, emissive: 0x555500 }));
+    safePad.position.set(-15, 0.4, 10);
     scene.add(safePad);
 
-    gps = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.2, 1.5), new THREE.MeshBasicMaterial({ color: 0x55efc4, transparent: true, opacity: 0.6 }));
+    // PERFECTED GPS LINE: Set depth exactly to 1 so scale.z exactly matches distance.
+    gps = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.2, 1), new THREE.MeshBasicMaterial({ color: 0x55efc4, transparent: true, opacity: 0.7 }));
     scene.add(gps);
 
     refreshPads();
@@ -62,15 +65,16 @@ function init() {
 function createIslands() {
     const islandPos = [[0,0], [110, 20], [80, -100], [-150, 50]];
     islandPos.forEach(p => {
-        const isl = new THREE.Mesh(new THREE.CylinderGeometry(55, 65, 8, 32), new THREE.MeshPhongMaterial({color: 0xdaeaf6}));
-        isl.position.set(p[0], -4.1, p[1]);
+        // Islands act as the solid ground raised slightly above the icy ocean
+        const isl = new THREE.Mesh(new THREE.CylinderGeometry(55, 65, 2, 32), new THREE.MeshPhongMaterial({color: 0xdaeaf6}));
+        isl.position.set(p[0], 0, p[1]);
         scene.add(isl);
     });
 }
 
 function createPlayer() {
     player = new THREE.Group();
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 1), new THREE.MeshPhongMaterial({color: 0x0984e3}));
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 1.2), new THREE.MeshPhongMaterial({color: 0x0984e3}));
     body.position.y = 1.4;
     player.add(body);
     scene.add(player);
@@ -101,7 +105,7 @@ function spawnObject(s) {
 
     if(mesh) {
         group.add(mesh);
-        group.position.set(s.x, 0, s.z);
+        group.position.set(s.x, 1, s.z); // Start slightly above ground
         group.scale.set(0.01, 0.01, 0.01);
         scene.add(group);
         s.obj = group;
@@ -112,39 +116,66 @@ function spawnObject(s) {
 function update() {
     requestAnimationFrame(update);
     
-    let speed = isDriving ? 1.8 : 0.7;
-    if (keys['w']) player.translateZ(-speed);
-    if (keys['s']) player.translateZ(speed);
-    if (keys['a']) player.rotation.y += 0.05;
-    if (keys['d']) player.rotation.y -= 0.05;
+    // SMOOTH MOVEMENT LOGIC (Lerping Speed)
+    let targetSpeed = 0;
+    if (keys['w'] || keys['arrowup']) targetSpeed = isDriving ? 2.2 : 0.8;
+    else if (keys['s'] || keys['arrowdown']) targetSpeed = isDriving ? -1.5 : -0.5;
+    
+    currentSpeed += (targetSpeed - currentSpeed) * 0.1; // Smooth acceleration/deceleration
+    player.translateZ(-currentSpeed);
 
-    camera.position.set(player.position.x, player.position.y + 50, player.position.z + 65);
+    if (keys['a'] || keys['arrowleft']) player.rotation.y += 0.05;
+    if (keys['d'] || keys['arrowright']) player.rotation.y -= 0.05;
+
+    // SMOOTH CAMERA FOLLOW
+    let targetCamPos = new THREE.Vector3(player.position.x, player.position.y + 45, player.position.z + 60);
+    camera.position.lerp(targetCamPos, 0.2); // Prevents camera jittering
     camera.lookAt(player.position);
 
     // TRT2 Pop Animation
-    buildSteps.forEach(s => { if(s.obj && s.obj.scale.x < 1) s.obj.scale.lerp(new THREE.Vector3(1,1,1), 0.08); });
+    buildSteps.forEach(s => { 
+        if(s.obj && s.obj.scale.x < 1) s.obj.scale.lerp(new THREE.Vector3(1,1,1), 0.08); 
+    });
 
-    // Safe Collection Logic
+    // Safe Collection Logic & Animation
     if(player.position.distanceTo(safePad.position) < 6) {
-        wallet += banked;
-        banked = 0;
-        safePad.scale.set(1.2, 1, 1.2);
-    } else safePad.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
+        if(banked > 0) {
+            wallet += banked;
+            banked = 0;
+            safePad.scale.set(1.2, 1, 1.2); // Pulse effect when collecting
+        }
+    } else {
+        safePad.scale.lerp(new THREE.Vector3(1,1,1), 0.1);
+    }
+    safePad.rotation.y += 0.02; // Spin the safe pad so it looks important
 
+    // GPS LINE LOGIC (Perfectly Attached)
     if (activePad) {
-        let d = player.position.distanceTo(activePad.position);
-        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 0.6, player.position.z + (activePad.position.z - player.position.z)/2);
-        gps.scale.set(5, 1, d);
-        gps.lookAt(activePad.position);
+        let dx = activePad.position.x - player.position.x;
+        let dz = activePad.position.z - player.position.z;
+        let dist = Math.sqrt(dx*dx + dz*dz);
+        
+        // Position it exactly in the middle between player and pad
+        gps.position.set(player.position.x + dx/2, 1, player.position.z + dz/2);
+        gps.scale.set(1, 1, dist); // Stretch exactly to the distance
+        gps.rotation.y = Math.atan2(dx, dz); // Point directly to it perfectly
+        gps.visible = true;
+
         activePad.rotation.y += 0.04;
 
-        if (d < 7 && wallet >= activePad.data.cost) {
+        if (dist < 6 && wallet >= activePad.data.cost) {
             wallet -= activePad.data.cost; activePad.data.bought = true;
             income += activePad.data.inc;
             spawnObject(activePad.data);
-            if(activePad.data.type === "vehicle") { isDriving = true; camera.fov = 90; camera.updateProjectionMatrix(); }
+            if(activePad.data.type === "vehicle") { 
+                isDriving = true; 
+                camera.fov = 90; 
+                camera.updateProjectionMatrix(); 
+            }
             refreshPads();
         }
+    } else {
+        gps.visible = false;
     }
 
     renderer.render(scene, camera);
@@ -157,7 +188,7 @@ function refreshPads() {
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
     if (next) {
         activePad = new THREE.Mesh(new THREE.CylinderGeometry(6, 6, 1, 32), new THREE.MeshPhongMaterial({ color: 0x00cec9, emissive: 0x004444 }));
-        activePad.position.set(next.x, 0.1, next.z);
+        activePad.position.set(next.x, 0.5, next.z);
         activePad.isPad = true; activePad.data = next;
         scene.add(activePad);
         document.getElementById('zoneInfo').innerText = `NEXT: ${next.label} ($${next.cost})`;
