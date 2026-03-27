@@ -112,6 +112,9 @@ function spawnObject(s) {
     } else if (s.type === "walls") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 15, s.d), mat);
         mesh.position.y = 8.5;
+    } else if (s.type === "bridge") {
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 1.5, s.d), mat);
+        mesh.position.y = 1.0; // Slightly higher than normal floors
     }
 
     group.add(mesh);
