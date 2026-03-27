@@ -5,11 +5,38 @@ const keys = {}, buildings = [];
 
 // DATA WITH COLLISION SIZES (w: width, d: depth)
 const buildSteps = [
-    { id: 1, x: 0, z: 0, cost: 0, label: "Main Lobby Floor", type: "floor", mat: 0x95a5a6, inc: 10, w: 40, d: 40 },
-    { id: 2, x: 10, z: 5, cost: 200, label: "Reception Desk", type: "furniture", mat: 0x784212, inc: 15, w: 8, d: 4 },
-    { id: 3, x: -10, z: -5, cost: 500, label: "Lobby Sofa", type: "furniture", mat: 0xd35400, inc: 20, w: 6, d: 3 },
-    { id: 4, x: 0, z: 19, cost: 2000, label: "Lobby Back Wall", type: "walls", mat: 0xecf0f1, inc: 50, w: 40, d: 2 },
-    { id: 5, x: 0, z: -40, cost: 5000, label: "Hotel Wing 1", type: "floor", mat: 0x95a5a6, inc: 100, w: 40, d: 40 }
+    // --- PHASE 1: THE LOBBY (1-7) ---
+    { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 10, w: 40, d: 40 },
+    { id: 2, x: 12, z: 8, cost: 250, label: "Reception Marble Desk", type: "furniture", mat: 0x34495e, inc: 15, w: 10, d: 3, needs: 1 },
+    { id: 3, x: 14, z: 10, cost: 400, label: "Computers & Phones", type: "furniture", mat: 0x2d3436, inc: 20, w: 2, d: 2, needs: 2 },
+    { id: 4, x: -10, z: -10, cost: 600, label: "Waiting Area Sofa 1", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 3 },
+    { id: 5, x: -10, z: -4, cost: 600, label: "Waiting Area Sofa 2", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 4 },
+    { id: 6, x: -10, z: -7, cost: 300, label: "Lobby Coffee Table", type: "furniture", mat: 0x7f8c8d, inc: 10, w: 3, d: 2, needs: 5 },
+    { id: 7, x: 0, z: 19, cost: 1500, label: "Lobby Glass Wall", type: "walls", mat: 0x81ecec, inc: 40, w: 40, d: 1, needs: 6 },
+
+    // --- PHASE 2: LUXURY SUITE 101 (8-14) ---
+    { id: 8, x: 0, z: -40, cost: 5000, label: "Suite 101 Floor", type: "floor", mat: 0xecf0f1, inc: 100, w: 30, d: 30, needs: 7 },
+    { id: 9, x: 0, z: -45, cost: 2500, label: "King Size Bed Frame", type: "furniture", mat: 0x3e2723, inc: 150, w: 10, d: 12, needs: 8 },
+    { id: 10, x: 0, z: -45, cost: 1200, label: "Luxury Mattress", type: "furniture", mat: 0xffffff, inc: 100, w: 9, d: 11, needs: 9 },
+    { id: 11, x: -8, z: -48, cost: 800, label: "Left Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 10 },
+    { id: 12, x: 8, z: -48, cost: 800, label: "Right Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 11 },
+    { id: 13, x: 0, z: -30, cost: 3500, label: "Large Smart TV", type: "furniture", mat: 0x1a1a1a, inc: 200, w: 8, d: 1, needs: 12 },
+    { id: 14, x: 14, z: -40, cost: 6000, label: "Suite 101 Privacy Wall", type: "walls", mat: 0xbdc3c7, inc: 150, w: 1, d: 30, needs: 13 },
+
+    // --- PHASE 3: THE OUTDOOR POOL DECK (15-21) ---
+    { id: 15, x: 50, z: 0, cost: 15000, label: "Poolside Tiling", type: "floor", mat: 0xbdc3c7, inc: 500, w: 50, d: 60, needs: 14 },
+    { id: 16, x: 50, z: 0, cost: 25000, label: "Heated Water", type: "floor", mat: 0x00d2ff, inc: 1000, w: 30, d: 40, needs: 15 },
+    { id: 17, x: 38, z: 15, cost: 2000, label: "Pool Lounge Chair A", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 16 },
+    { id: 18, x: 45, z: 15, cost: 2000, label: "Pool Lounge Chair B", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 17 },
+    { id: 19, x: 52, z: 15, cost: 2000, label: "Pool Lounge Chair C", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 18 },
+    { id: 20, x: 70, z: -10, cost: 12000, label: "Outdoor Tiki Bar", type: "furniture", mat: 0xe67e22, inc: 800, w: 8, d: 8, needs: 19 },
+    { id: 21, x: 70, z: -10, cost: 4000, label: "Bar Stools", type: "furniture", mat: 0x2c3e50, inc: 300, w: 6, d: 2, needs: 20 },
+
+    // --- PHASE 4: SKI MOUNTAIN TRANSITION (22-25) ---
+    { id: 22, x: 100, z: 0, cost: 50000, label: "Mountain Bridge Pier", type: "floor", mat: 0x7f8c8d, inc: 2000, w: 15, d: 15, needs: 21 },
+    { id: 23, x: 140, z: 0, cost: 100000, label: "Suspension Cables", type: "walls", mat: 0x34495e, inc: 3000, w: 1, d: 80, needs: 22 },
+    { id: 24, x: 140, z: 0, cost: 150000, label: "Bridge Tarmac", type: "bridge", mat: 0x2d3436, inc: 5000, w: 80, d: 15, needs: 23 },
+    { id: 25, x: 200, z: 0, cost: 250000, label: "Mountain Welcome Sign", type: "furniture", mat: 0xf1c40f, inc: 10000, w: 10, d: 2, needs: 24 }
 ];
 
 function startGame() {
