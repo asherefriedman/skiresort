@@ -7,12 +7,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-
     <div id="loginScreen">
         <div class="login-card">
             <h1>🏔️ SKI RESORT <span class="blue-text">3D</span></h1>
-            <p>Status: <span id="engineStatus">Loading Engine...</span></p>
-            <button id="guestPlay" class="start-btn" style="display:none;">PLAY NOW</button>
+            <p id="engineStatus">Loading 3D Assets...</p>
+            <button id="guestPlay" class="start-btn" style="display:none;">START GAME</button>
         </div>
     </div>
 
@@ -23,18 +22,6 @@
             <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
         </div>
     </div>
-
     <script src="game.js"></script>
-
-    <script>
-        // Emergency check to show the button once Three.js is ready
-        const checkLoad = setInterval(() => {
-            if (typeof THREE !== 'undefined') {
-                document.getElementById('engineStatus').innerText = "Engine Ready!";
-                document.getElementById('guestPlay').style.display = "inline-block";
-                clearInterval(checkLoad);
-            }
-        }, 500);
-    </script>
 </body>
 </html>
