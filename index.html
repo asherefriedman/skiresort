@@ -36,5 +36,11 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="game.js"></script>
+
+    <div id="save-menu" style="position: fixed; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 8px; pointer-events: auto; font-size: 12px; z-index: 2000;">
+    <div id="save-status">💾 Game Autosaved</div>
+    <button onclick="exportSave()" style="margin-top:5px; cursor:pointer;">Copy Save Code</button>
+    <button onclick="importSave()" style="margin-top:5px; cursor:pointer;">Load from Code</button>
+</div>
 </body>
 </html>
