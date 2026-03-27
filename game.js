@@ -72,6 +72,17 @@ addTrees(); // Call this in init()
 
     refreshPads();
     update();
+
+    function init() {
+    // ... (your existing light, ground, and player code) ...
+
+    // ADD THESE TWO LINES:
+    addForest();
+    addMountains();
+
+    refreshPads();
+    update();
+}
 }
 
 function refreshPads() {
@@ -144,3 +155,66 @@ function update() {
             spawnObject(step);
             let n = buildSteps.find(item => item.needs === step.id);
             if (n) n.unlocked =
+
+/* --- ENVIRONMENT GENERATOR --- */
+
+function addForest() {
+    // Create 150 trees scattered around
+    for (let i = 0; i < 150; i++) {
+        // Random Position
+        const rx = Math.random() * 800 - 400;
+        const rz = Math.random() * 800 - 400;
+
+        // Don't spawn trees too close to the starting lodge (0,0)
+        if (Math.abs(rx) < 15 && Math.abs(rz) < 15) continue;
+
+        // Tree Trunk
+        const trunkGeo = new THREE.CylinderGeometry(0.3, 0.4, 1.5);
+        const trunkMat = new THREE.MeshPhongMaterial({ color: 0x4e342e });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+
+        // Snowy Leaves (Cone)
+        const leavesGeo = new THREE.ConeGeometry(2, 5, 6);
+        const leavesMat = new THREE.MeshPhongMaterial({ color: 0x2d6a4f });
+        const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+        leaves.position.y = 3;
+
+        // Add a "Snow Cap" to the tree
+        const snowCapGeo = new THREE.ConeGeometry(1, 2, 6);
+        const snowCapMat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        const snowCap = new THREE.Mesh(snowCapGeo, snowCapMat);
+        snowCap.position.y = 4.5;
+
+        const treeGroup = new THREE.Group();
+        treeGroup.add(trunk);
+        treeGroup.add(leaves);
+        treeGroup.add(snowCap);
+        
+        treeGroup.position.set(rx, 0.75, rz);
+        // Random scale so trees aren't all the same size
+        const s = 0.5 + Math.random();
+        treeGroup.scale.set(s, s, s);
+        
+        scene.add(treeGroup);
+    }
+}
+
+function addMountains() {
+    // Create big distant peaks
+    for (let i = 0; i < 8; i++) {
+        const mGeo = new THREE.ConeGeometry(80, 150, 4);
+        const mMat = new THREE.MeshPhongMaterial({ color: 0xd1d8e0 });
+        const mountain = new THREE.Mesh(mGeo, mMat);
+        
+        // Place them far away in a circle
+        const angle = (i / 8) * Math.PI * 2;
+        const dist = 400;
+        mountain.position.set(
+            Math.cos(angle) * dist,
+            40, // Half height so base is underground
+            Math.sin(angle) * dist
+        );
+        mountain.rotation.y = Math.random() * Math.PI;
+        scene.add(mountain);
+    }
+}
