@@ -1,27 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ski Resort Tycoon 3D</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-</head>
-<body>
-    <div id="loginScreen">
-        <div class="login-card">
-            <h1>🏔️ SKI RESORT <span class="blue-text">3D</span></h1>
-            <p>High-Performance WebGL Engine</p>
-            <button id="guestPlay" class="start-btn">START 3D TYCOON</button>
-        </div>
-    </div>
+let scene, camera, renderer, player, money = 100, income = 0;
+const keys = {};
 
-    <div id="gameScreen" style="display: none;">
-        <div id="hud">
-            <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
-            <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
-        </div>
-        </div>
-    <script src="game.js"></script>
-</body>
-</html>
+// Building Data (X, Z are floor coordinates. Y is height)
+const buildSteps = [
+    { id: 1, x: 0, z: -5, cost: 0, label: "Lodge Floor", type: "floor", bought: false, unlocked: true, inc: 5 },
+    { id: 2, x: 0, z: -5, cost: 100, label: "Lodge Walls", type: "walls", bought: false, unlocked: false, inc: 10, needs: 1 },
+    { id: 3, x: 0, z: -5, cost: 250, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, inc: 20, needs: 2 },
+    { id: 4, x: 10, z: -10, cost: 1000, label: "Cocoa Shop", type: "floor", bought: false, unlocked: false, inc: 100, needs: 3 }
+];
+
+function init() {
+    // 1. Scene & Sky
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x81ecec);
+
+    // 2. Camera (Perspective makes it look 3D)
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    
+    // 3. Renderer (The Engine)
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('gameScreen').appendChild(renderer.domElement);
+
+    // 4. Lights
+    const sun = new THREE.DirectionalLight(0xffffff, 1);
+    sun.position.set(5, 10, 7.5);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+    // 5. Snow Ground
+    const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(2000, 2000),
+        new THREE.MeshPhongMaterial({ color: 0xffffff })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    scene.add(ground);
+
+    // 6. Player (A 3D Character)
+    player = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 2, 1),
+        new THREE.MeshPhongMaterial({ color: 0xff7675 })
+    );
+    player.position.y = 1;
+    scene.add(player);
+
+    update();
+}
+
+function spawnObject(step) {
+    let geo, mat, mesh;
+    
+    if (step.type === "floor") {
+        geo = new THREE.BoxGeometry(6, 0.5, 6);
+        mat = new THREE.MeshPhongMaterial({ color: 0x95a5a6 });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 0.25, step.z);
+    } else if (step.type === "walls") {
+        geo = new THREE.BoxGeometry(5.5, 4, 5.5);
+        mat = new THREE.MeshPhongMaterial({ color: 0x5d4037 });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 2.5, step.z);
+    } else if (step.type === "roof") {
+        geo = new THREE.ConeGeometry(5, 4, 4); // Pyramid roof
+        mat = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(step.x, 6.5, step.z);
+        mesh.rotation.y = Math.PI / 4;
+    }
+
+    scene.add(mesh);
+}
+
+function update() {
+    requestAnimationFrame(update);
+
+    // Movement
+    const speed = 0.15;
+    if (keys['w']) player.position.z -= speed;
+    if (keys['s']) player.position.z += speed;
+    if (keys['a']) player.position.x -= speed;
+    if (keys['d']) player.position.x += speed;
+
+    // Camera follow (Offset from player)
+    camera.position.set(player.position.x, player.position.y + 12, player.position.z + 12);
+    camera.lookAt(player.position);
+
+    // Tycoon Collision
+    buildSteps.forEach(s => {
+        if (s.unlocked && !s.bought) {
+            let dist = player.position.distanceTo(new THREE.Vector3(s.x, 1, s.z));
+            if (dist < 2.5 && money >= s.cost) {
+                money -= s.cost;
+                s.bought = true;
+                income += s.inc;
+                spawnObject(s);
+                // Unlock next item
+                const next = buildSteps.find(n => n.needs === s.id);
+                if (next) next.unlocked = true;
+            }
+        }
+    });
+
+    renderer.render(scene, camera);
+    document.getElementById('moneyDisplay').innerText = Math.floor(money);
+    document.getElementById('incomeDisplay').innerText = income;
+}
+
+// Input Handlers
+window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+document.getElementById('guestPlay').onclick = () => {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('gameScreen').style.display = 'block';
+    init();
+};
+
+setInterval(() => { money += income; }, 1000);
