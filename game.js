@@ -1,3 +1,4 @@
+/* 3D SKI RESORT ENGINE */
 let scene, camera, renderer, player, money = 100, income = 0;
 const keys = {};
 
@@ -11,32 +12,20 @@ const buildSteps = [
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x81ecec);
-
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.getElementById('gameScreen').appendChild(renderer.domElement);
-
     const sun = new THREE.DirectionalLight(0xffffff, 1);
     sun.position.set(10, 20, 10);
     scene.add(sun);
     scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-    const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(2000, 2000),
-        new THREE.MeshPhongMaterial({ color: 0xffffff })
-    );
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshPhongMaterial({ color: 0xffffff }));
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
-
-    player = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 2, 1),
-        new THREE.MeshPhongMaterial({ color: 0xff7675 })
-    );
+    player = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshPhongMaterial({ color: 0xff7675 }));
     player.position.y = 1;
     scene.add(player);
-
     update();
 }
 
@@ -53,7 +42,10 @@ function spawnObject(step) {
         mat = new THREE.MeshPhongMaterial({ color: 0xfafafa });
     }
     mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(step.x, (step.type === "floor" ? 0.25 : step.type === "walls" ? 2.75 : 7), step.z);
+    let yPos = 0.25;
+    if (step.type === "walls") yPos = 2.75;
+    if (step.type === "roof") yPos = 7;
+    mesh.position.set(step.x, yPos, step.z);
     if (step.type === "roof") mesh.rotation.y = Math.PI / 4;
     scene.add(mesh);
 }
@@ -65,10 +57,8 @@ function update() {
     if (keys['s']) player.position.z += speed;
     if (keys['a']) player.position.x -= speed;
     if (keys['d']) player.position.x += speed;
-
     camera.position.set(player.position.x, player.position.y + 15, player.position.z + 15);
     camera.lookAt(player.position);
-
     buildSteps.forEach(s => {
         if (s.unlocked && !s.bought) {
             let dist = player.position.distanceTo(new THREE.Vector3(s.x, 1, s.z));
@@ -82,16 +72,15 @@ function update() {
             }
         }
     });
-
     renderer.render(scene, camera);
     document.getElementById('moneyDisplay').innerText = Math.floor(money);
     document.getElementById('incomeDisplay').innerText = income;
 }
 
-window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
-window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
 
-document.getElementById('guestPlay').onclick = () => {
+document.getElementById('guestPlay').onclick = function() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('gameScreen').style.display = 'block';
     init();
