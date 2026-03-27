@@ -32,6 +32,32 @@ function init() {
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
 
+    function addTrees() {
+    for (let i = 0; i < 100; i++) {
+        const trunkGeo = new THREE.CylinderGeometry(0.2, 0.2, 1);
+        const trunkMat = new THREE.MeshPhongMaterial({ color: 0x5d4037 });
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+
+        const leavesGeo = new THREE.ConeGeometry(1.5, 4, 8);
+        const leavesMat = new THREE.MeshPhongMaterial({ color: 0x27ae60 });
+        const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+        
+        leaves.position.y = 2.5;
+        const tree = new THREE.Group();
+        tree.add(trunk);
+        tree.add(leaves);
+
+        // Randomly scatter trees
+        tree.position.set(
+            Math.random() * 400 - 200, 
+            0.5, 
+            Math.random() * 400 - 200
+        );
+        scene.add(tree);
+    }
+}
+addTrees(); // Call this in init()
+
     // PLAYER
     player = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2, 1.2), new THREE.MeshPhongMaterial({ color: 0xff7675 }));
     player.position.y = 1;
