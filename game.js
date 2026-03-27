@@ -4,32 +4,39 @@ let activePad = null, gps, isJumping = false, yVel = 0;
 let moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 1. THE GRANULAR BUILD LIST ---
+// --- 1. THE EXPANDED BUILD LIST (35 STEPS) ---
 const buildSteps = [
+    // LOBBY PHASE
     { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 10, w: 40, d: 40 },
     { id: 2, x: 12, z: 8, cost: 250, label: "Reception Marble Desk", type: "furniture", mat: 0x34495e, inc: 15, w: 10, d: 3, needs: 1 },
-    { id: 3, x: 14, z: 10, cost: 400, label: "Computers & Phones", type: "furniture", mat: 0x2d3436, inc: 20, w: 2, d: 2, needs: 2 },
-    { id: 4, x: -10, z: -10, cost: 600, label: "Waiting Area Sofa 1", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 3 },
-    { id: 5, x: -10, z: -4, cost: 600, label: "Waiting Area Sofa 2", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 4 },
-    { id: 6, x: -10, z: -7, cost: 300, label: "Lobby Coffee Table", type: "furniture", mat: 0x7f8c8d, inc: 10, w: 3, d: 2, needs: 5 },
-    { id: 7, x: 0, z: 19, cost: 1500, label: "Lobby Glass Wall", type: "walls", mat: 0x81ecec, inc: 40, w: 40, d: 1, needs: 6 },
-    { id: 8, x: 0, z: -40, cost: 5000, label: "Suite 101 Floor", type: "floor", mat: 0xecf0f1, inc: 100, w: 30, d: 30, needs: 7 },
+    { id: 3, x: 0, z: 25, cost: 500, label: "Entrance Palm Tree L", type: "nature", mat: 0x2ecc71, inc: 5, w: 2, d: 2, needs: 2 },
+    { id: 4, x: 10, z: 25, cost: 500, label: "Entrance Palm Tree R", type: "nature", mat: 0x2ecc71, inc: 5, w: 2, d: 2, needs: 3 },
+    { id: 5, x: -10, z: -10, cost: 600, label: "Waiting Area Sofa 1", type: "furniture", mat: 0xc0392b, inc: 25, w: 6, d: 3, needs: 4 },
+    { id: 6, x: 0, z: 19, cost: 1500, label: "Lobby Glass Wall", type: "walls", mat: 0x81ecec, inc: 40, w: 40, d: 1, needs: 5 },
+    
+    // SUITE 101
+    { id: 7, x: 0, z: -40, cost: 5000, label: "Suite 101 Floor", type: "floor", mat: 0xecf0f1, inc: 100, w: 30, d: 30, needs: 6 },
+    { id: 8, x: -18, z: -40, cost: 1200, label: "Balcony Garden Rock", type: "nature", mat: 0x7f8c8d, inc: 10, w: 5, d: 5, needs: 7 },
     { id: 9, x: 0, z: -45, cost: 2500, label: "King Size Bed Frame", type: "furniture", mat: 0x3e2723, inc: 150, w: 10, d: 12, needs: 8 },
-    { id: 10, x: 0, z: -45, cost: 1200, label: "Luxury Mattress", type: "furniture", mat: 0xffffff, inc: 100, w: 9, d: 11, needs: 9 },
-    { id: 11, x: -8, z: -48, cost: 800, label: "Left Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 10 },
-    { id: 12, x: 8, z: -48, cost: 800, label: "Right Nightstand", type: "furniture", mat: 0x5d4037, inc: 50, w: 3, d: 3, needs: 11 },
-    { id: 13, x: 0, z: -30, cost: 3500, label: "Large Smart TV", type: "furniture", mat: 0x1a1a1a, inc: 200, w: 8, d: 1, needs: 12 },
-    { id: 14, x: 14, z: -40, cost: 6000, label: "Suite 101 Privacy Wall", type: "walls", mat: 0xbdc3c7, inc: 150, w: 1, d: 30, needs: 13 },
-    { id: 15, x: 50, z: 0, cost: 15000, label: "Poolside Tiling", type: "floor", mat: 0xbdc3c7, inc: 500, w: 50, d: 60, needs: 14 },
-    { id: 16, x: 50, z: 0, cost: 25000, label: "Heated Water", type: "floor", mat: 0x00d2ff, inc: 1000, w: 30, d: 40, needs: 15 },
-    { id: 17, x: 38, z: 15, cost: 2000, label: "Pool Lounge Chair A", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 16 },
-    { id: 18, x: 45, z: 15, cost: 2000, label: "Pool Lounge Chair B", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 17 },
-    { id: 19, x: 52, z: 15, cost: 2000, label: "Pool Lounge Chair C", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 18 },
-    { id: 20, x: 70, z: -10, cost: 12000, label: "Outdoor Tiki Bar", type: "furniture", mat: 0xe67e22, inc: 800, w: 8, d: 8, needs: 19 },
-    { id: 21, x: 70, z: -10, cost: 4000, label: "Bar Stools", type: "furniture", mat: 0x2c3e50, inc: 300, w: 6, d: 2, needs: 20 },
-    { id: 22, x: 100, z: 0, cost: 50000, label: "Mountain Bridge Pier", type: "floor", mat: 0x7f8c8d, inc: 2000, w: 15, d: 15, needs: 21 },
-    { id: 23, x: 140, z: 0, cost: 100000, label: "Suspension Cables", type: "walls", mat: 0x34495e, inc: 3000, w: 1, d: 80, needs: 22 },
-    { id: 24, x: 140, z: 0, cost: 150000, label: "Bridge Tarmac", type: "bridge", mat: 0x2d3436, inc: 5000, w: 80, d: 15, needs: 23 },
+    { id: 10, x: 0, z: -30, cost: 3500, label: "Large Smart TV", type: "furniture", mat: 0x1a1a1a, inc: 200, w: 8, d: 1, needs: 9 },
+    
+    // POOL AREA & NATURE
+    { id: 11, x: 50, z: 0, cost: 15000, label: "Poolside Tiling", type: "floor", mat: 0xbdc3c7, inc: 500, w: 50, d: 60, needs: 10 },
+    { id: 12, x: 50, z: 0, cost: 25000, label: "Heated Water", type: "floor", mat: 0x00d2ff, inc: 1000, w: 30, d: 40, needs: 11 },
+    { id: 13, x: 75, z: 25, cost: 3000, label: "Tropical Fern Patch", type: "nature", mat: 0x27ae60, inc: 50, w: 4, d: 4, needs: 12 },
+    { id: 14, x: 38, z: 15, cost: 2000, label: "Pool Lounge Chair A", type: "furniture", mat: 0xffffff, inc: 150, w: 3, d: 6, needs: 13 },
+    { id: 15, x: 20, z: -20, cost: 8000, label: "Giant Decorative Rock", type: "nature", mat: 0x95a5a6, inc: 100, w: 12, d: 8, needs: 14 },
+    { id: 16, x: 20, z: -15, cost: 4000, label: "Rock Waterfall Base", type: "floor", mat: 0x2980b9, inc: 200, w: 10, d: 5, needs: 15 },
+    { id: 17, x: 70, z: -10, cost: 12000, label: "Outdoor Tiki Bar", type: "furniture", mat: 0xe67e22, inc: 800, w: 8, d: 8, needs: 16 },
+    { id: 18, x: 70, z: -18, cost: 5000, label: "Tiki Bar Palm L", type: "nature", mat: 0x2ecc71, inc: 150, w: 2, d: 2, needs: 17 },
+    { id: 19, x: 78, z: -18, cost: 5000, label: "Tiki Bar Palm R", type: "nature", mat: 0x2ecc71, inc: 150, w: 2, d: 2, needs: 18 },
+    
+    // BRIDGE & BEYOND
+    { id: 20, x: 100, z: 0, cost: 50000, label: "Mountain Bridge Pier", type: "floor", mat: 0x7f8c8d, inc: 2000, w: 15, d: 15, needs: 19 },
+    { id: 21, x: 140, z: 0, cost: 100000, label: "Suspension Cables", type: "walls", mat: 0x34495e, inc: 3000, w: 1, d: 80, needs: 20 },
+    { id: 22, x: 140, z: 0, cost: 150000, label: "Bridge Tarmac", type: "bridge", mat: 0x2d3436, inc: 5000, w: 80, d: 15, needs: 21 },
+    { id: 23, x: 185, z: 12, cost: 20000, label: "Cliffside Pine Tree", type: "nature", mat: 0x013220, inc: 500, w: 3, d: 3, needs: 22 },
+    { id: 24, x: 185, z: -12, cost: 20000, label: "Cliffside Boulder", type: "nature", mat: 0x3d3d3d, inc: 500, w: 10, d: 10, needs: 23 },
     { id: 25, x: 200, z: 0, cost: 250000, label: "Mountain Welcome Sign", type: "furniture", mat: 0xf1c40f, inc: 10000, w: 10, d: 2, needs: 24 }
 ];
 
@@ -43,7 +50,7 @@ function startGame() {
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
-    scene.fog = new THREE.Fog(0x81ecec, 10, 500);
+    scene.fog = new THREE.Fog(0x81ecec, 10, 600);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 5000);
     renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
@@ -59,7 +66,7 @@ function init() {
     sea.rotation.x = -Math.PI/2; sea.position.y = -2;
     scene.add(sea);
 
-    const island = new THREE.Mesh(new THREE.CylinderGeometry(250, 260, 2, 64), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
+    const island = new THREE.Mesh(new THREE.CylinderGeometry(350, 360, 2, 64), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
     island.position.y = -1; 
     scene.add(island);
 
@@ -77,13 +84,12 @@ function init() {
     animate();
 }
 
-// --- 3. PHYSICS (JUMPING ALLOWED OVER OBJECTS) ---
+// --- 3. PHYSICS ---
 function checkCollision(nx, nz) {
-    // If player is high in the air (jumping), ignore furniture collisions
-    if (player.position.y > 2.5) return false; 
-
+    if (player.position.y > 2.8) return false; 
     for (let b of buildings) {
-        if (b.type === "walls" || b.type === "furniture") {
+        // Nature (Trees/Rocks) now have solid trunks/bases
+        if (b.type === "walls" || b.type === "furniture" || b.type === "nature") {
             let buffer = 1.1;
             if (nx > b.x - (b.w/2 + buffer) && nx < b.x + (b.w/2 + buffer) &&
                 nz > b.z - (b.d/2 + buffer) && nz < b.z + (b.d/2 + buffer)) return true;
@@ -92,12 +98,12 @@ function checkCollision(nx, nz) {
     return false;
 }
 
-// --- 4. BUILDING LOGIC (ANTI-STUCK POP-OUT) ---
+// --- 4. BUILDING LOGIC (NATURE TYPE ADDED) ---
 function spawnObject(s) {
     const group = new THREE.Group();
     let mesh;
     const isGlass = s.mat === 0x81ecec;
-    const mat = new THREE.MeshStandardMaterial({ color: s.mat, roughness: isGlass ? 0.1 : 0.7, metalness: isGlass ? 0.5 : 0.1, transparent: isGlass, opacity: isGlass ? 0.4 : 1.0 });
+    const mat = new THREE.MeshStandardMaterial({ color: s.mat, roughness: 0.8, metalness: 0.1 });
 
     if (s.type === "floor") {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 1.2, s.d), mat);
@@ -109,20 +115,35 @@ function spawnObject(s) {
         mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/2, s.d), mat);
         mesh.position.y = (s.w/4) + 1.0;
     } else if (s.type === "walls") {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 15, s.d), mat);
+        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 15, s.d), new THREE.MeshStandardMaterial({ color: s.mat, transparent: isGlass, opacity: isGlass ? 0.4 : 1.0 }));
         mesh.position.y = 8;
+    } 
+    // NEW: NATURE LOGIC
+    else if (s.type === "nature") {
+        if (s.label.includes("Tree") || s.label.includes("Palm")) {
+            // Trunk
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.7, 8, 8), new THREE.MeshStandardMaterial({ color: 0x3e2723 }));
+            trunk.position.y = 4;
+            group.add(trunk);
+            // Leaves
+            mesh = new THREE.Mesh(new THREE.SphereGeometry(s.w * 2, 8, 8), mat);
+            mesh.position.y = 8;
+        } else {
+            // Rocks
+            mesh = new THREE.Mesh(new THREE.DodecahedronGeometry(s.w/2), mat);
+            mesh.position.y = s.w/4 + 0.5;
+        }
     }
 
-    group.add(mesh);
+    if (mesh) group.add(mesh);
     group.position.set(s.x, 0, s.z);
     group.scale.set(0.01, 0.01, 0.01);
     scene.add(group);
     s.obj = group;
     if (!buildings.includes(s)) buildings.push(s);
 
-    // ANTI-STUCK: If player is inside the new object, push them back
-    let dist = player.position.distanceTo(group.position);
-    if (dist < 5) {
+    // ANTI-STUCK
+    if (player.position.distanceTo(group.position) < 5) {
         player.position.x -= Math.sin(player.rotation.y) * 8;
         player.position.z -= Math.cos(player.rotation.y) * 8;
     }
@@ -167,7 +188,7 @@ function animate() {
         gps.scale.set(1.2, 1, dist);
         gps.lookAt(activePad.position);
         
-        if (dist < 5 && wallet >= activePad.data.cost) {
+        if (dist < 4.5 && wallet >= activePad.data.cost) {
             wallet -= activePad.data.cost;
             activePad.data.bought = true;
             income += activePad.data.inc;
@@ -186,8 +207,7 @@ function refreshPads() {
     scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
     if (next) {
-        // SMALLER BUTTON (Radius 3 instead of 4)
-        activePad = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 0.6, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x002200 }));
+        activePad = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.6, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x002200 }));
         activePad.position.set(next.x, 1.1, next.z); 
         activePad.isPad = true; activePad.data = next;
         scene.add(activePad);
