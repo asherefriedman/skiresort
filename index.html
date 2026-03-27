@@ -2,10 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ski Resort Tycoon 3D</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
@@ -13,30 +11,30 @@
     <div id="loginScreen">
         <div class="login-card">
             <h1>🏔️ SKI RESORT <span class="blue-text">3D</span></h1>
-            <p>Ready to Build?</p>
-            <button id="guestPlay" class="start-btn">PLAY NOW</button>
+            <p>Status: <span id="engineStatus">Loading Engine...</span></p>
+            <button id="guestPlay" class="start-btn" style="display:none;">PLAY NOW</button>
         </div>
     </div>
 
     <div id="gameScreen" style="display: none;">
         <div id="hud">
-            <div class="stat-box">
-                💰 $<span id="moneyDisplay">0</span>
-            </div>
-            <div class="income-tag">
-                +$<span id="incomeDisplay">0</span>/sec
-            </div>
+            <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
+            <div id="zoneDisplay">Next: Lodge Floor ($0)</div>
+            <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
         </div>
-        </div>
+    </div>
 
     <script src="game.js"></script>
-    <div id="hud">
-    <div class="stat-box">💰 $<span id="moneyDisplay">0</span></div>
-    <div id="zoneDisplay" style="background: rgba(0,0,0,0.5); color: white; padding: 5px 15px; border-radius: 10px; margin-top: 10px; font-weight: bold;">
-        Next: Lodge Floor ($0)
-    </div>
-    <div class="income-tag">+$<span id="incomeDisplay">0</span>/sec</div>
-</div>
 
+    <script>
+        // Emergency check to show the button once Three.js is ready
+        const checkLoad = setInterval(() => {
+            if (typeof THREE !== 'undefined') {
+                document.getElementById('engineStatus').innerText = "Engine Ready!";
+                document.getElementById('guestPlay').style.display = "inline-block";
+                clearInterval(checkLoad);
+            }
+        }, 500);
+    </script>
 </body>
 </html>
