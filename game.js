@@ -1,9 +1,10 @@
+// --- GLOBAL CONSTANTS & STATE ---
 let scene, camera, renderer, player, wallet = 200, income = 0;
 let activePad = null, gps, isJumping = false, yVel = 0;
 let moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 1. THE FULL RESORT LIST ---
+// --- 1. FULL 28-STEP BALANCED ECONOMY ---
 const buildSteps = [
     { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 5, w: 40, d: 40 },
     { id: 2, x: 12, z: 8, cost: 100, label: "Reception Desk", type: "furniture", mat: 0x34495e, inc: 8, w: 10, d: 3, needs: 1 },
@@ -35,6 +36,7 @@ const buildSteps = [
     { id: 28, x: 200, z: 0, cost: 200000, label: "Mountain Sign", type: "furniture", mat: 0xf1c40f, inc: 8000, w: 10, d: 2, needs: 27 }
 ];
 
+// --- 2. STARTUP ---
 function startGame() {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gui').style.display = 'block';
@@ -44,41 +46,44 @@ function startGame() {
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
-    scene.fog = new THREE.Fog(0x81ecec, 1, 1500);
+    scene.fog = new THREE.Fog(0x81ecec, 1, 2000);
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 3000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 5000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    let sun = new THREE.DirectionalLight(0xffffff, 1.0);
-    sun.position.set(50, 100, 50);
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(50, 150, 50);
     scene.add(sun);
 
-    // Island & Sea
-    const island = new THREE.Mesh(new THREE.CylinderGeometry(800, 810, 4, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
-    island.position.y = -2;
+    // Island Ground
+    const island = new THREE.Mesh(new THREE.CylinderGeometry(800, 820, 5, 64), new THREE.MeshPhongMaterial({ color: 0x2ecc71 }));
+    island.position.y = -2.5;
     scene.add(island);
 
-    const sea = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.6 }));
-    sea.rotation.x = -Math.PI/2; sea.position.y = -3;
+    // Sea
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(15000, 15000), new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.7 }));
+    sea.rotation.x = -Math.PI/2; sea.position.y = -3.5;
     scene.add(sea);
 
-    // Player (The Blue Capsule)
+    // Player (Blue Capsule)
     player = new THREE.Group();
     const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
     pMesh.position.y = 1.75;
     player.add(pMesh);
     scene.add(player);
-    player.position.set(0, 5, 40); 
+    player.position.set(0, 10, 45); 
 
-    gps = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5 }));
+    // GPS Helper
+    gps = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.5 }));
     scene.add(gps);
 
     initSaveSystem();
 
-    // Force build Item #1
+    // Ensure first item exists
     if (!buildSteps.find(s => s.bought)) {
         buildSteps[0].bought = true;
         spawnObject(buildSteps[0]);
@@ -89,64 +94,84 @@ function init() {
     animate();
 }
 
+// --- 3. ADVANCED SPAWNER (RESTORED LOGIC) ---
 function spawnObject(s) {
+    if (!s) return;
     const group = new THREE.Group();
-    let mesh;
-    const mat = new THREE.MeshStandardMaterial({ color: s.mat });
+    let mainMesh;
+    const isGlass = s.mat === 0x81ecec;
+    const mat = new THREE.MeshStandardMaterial({ color: s.mat, roughness: 0.7, transparent: isGlass, opacity: isGlass ? 0.4 : 1.0 });
 
     if (s.type === "floor" || s.type === "bridge") {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, 1.2, s.d), mat);
+        mainMesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.type === "bridge" ? 2.5 : 1.2, s.d), mat);
     } else if (s.type === "palm") {
-        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 8), new THREE.MeshStandardMaterial({color: 0x5d4037}));
-        trunk.position.y = 4; group.add(trunk);
-        mesh = new THREE.Mesh(new THREE.SphereGeometry(s.w * 2), mat);
-        mesh.position.y = 8;
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 9, 8), new THREE.MeshStandardMaterial({ color: 0x5d4037 }));
+        trunk.position.y = 4.5;
+        group.add(trunk);
+        mainMesh = new THREE.Mesh(new THREE.SphereGeometry(s.w * 2.2, 8, 8), mat);
+        mainMesh.position.y = 10;
+    } else if (s.type === "rock") {
+        mainMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(s.w, 0), mat);
+        mainMesh.rotation.set(Math.random(), Math.random(), Math.random());
+    } else if (s.type === "nature") {
+        mainMesh = new THREE.Mesh(new THREE.ConeGeometry(s.w, s.w * 3, 8), mat);
+        mainMesh.position.y = (s.w * 1.5);
     } else {
-        mesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/3 + 1, s.d), mat);
+        mainMesh = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.w/2 + 0.5, s.d), mat);
+        mainMesh.position.y = (s.w/4) + 1;
     }
 
-    group.add(mesh);
-    group.position.set(s.x, (s.type === "floor" ? 0.6 : 1), s.z);
+    if (mainMesh) group.add(mainMesh);
+    group.position.set(s.x, (s.type === "floor" ? 0.6 : 0), s.z);
+    group.scale.set(0.01, 0.01, 0.01);
     scene.add(group);
     s.obj = group;
     if (!buildings.includes(s)) buildings.push(s);
 }
 
+// --- 4. CORE ENGINE ---
 function animate() {
     requestAnimationFrame(animate);
 
+    // Smoothing Movement
     let targetSpeed = 0;
-    if (keys['w']) targetSpeed = 0.8;
-    if (keys['s']) targetSpeed = -0.4;
-    moveSpeed += (targetSpeed - moveSpeed) * 0.1;
+    if (keys['w']) targetSpeed = 0.85;
+    if (keys['s']) targetSpeed = -0.45;
+    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
 
     player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
     player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
 
-    if (keys['a']) player.rotation.y += 0.05;
-    if (keys['d']) player.rotation.y -= 0.05;
+    if (keys['a']) player.rotation.y += 0.06;
+    if (keys['d']) player.rotation.y -= 0.06;
 
-    if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
+    // Jump Physics
+    if (keys[' '] && !isJumping) { yVel = 0.55; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
-        yVel -= 0.025;
+        yVel -= 0.03;
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    const camOffset = new THREE.Vector3(0, 12, 25).applyMatrix4(player.matrixWorld);
-    camera.position.lerp(camOffset, 0.1);
-    camera.lookAt(player.position.x, player.position.y + 2, player.position.z);
+    // Camera Chase
+    const camPos = new THREE.Vector3(0, 12, 28).applyMatrix4(player.matrixWorld);
+    camera.position.lerp(camPos, 0.15);
+    camera.lookAt(player.position.x, player.position.y + 2.5, player.position.z);
 
+    // Object "Pop-in" Animation
+    buildSteps.forEach(b => { if(b.obj && b.obj.scale.x < 1) b.obj.scale.lerp(new THREE.Vector3(1,1,1), 0.12); });
+
+    // GPS & Buying Logic
     if (activePad) {
         let dist = player.position.distanceTo(activePad.position);
-        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1, player.position.z + (activePad.position.z - player.position.z)/2);
-        gps.scale.set(1, 1, dist);
+        gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 1.2, player.position.z + (activePad.position.z - player.position.z)/2);
+        gps.scale.set(1.2, 1, dist);
         gps.lookAt(activePad.position);
         
         if (dist < 5 && wallet >= activePad.data.cost) {
             wallet -= activePad.data.cost;
             activePad.data.bought = true;
-            income += activePad.data.inc;
+            income += (activePad.data.inc || 0);
             spawnObject(activePad.data);
             refreshPads();
         }
@@ -157,11 +182,12 @@ function animate() {
     document.getElementById('i-val').innerText = income;
 }
 
+// --- 5. UTILITIES ---
 function refreshPads() {
     scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
     if (next) {
-        activePad = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.5, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x003300 }));
+        activePad = new THREE.Mesh(new THREE.CylinderGeometry(2.8, 2.8, 0.6, 32), new THREE.MeshPhongMaterial({ color: 0x2ecc71, emissive: 0x004400 }));
         activePad.position.set(next.x, 0.8, next.z); 
         activePad.isPad = true; activePad.data = next;
         scene.add(activePad);
@@ -172,12 +198,14 @@ function refreshPads() {
 function initSaveSystem() {
     const raw = localStorage.getItem('MegaResort_Save');
     if (raw) {
-        const data = JSON.parse(raw);
-        wallet = data.wallet; income = data.income;
-        data.bought.forEach(id => {
-            const s = buildSteps.find(x => x.id === id);
-            if(s) { s.bought = true; spawnObject(s); }
-        });
+        try {
+            const data = JSON.parse(raw);
+            wallet = data.wallet; income = data.income;
+            data.bought.forEach(id => {
+                const s = buildSteps.find(x => x.id === id);
+                if(s) { s.bought = true; spawnObject(s); }
+            });
+        } catch(e) { console.warn("Save Error"); }
     }
 }
 
@@ -190,3 +218,8 @@ setInterval(() => {
 
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
