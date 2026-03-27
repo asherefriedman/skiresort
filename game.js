@@ -1,18 +1,19 @@
-/* 3D SKI RESORT - RED BUTTONS & NAVIGATION */
+/* 3D SKI RESORT - GPS PATH & COST DISPLAY */
 let scene, camera, renderer, player, money = 100, income = 0;
-let activePad = null, arrow = null;
+let activePad = null, gpsLine = null, costLabel = null;
 const keys = {};
 
 const buildSteps = [
     { id: 1, x: 0, z: -10, cost: 0, label: "Lodge Floor", type: "floor", bought: false, unlocked: true, inc: 5, needs: 0 },
     { id: 2, x: 0, z: -10, cost: 50, label: "Lodge Walls", type: "walls", bought: false, unlocked: false, inc: 10, needs: 1 },
     { id: 3, x: 0, z: -10, cost: 250, label: "Lodge Roof", type: "roof", bought: false, unlocked: false, inc: 20, needs: 2 },
-    { id: 4, x: 20, z: -20, cost: 1000, label: "Cocoa Shop", type: "floor", bought: false, unlocked: false, inc: 100, needs: 3 }
+    { id: 4, x: 25, z: -25, cost: 1000, label: "Cocoa Shop", type: "floor", bought: false, unlocked: false, inc: 100, needs: 3 }
 ];
 
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x81ecec); // Sky Blue
+    scene.background = new THREE.Color(0x81ecec); 
+
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -23,10 +24,10 @@ function init() {
     scene.add(sun);
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
-    // ICY BLUE GROUND (So white roofs show up!)
+    // ICY BLUE GROUND
     const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(2000, 2000),
-        new THREE.MeshPhongMaterial({ color: 0xe1f5fe }) 
+        new THREE.MeshPhongMaterial({ color: 0xbbdefb }) // Clear Ice Blue
     );
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
@@ -36,38 +37,36 @@ function init() {
     player.position.y = 1;
     scene.add(player);
 
-    // FLOATING ARROW
-    const arrowGeo = new THREE.ConeGeometry(0.5, 1, 4);
-    const arrowMat = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-    arrow = new THREE.Mesh(arrowGeo, arrowMat);
-    arrow.rotation.x = Math.PI; // Point down
-    scene.add(arrow);
+    // GPS LINE SETUP
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x00ff00, linewidth: 5 });
+    const points = [new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0)];
+    const lineGeo = new THREE.BufferGeometry().setFromPoints(points);
+    gpsLine = new THREE.Line(lineGeo, lineMat);
+    scene.add(gpsLine);
 
     refreshPads();
     update();
 }
 
 function refreshPads() {
-    // Remove old pads
-    const oldPads = scene.children.filter(child => child.isPad);
-    oldPads.forEach(p => scene.remove(p));
+    // Clean up old pads
+    scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
 
-    // Find the next thing to buy
-    const nextStep = buildSteps.find(s => s.unlocked && !s.bought);
-    if (nextStep) {
-        // Create 3D Red Button (Cylinder)
+    const next = buildSteps.find(s => s.unlocked && !s.bought);
+    if (next) {
         const padGeo = new THREE.CylinderGeometry(2, 2, 0.2, 32);
         const padMat = new THREE.MeshPhongMaterial({ color: 0xff0000 });
         activePad = new THREE.Mesh(padGeo, padMat);
-        activePad.position.set(nextStep.x, 0.1, nextStep.z);
+        activePad.position.set(next.x, 0.1, next.z);
         activePad.isPad = true;
-        activePad.stepData = nextStep;
+        activePad.stepData = next;
         scene.add(activePad);
         
-        arrow.visible = true;
-        arrow.position.set(nextStep.x, 5, nextStep.z);
+        // Show cost in HUD or console (3D Text is complex, so we'll use a dynamic HUD)
+        document.getElementById('zoneDisplay').innerText = `Next: ${next.label} ($${next.cost})`;
     } else {
-        arrow.visible = false;
+        activePad = null;
+        document.getElementById('zoneDisplay').innerText = "All Built!";
     }
 }
 
@@ -81,7 +80,7 @@ function spawnObject(step) {
         mat = new THREE.MeshPhongMaterial({ color: 0x5d4037 });
     } else if (step.type === "roof") {
         geo = new THREE.ConeGeometry(8, 5, 4);
-        mat = new THREE.MeshPhongMaterial({ color: 0xffffff }); // Bright White
+        mat = new THREE.MeshPhongMaterial({ color: 0xffffff }); // Snowy White
     }
     mesh = new THREE.Mesh(geo, mat);
     let yPos = (step.type === "floor" ? 0.25 : step.type === "walls" ? 3 : 8.5);
@@ -101,14 +100,15 @@ function update() {
     camera.position.set(player.position.x, player.position.y + 18, player.position.z + 18);
     camera.lookAt(player.position);
 
-    // Bounce the arrow
-    if (arrow.visible) {
-        arrow.position.y = 4 + Math.sin(Date.now() * 0.005) * 0.5;
-        arrow.rotation.y += 0.02;
-    }
-
-    // Check collision with the Red Pad
+    // UPDATE GPS LINE
     if (activePad) {
+        const points = [];
+        points.push(new THREE.Vector3(player.position.x, 0.2, player.position.z));
+        points.push(new THREE.Vector3(activePad.position.x, 0.2, activePad.position.z));
+        gpsLine.geometry.setFromPoints(points);
+        gpsLine.visible = true;
+
+        // Check Collision
         let dist = player.position.distanceTo(new THREE.Vector3(activePad.position.x, 1, activePad.position.z));
         let step = activePad.stepData;
         if (dist < 2.5 && money >= step.cost) {
@@ -116,27 +116,5 @@ function update() {
             step.bought = true;
             income += step.inc;
             spawnObject(step);
-            
-            // Unlock next
-            let next = buildSteps.find(n => n.needs === step.id);
-            if (next) next.unlocked = true;
-            
-            refreshPads();
-        }
-    }
-
-    renderer.render(scene, camera);
-    document.getElementById('moneyDisplay').innerText = Math.floor(money);
-    document.getElementById('incomeDisplay').innerText = income;
-}
-
-window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
-window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-
-document.getElementById('guestPlay').onclick = function() {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('gameScreen').style.display = 'block';
-    init();
-};
-
-setInterval(() => { money += income; }, 1000);
+            let n = buildSteps.find(item => item.needs === step.id);
+            if (n) n.unlocked =
