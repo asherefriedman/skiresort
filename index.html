@@ -7,36 +7,27 @@
     <style>
         body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; }
         #hud { position: fixed; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; pointer-events: none; z-index: 100; }
-        .money-bar { background: rgba(255, 255, 255, 0.95); padding: 10px 40px; border-radius: 12px; border-bottom: 5px solid #0984e3; display: flex; gap: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .stat { text-align: center; }
-        .label { font-size: 12px; color: #636e72; font-weight: bold; text-transform: uppercase; }
-        .value { font-size: 28px; font-weight: 900; color: #2d3436; }
-        #zoneInfo { background: #0984e3; color: white; padding: 8px 20px; border-radius: 0 0 10px 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
+        .money-bar { background: rgba(255, 255, 255, 0.95); padding: 12px 50px; border-radius: 15px; border-bottom: 6px solid #0984e3; display: flex; flex-direction: column; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        .value { font-size: 36px; font-weight: 900; color: #2d3436; }
+        .income-text { font-size: 18px; color: #00b894; font-weight: bold; margin-top: -5px; }
+        #zoneInfo { background: #0984e3; color: white; padding: 8px 25px; border-radius: 0 0 10px 10px; font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
         #startMenu { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: radial-gradient(circle, #74b9ff, #0984e3); z-index: 1000; }
-        .card { background: white; padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
-        .play-btn { padding: 15px 50px; background: #00cec9; color: white; border-radius: 15px; border: none; cursor: pointer; font-size: 24px; font-weight: bold; box-shadow: 0 6px 0 #00b894; transition: 0.1s; }
-        .play-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #00b894; }
+        .card { background: white; padding: 50px; border-radius: 30px; text-align: center; }
+        .play-btn { padding: 15px 60px; background: #00cec9; color: white; border-radius: 15px; border: none; cursor: pointer; font-size: 24px; font-weight: bold; box-shadow: 0 6px 0 #00b894; }
     </style>
 </head>
 <body>
     <div id="startMenu">
         <div class="card">
-            <h1 style="font-size: 42px; margin-bottom: 5px;">🏔️ ALPINE RESORT <span style="color:#0984e3">2</span></h1>
-            <p style="color: #636e72; margin-bottom: 25px;">Use Arrow Keys or WASD to move.</p>
-            <button class="play-btn" onclick="begin()">CLAIM TYCOON</button>
+            <h1 style="font-size: 42px;">🏔️ ALPINE RESORT <span style="color:#0984e3">2</span></h1>
+            <button class="play-btn" onclick="begin()">START BUILDING</button>
         </div>
     </div>
     <div id="ui" style="display:none">
         <div id="hud">
             <div class="money-bar">
-                <div class="stat">
-                    <div class="label">Wallet</div>
-                    <div class="value">💰 $<span id="wallet">0</span></div>
-                </div>
-                <div class="stat">
-                    <div class="label">Banked (Go to Safe)</div>
-                    <div class="value" style="color:#00b894;">🏦 $<span id="banked">0</span></div>
-                </div>
+                <div class="value">💰 $<span id="wallet">0</span></div>
+                <div class="income-text">+$<span id="inc">0</span> / SEC</div>
             </div>
             <div id="zoneInfo">Next: Welcome Center</div>
         </div>
