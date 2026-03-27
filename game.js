@@ -17,6 +17,66 @@ const buildSteps = [
     { id: 10, x: 150, z: 50, cost: 500000, label: "Mountain Bridge", type: "bridge", mat: 0x7f8c8d, inc: 5000, needs: 9 }
 ];
 
+// --- THE CHROMEBOOK-SAFE SAVE ENGINE ---
+
+// 1. Run this immediately when the script loads
+function initSaveSystem() {
+    const raw = localStorage.getItem('MegaResort_Data');
+    if (raw) {
+        const data = JSON.parse(raw);
+        wallet = data.wallet;
+        income = data.income;
+        
+        // Re-buy everything from the list
+        data.unlocked.forEach(id => {
+            const step = buildSteps.find(s => s.id === id);
+            if (step) {
+                step.bought = true;
+                spawnObject(step);
+            }
+        });
+        console.log("Welcome back! Progress restored.");
+    }
+}
+
+// 2. Call this every time a player buys something
+function autoSave() {
+    const saveObj = {
+        wallet: wallet,
+        income: income,
+        unlocked: buildSteps.filter(s => s.bought).map(s => s.id)
+    };
+    localStorage.setItem('MegaResort_Data', JSON.stringify(saveObj));
+    
+    // Quick UI flash
+    const status = document.getElementById('save-status');
+    status.innerText = "✅ Saved!";
+    setTimeout(() => { status.innerText = "💾 Game Autosaved"; }, 2000);
+}
+
+// 3. The "Transfer" System (Copy this to a Google Doc to move to another PC)
+function exportSave() {
+    const data = localStorage.getItem('MegaResort_Data');
+    if (data) {
+        const base64 = btoa(data); // Turns the save into a short code
+        navigator.clipboard.writeText(base64);
+        alert("Save Code copied to clipboard! Paste it into a Google Doc to keep it safe.");
+    }
+}
+
+function importSave() {
+    const code = prompt("Paste your Secret Save Code here:");
+    if (code) {
+        try {
+            const decoded = atob(code);
+            localStorage.setItem('MegaResort_Data', decoded);
+            location.reload(); // Restart game to apply save
+        } catch(e) {
+            alert("Invalid Code!");
+        }
+    }
+}
+
 function startGame() {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gui').style.display = 'block';
