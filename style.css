@@ -1,15 +1,30 @@
-body, html { margin: 0; padding: 0; overflow: hidden; background: #2d3436; font-family: sans-serif; }
-#hud { position: fixed; top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 10; pointer-events: none; }
-.stat-container { display: flex; gap: 15px; }
-.stat-box, .zone-box { background: white; padding: 12px 30px; border-radius: 50px; border: 4px solid #0984e3; font-size: 24px; font-weight: bold; box-shadow: 0 5px 0 #0652dd; }
-.income-tag { margin-top: 10px; color: #55efc4; font-weight: bold; text-shadow: 1px 1px 2px black; }
+body, html {
+    margin: 0; padding: 0;
+    overflow: hidden;
+    background-color: #1e272e;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-#modPanel { position: fixed; left: -320px; top: 0; width: 280px; height: 100%; background: rgba(255,255,255,0.95); padding: 20px; z-index: 100; transition: 0.3s; display: flex; flex-direction: column; gap: 8px; box-shadow: 5px 0 15px rgba(0,0,0,0.5); overflow-y: auto; }
-#modPanel.active { left: 0; }
-#modPanel input, #modPanel select, #modPanel textarea { padding: 8px; border: 1px solid #dfe6e9; border-radius: 5px; font-size: 12px; }
-#exportBox { height: 100px; background: #2d3436; color: #55efc4; }
+#hud {
+    position: fixed; top: 20px; width: 100%;
+    display: flex; flex-direction: column; align-items: center;
+    pointer-events: none; z-index: 100;
+}
 
-#toggleMod { position: fixed; left: 10px; bottom: 10px; z-index: 101; padding: 10px; border-radius: 5px; background: #0984e3; color: white; border: none; cursor: pointer; }
-.start-btn { padding: 20px 50px; background: #00cec9; color: white; border-radius: 15px; border: none; cursor: pointer; font-size: 20px; font-weight: bold; box-shadow: 0 6px 0 #00b894; }
-.login-card { background: white; padding: 50px; border-radius: 30px; text-align: center; }
-#loginScreen { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; background: #74b9ff; z-index: 1000; }
+.stat-box {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 40px; border-radius: 50px;
+    border: 4px solid #0984e3; font-size: 28px; font-weight: bold;
+}
+
+.income-tag { color: #00cec9; font-weight: bold; margin-top: 5px; text-shadow: 1px 1px 2px black; }
+
+#loginScreen {
+    position: fixed; width: 100%; height: 100%;
+    display: flex; justify-content: center; align-items: center;
+    background: linear-gradient(to bottom, #74b9ff, #a29bfe);
+    z-index: 1000;
+}
+
+.login-card { background: white; padding: 50px; border-radius: 30px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.start-btn { padding: 15px 40px; background: #00cec9; color: white; border: none; border-radius: 10px; font-size: 20px; cursor: pointer; font-weight: bold; }
