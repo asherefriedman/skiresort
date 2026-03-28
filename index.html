@@ -4,39 +4,237 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mega Resort Tycoon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #gui { position: fixed; top: 20px; left: 20px; color: white; text-shadow: 2px 2px 4px #000; z-index: 10; display: none; pointer-events: none; }
-        #m-val { color: #f1c40f; font-size: 28px; font-weight: bold; }
-        #i-val { color: #2ecc71; font-size: 18px; }
-        #hint { margin-top: 15px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; border-left: 5px solid #ffff00; width: fit-content; }
-        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0fbcf9; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
-        button { padding: 15px 40px; font-size: 22px; cursor: pointer; background: #f1c40f; border: none; border-radius: 50px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* ── START SCREEN ── */
+        #startScreen {
+            position: fixed; inset: 0;
+            background: linear-gradient(160deg, #0a3d62 0%, #0fbcf9 60%, #6dd5fa 100%);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100;
+            gap: 12px;
+        }
+
+        #startScreen::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .start-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(56px, 10vw, 110px);
+            color: #fff;
+            letter-spacing: 4px;
+            text-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.15);
+            line-height: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .start-sub {
+            font-size: 16px;
+            color: rgba(255,255,255,0.7);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        #startBtn {
+            padding: 18px 56px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            background: #f1c40f;
+            color: #1a1a2e;
+            border: none;
+            border-radius: 60px;
+            box-shadow: 0 6px 30px rgba(241,196,15,0.5), 0 2px 0 #c9a800;
+            transition: transform 0.12s, box-shadow 0.12s;
+            position: relative;
+        }
+        #startBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(241,196,15,0.6), 0 2px 0 #c9a800; }
+        #startBtn:active { transform: translateY(1px); }
+
+        .controls-hint {
+            margin-top: 28px;
+            display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+        }
+        .ctrl {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 8px 14px;
+            color: rgba(255,255,255,0.85);
+            font-size: 13px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .ctrl kbd {
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            padding: 2px 7px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        /* ── HUD ── */
+        #gui {
+            position: fixed; top: 0; left: 0; right: 0;
+            display: none;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #hud-bar {
+            display: flex; align-items: center;
+            background: rgba(10,20,40,0.75);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 24px;
+            gap: 32px;
+        }
+
+        .hud-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: #f1c40f;
+            letter-spacing: 2px;
+            margin-right: auto;
+        }
+
+        .hud-stat {
+            display: flex; flex-direction: column; align-items: flex-end;
+        }
+        .hud-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255,255,255,0.45);
+        }
+        .hud-value {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px;
+            line-height: 1;
+        }
+        #m-val { color: #f1c40f; }
+        #i-val { color: #2ecc71; }
+
+        /* ── NEXT BUILDING CARD ── */
+        #hint-card {
+            position: fixed;
+            bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(10,20,40,0.82);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid #f1c40f;
+            border-radius: 12px;
+            padding: 14px 24px;
+            color: #fff;
+            display: none;
+            pointer-events: none;
+            z-index: 10;
+            white-space: nowrap;
+            text-align: center;
+        }
+        .hint-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+        .hint-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
+        .hint-cost { font-size: 13px; color: #f1c40f; margin-top: 2px; }
+
+        /* ── BUY PROMPT ── */
+        #buy-prompt {
+            position: fixed;
+            bottom: 110px; left: 50%; transform: translateX(-50%);
+            background: #f1c40f;
+            color: #1a1a2e;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            padding: 10px 28px;
+            border-radius: 40px;
+            display: none;
+            pointer-events: none;
+            z-index: 10;
+            animation: pulse 1s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.04); } }
+
+        /* ── TOAST ── */
+        #toast {
+            position: fixed;
+            top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #2ecc71;
+            color: #fff;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 20px;
+            letter-spacing: 2px;
+            padding: 10px 28px;
+            border-radius: 40px;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            z-index: 20;
+        }
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body>
 
+    <!-- START SCREEN -->
     <div id="startScreen">
-        <h1 style="font-size: 40px;">🌴 MEGA RESORT</h1>
-        <button onclick="startGame()">START BUILDING</button>
+        <div class="start-logo">🌴 MEGA<br>RESORT</div>
+        <div class="start-sub">Tycoon Edition</div>
+        <button id="startBtn" onclick="startGame()">START BUILDING</button>
+        <div class="controls-hint">
+            <div class="ctrl"><kbd>W</kbd><kbd>S</kbd> Move</div>
+            <div class="ctrl"><kbd>A</kbd><kbd>D</kbd> Turn</div>
+            <div class="ctrl"><kbd>Space</kbd> Jump</div>
+            <div class="ctrl"><kbd>E</kbd> Buy</div>
+        </div>
     </div>
 
+    <!-- HUD -->
     <div id="gui">
-        <div>Money: $<span id="m-val">200</span></div>
-        <div>Income: $<span id="i-val">0</span>/s</div>
-        <div id="hint">Next: Lobby Foundation</div>
+        <div id="hud-bar">
+            <div class="hud-logo">🌴 MEGA RESORT</div>
+            <div class="hud-stat">
+                <div class="hud-label">Balance</div>
+                <div class="hud-value" id="m-val">$200</div>
+            </div>
+            <div class="hud-stat">
+                <div class="hud-label">Income</div>
+                <div class="hud-value" id="i-val">$0/s</div>
+            </div>
+        </div>
     </div>
 
-
-    <div id="startScreen">
-        <h1>🌴 MEGA RESORT</h1>
-        <button onclick="startGame()">START BUILDING</button>
+    <!-- NEXT BUILDING CARD -->
+    <div id="hint-card">
+        <div class="hint-label">Next Unlock</div>
+        <div class="hint-name" id="hint-name">Lobby Foundation</div>
+        <div class="hint-cost" id="hint-cost">FREE</div>
     </div>
 
-    <div id="gui">...your stats here...</div>
+    <!-- BUY PROMPT -->
+    <div id="buy-prompt">Press E to Buy</div>
+
+    <!-- TOAST -->
+    <div id="toast"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
-    
     <script src="game.js"></script>
 </body>
 </html>
