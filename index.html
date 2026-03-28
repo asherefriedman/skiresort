@@ -6,432 +6,399 @@
     <title>Mega Resort Tycoon</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        body { overflow: hidden; background: #0fbcf9; font-family: 'DM Sans', sans-serif; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { overflow:hidden; background:#000; font-family:'DM Sans',sans-serif; }
 
         #startScreen {
-            position: fixed; inset: 0;
-            background: linear-gradient(160deg, #0a3d62 0%, #0fbcf9 60%, #6dd5fa 100%);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 100; gap: 12px;
+            position:fixed; inset:0; z-index:100;
+            background:linear-gradient(160deg,#0a3d62,#0fbcf9,#6dd5fa);
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center; gap:16px;
         }
-        .start-logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: clamp(56px, 10vw, 110px);
-            color: #fff; letter-spacing: 4px;
-            text-shadow: 0 8px 40px rgba(0,0,0,0.4);
-            line-height: 1; text-align: center;
-        }
-        .start-sub {
-            font-size: 16px; color: rgba(255,255,255,0.7);
-            letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px;
-        }
+        .logo { font-family:'Bebas Neue',sans-serif; font-size:90px; color:#fff; letter-spacing:6px; text-align:center; line-height:1; text-shadow:0 4px 30px rgba(0,0,0,0.4); }
+        .sub  { color:rgba(255,255,255,0.6); letter-spacing:4px; font-size:14px; text-transform:uppercase; }
         #startBtn {
-            padding: 18px 56px; font-family: 'Bebas Neue', sans-serif;
-            font-size: 26px; letter-spacing: 3px; cursor: pointer;
-            background: #f1c40f; color: #1a1a2e; border: none;
-            border-radius: 60px; box-shadow: 0 6px 30px rgba(241,196,15,0.5);
-            transition: transform 0.12s;
+            margin-top:10px; padding:16px 52px;
+            font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px;
+            background:#f1c40f; color:#1a1a2e; border:none; border-radius:50px;
+            cursor:pointer; box-shadow:0 6px 24px rgba(241,196,15,0.45);
+            transition:transform .15s,box-shadow .15s;
         }
-        #startBtn:hover { transform: translateY(-3px); }
+        #startBtn:hover { transform:translateY(-3px); box-shadow:0 10px 32px rgba(241,196,15,0.6); }
+        .ctrls { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:8px; }
+        .key {
+            background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.22);
+            border-radius:8px; padding:7px 13px; color:rgba(255,255,255,0.85); font-size:13px;
+        }
+        .key b { background:rgba(255,255,255,0.22); border-radius:4px; padding:1px 6px; font-family:monospace; }
 
-        .controls-hint {
-            margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+        /* HUD */
+        #hud {
+            position:fixed; top:0; left:0; right:0; z-index:10;
+            display:none; pointer-events:none;
+            background:rgba(8,16,32,0.78); backdrop-filter:blur(10px);
+            border-bottom:1px solid rgba(255,255,255,0.07);
+            padding:10px 24px; display:none;
+            flex-direction:row; align-items:center; gap:28px;
         }
-        .ctrl {
-            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px; padding: 8px 14px; color: rgba(255,255,255,0.85);
-            font-size: 13px; display: flex; align-items: center; gap: 6px;
-        }
-        .ctrl kbd {
-            background: rgba(255,255,255,0.2); border-radius: 5px;
-            padding: 2px 7px; font-family: monospace; font-size: 12px;
-        }
+        .hud-brand { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#f1c40f; letter-spacing:2px; margin-right:auto; }
+        .hud-block { display:flex; flex-direction:column; align-items:flex-end; }
+        .hud-lbl { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.38); }
+        .hud-num { font-family:'Bebas Neue',sans-serif; font-size:28px; line-height:1; }
+        #mv { color:#f1c40f; } #iv { color:#2ecc71; }
 
-        canvas { position: fixed; top: 0; left: 0; z-index: 1; }
-
-        #gui {
-            position: fixed; top: 0; left: 0; right: 0;
-            display: none; pointer-events: none; z-index: 10;
+        /* Next card */
+        #card {
+            position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+            background:rgba(8,16,32,0.82); backdrop-filter:blur(10px);
+            border:1px solid rgba(255,255,255,0.08); border-left:4px solid #f1c40f;
+            border-radius:12px; padding:12px 22px; color:#fff;
+            text-align:center; display:none; pointer-events:none; z-index:10;
         }
-        #hud-bar {
-            display: flex; align-items: center;
-            background: rgba(10,20,40,0.75); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 10px 24px; gap: 32px;
-        }
-        .hud-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #f1c40f; letter-spacing: 2px; margin-right: auto; }
-        .hud-stat { display: flex; flex-direction: column; align-items: flex-end; }
-        .hud-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.45); }
-        .hud-value { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; }
-        #m-val { color: #f1c40f; }
-        #i-val { color: #2ecc71; }
+        .card-lbl { font-size:9px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.38); margin-bottom:3px; }
+        .card-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
+        .card-cost { font-size:12px; color:#f1c40f; margin-top:2px; }
 
-        #hint-card {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(10,20,40,0.82); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid #f1c40f;
-            border-radius: 12px; padding: 14px 24px; color: #fff;
-            display: none; pointer-events: none; z-index: 10;
-            white-space: nowrap; text-align: center;
+        /* Buy prompt */
+        #buyprompt {
+            position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+            background:#f1c40f; color:#1a1a2e;
+            font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px;
+            padding:10px 30px; border-radius:40px;
+            display:none; pointer-events:none; z-index:10;
+            animation:pop 1s ease-in-out infinite;
         }
-        .hint-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
-        .hint-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
-        .hint-cost { font-size: 13px; color: #f1c40f; margin-top: 2px; }
+        @keyframes pop { 0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.05)} }
 
-        #buy-prompt {
-            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
-            background: #f1c40f; color: #1a1a2e;
-            font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
-            padding: 10px 28px; border-radius: 40px;
-            display: none; pointer-events: none; z-index: 10;
-            animation: pulse 1s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.04); } }
-
+        /* Toast */
         #toast {
-            position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
-            background: #2ecc71; color: #fff;
-            font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
-            padding: 10px 28px; border-radius: 40px;
-            opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 20;
+            position:fixed; top:72px; left:50%; transform:translateX(-50%) translateY(-16px);
+            background:#27ae60; color:#fff;
+            font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px;
+            padding:9px 26px; border-radius:40px;
+            opacity:0; transition:.3s; pointer-events:none; z-index:20;
         }
-        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        #toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
+<!-- START -->
 <div id="startScreen">
-    <div class="start-logo">🌴 MEGA<br>RESORT</div>
-    <div class="start-sub">Tycoon Edition</div>
+    <div class="logo">🌴 MEGA<br>RESORT</div>
+    <div class="sub">Tycoon Edition</div>
     <button id="startBtn" onclick="startGame()">START BUILDING</button>
-    <div class="controls-hint">
-        <div class="ctrl"><kbd>W</kbd><kbd>S</kbd> Move</div>
-        <div class="ctrl"><kbd>A</kbd><kbd>D</kbd> Turn</div>
-        <div class="ctrl"><kbd>Space</kbd> Jump</div>
-        <div class="ctrl"><kbd>E</kbd> Buy</div>
+    <div class="ctrls">
+        <div class="key"><b>W S</b> Move</div>
+        <div class="key"><b>A D</b> Turn</div>
+        <div class="key"><b>Space</b> Jump</div>
+        <div class="key"><b>E</b> Buy</div>
     </div>
 </div>
 
-<div id="gui">
-    <div id="hud-bar">
-        <div class="hud-logo">🌴 MEGA RESORT</div>
-        <div class="hud-stat">
-            <div class="hud-label">Balance</div>
-            <div class="hud-value" id="m-val">$200</div>
-        </div>
-        <div class="hud-stat">
-            <div class="hud-label">Income</div>
-            <div class="hud-value" id="i-val">$0/s</div>
-        </div>
-    </div>
+<!-- HUD -->
+<div id="hud">
+    <div class="hud-brand">🌴 Mega Resort</div>
+    <div class="hud-block"><div class="hud-lbl">Balance</div><div class="hud-num" id="mv">$200</div></div>
+    <div class="hud-block"><div class="hud-lbl">Income</div><div class="hud-num" id="iv">$0/s</div></div>
 </div>
 
-<div id="hint-card">
-    <div class="hint-label">Next Unlock</div>
-    <div class="hint-name" id="hint-name">Lobby Foundation</div>
-    <div class="hint-cost" id="hint-cost">FREE</div>
+<!-- Next unlock card -->
+<div id="card">
+    <div class="card-lbl">Next Unlock</div>
+    <div class="card-name" id="cname">—</div>
+    <div class="card-cost" id="ccost"></div>
 </div>
 
-<div id="buy-prompt">Press E to Buy</div>
+<div id="buyprompt">Press E to Buy</div>
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
 <script>
-// ─── GLOBALS ────────────────────────────────────────────────────────────────
-let scene, camera, renderer, player;
-let wallet = 200, income = 0;
-let activePad = null, gpsLine = null;
-let isJumping = false, yVel = 0, moveSpeed = 0;
-let gameStarted = false, inRangeOfPad = false;
-const keys = {}, buildings = [], pads = [];
+'use strict';
 
-const buildSteps = [
-    { id:1,  x:0,   z:0,   cost:0,      label:"Lobby Foundation",   type:"floor",     mat:0x95a5a6, inc:5,    w:40, d:40 },
-    { id:2,  x:12,  z:8,   cost:100,    label:"Reception Desk",     type:"furniture", mat:0x34495e, inc:8,    w:10, d:3,  needs:1 },
-    { id:3,  x:14,  z:10,  cost:150,    label:"Reception Computer", type:"furniture", mat:0x2d3436, inc:10,   w:2,  d:2,  needs:2 },
-    { id:4,  x:10,  z:10,  cost:150,    label:"Guest Registry",     type:"furniture", mat:0xffffff, inc:10,   w:1.5,d:1.5,needs:3 },
-    { id:5,  x:-5,  z:25,  cost:200,    label:"Entry Palm Tree L",  type:"palm",      mat:0x2ecc71, inc:2,    w:2,  d:2,  needs:4 },
-    { id:6,  x:5,   z:25,  cost:200,    label:"Entry Palm Tree R",  type:"palm",      mat:0x2ecc71, inc:2,    w:2,  d:2,  needs:5 },
-    { id:7,  x:-10, z:-10, cost:300,    label:"Lobby Sofa 1",       type:"furniture", mat:0xc0392b, inc:12,   w:6,  d:3,  needs:6 },
-    { id:8,  x:-10, z:-4,  cost:300,    label:"Lobby Sofa 2",       type:"furniture", mat:0xc0392b, inc:12,   w:6,  d:3,  needs:7 },
-    { id:9,  x:0,   z:19,  cost:800,    label:"Glass Front Wall",   type:"walls",     mat:0x81ecec, inc:20,   w:40, d:1,  needs:8 },
-    { id:10, x:0,   z:-40, cost:2500,   label:"Suite 101 Floor",    type:"floor",     mat:0xecf0f1, inc:50,   w:30, d:30, needs:9 },
-    { id:11, x:0,   z:-45, cost:1200,   label:"King Bed Frame",     type:"furniture", mat:0x3e2723, inc:40,   w:10, d:12, needs:10 },
-    { id:12, x:0,   z:-45, cost:600,    label:"Luxury Mattress",    type:"furniture", mat:0xffffff, inc:30,   w:9,  d:11, needs:11 },
-    { id:13, x:0,   z:-42, cost:200,    label:"Silk Pillows",       type:"furniture", mat:0xecf0f1, inc:10,   w:7,  d:2,  needs:12 },
-    { id:14, x:-8,  z:-48, cost:400,    label:"Suite Nightstand L", type:"furniture", mat:0x5d4037, inc:15,   w:3,  d:3,  needs:13 },
-    { id:15, x:8,   z:-48, cost:400,    label:"Suite Nightstand R", type:"furniture", mat:0x5d4037, inc:15,   w:3,  d:3,  needs:14 },
-    { id:16, x:0,   z:-30, cost:1800,   label:"Suite Smart TV",     type:"furniture", mat:0x1a1a1a, inc:80,   w:8,  d:1,  needs:15 },
-    { id:17, x:50,  z:0,   cost:8000,   label:"Pool Deck Tiles",    type:"floor",     mat:0xbdc3c7, inc:200,  w:50, d:60, needs:16 },
-    { id:18, x:50,  z:0,   cost:15000,  label:"Heated Pool Water",  type:"floor",     mat:0x00d2ff, inc:500,  w:30, d:40, needs:17 },
-    { id:19, x:38,  z:15,  cost:1000,   label:"Pool Lounge Chair",  type:"furniture", mat:0xffffff, inc:40,   w:3,  d:6,  needs:18 },
-    { id:20, x:75,  z:25,  cost:1500,   label:"Tropical Ferns",     type:"nature",    mat:0x27ae60, inc:20,   w:4,  d:4,  needs:19 },
-    { id:21, x:75,  z:30,  cost:500,    label:"Decorative Rocks",   type:"rock",      mat:0x7f8c8d, inc:10,   w:3,  d:3,  needs:20 },
-    { id:22, x:70,  z:-10, cost:10000,  label:"Outdoor Tiki Bar",   type:"furniture", mat:0xe67e22, inc:400,  w:8,  d:8,  needs:21 },
-    { id:23, x:70,  z:-18, cost:4000,   label:"Tiki Palm Tree",     type:"palm",      mat:0x2ecc71, inc:100,  w:2,  d:2,  needs:22 },
-    { id:24, x:100, z:0,   cost:40000,  label:"Bridge Support",     type:"floor",     mat:0x7f8c8d, inc:1000, w:15, d:15, needs:23 },
-    { id:25, x:140, z:0,   cost:80000,  label:"Bridge Cables",      type:"walls",     mat:0x34495e, inc:1500, w:1,  d:80, needs:24 },
-    { id:26, x:140, z:0,   cost:120000, label:"Bridge Roadway",     type:"bridge",    mat:0x2d3436, inc:2500, w:80, d:15, needs:25 },
-    { id:27, x:185, z:12,  cost:20000,  label:"Mountain Pine",      type:"nature",    mat:0x013220, inc:500,  w:3,  d:3,  needs:26 },
-    { id:28, x:200, z:0,   cost:200000, label:"Mountain Sign",      type:"furniture", mat:0xf1c40f, inc:8000, w:10, d:2,  needs:27 }
+// ── state ──────────────────────────────────────────────────────────────────
+let scene, cam, renderer, player;
+let wallet=200, income=0;
+let activePad=null, arrow=null;
+let jumping=false, yv=0, spd=0;
+let started=false, nearPad=false;
+const K={}, objs=[], pads=[];
+
+// ── build list ─────────────────────────────────────────────────────────────
+const STEPS=[
+  {id:1, x:0,  z:0,  cost:0,     label:'Lobby Foundation',   type:'floor', color:0x95a5a6, inc:5,   w:40,h:0.5,d:40},
+  {id:2, x:12, z:8,  cost:100,   label:'Reception Desk',     type:'box',   color:0x34495e, inc:8,   w:10,h:2,  d:3,  need:1},
+  {id:3, x:14, z:10, cost:150,   label:'Reception Computer', type:'box',   color:0x2d3436, inc:10,  w:2, h:1.5,d:2,  need:2},
+  {id:4, x:10, z:10, cost:150,   label:'Guest Registry',     type:'box',   color:0xf5f5f5, inc:10,  w:2, h:1.2,d:2,  need:3},
+  {id:5, x:-5, z:20, cost:200,   label:'Entry Palm L',       type:'palm',  color:0x27ae60, inc:2,   w:2, h:8,  d:2,  need:4},
+  {id:6, x:5,  z:20, cost:200,   label:'Entry Palm R',       type:'palm',  color:0x27ae60, inc:2,   w:2, h:8,  d:2,  need:5},
+  {id:7, x:-10,z:-8, cost:300,   label:'Lobby Sofa 1',       type:'box',   color:0xc0392b, inc:12,  w:6, h:1.2,d:3,  need:6},
+  {id:8, x:-10,z:-2, cost:300,   label:'Lobby Sofa 2',       type:'box',   color:0xc0392b, inc:12,  w:6, h:1.2,d:3,  need:7},
+  {id:9, x:0,  z:18, cost:800,   label:'Glass Front Wall',   type:'box',   color:0x81ecec, inc:20,  w:40,h:5,  d:1,  need:8},
+  {id:10,x:0,  z:-40,cost:2500,  label:'Suite 101 Floor',    type:'floor', color:0xecf0f1, inc:50,  w:30,h:0.5,d:30, need:9},
+  {id:11,x:0,  z:-45,cost:1200,  label:'King Bed Frame',     type:'box',   color:0x3e2723, inc:40,  w:10,h:2,  d:12, need:10},
+  {id:12,x:0,  z:-45,cost:600,   label:'Luxury Mattress',    type:'box',   color:0xffffff, inc:30,  w:9, h:0.8,d:11, need:11},
+  {id:13,x:0,  z:-42,cost:200,   label:'Silk Pillows',       type:'box',   color:0xecf0f1, inc:10,  w:7, h:0.5,d:2,  need:12},
+  {id:14,x:-8, z:-48,cost:400,   label:'Nightstand L',       type:'box',   color:0x5d4037, inc:15,  w:3, h:2,  d:3,  need:13},
+  {id:15,x:8,  z:-48,cost:400,   label:'Nightstand R',       type:'box',   color:0x5d4037, inc:15,  w:3, h:2,  d:3,  need:14},
+  {id:16,x:0,  z:-30,cost:1800,  label:'Suite Smart TV',     type:'box',   color:0x1a1a1a, inc:80,  w:8, h:4,  d:0.5,need:15},
+  {id:17,x:50, z:0,  cost:8000,  label:'Pool Deck',          type:'floor', color:0xbdc3c7, inc:200, w:50,h:0.5,d:60, need:16},
+  {id:18,x:50, z:0,  cost:15000, label:'Pool Water',         type:'floor', color:0x00bcd4, inc:500, w:30,h:0.4,d:40, need:17},
+  {id:19,x:38, z:15, cost:1000,  label:'Lounge Chair',       type:'box',   color:0xffffff, inc:40,  w:3, h:0.6,d:6,  need:18},
+  {id:20,x:75, z:25, cost:1500,  label:'Tropical Ferns',     type:'palm',  color:0x27ae60, inc:20,  w:3, h:7,  d:3,  need:19},
+  {id:21,x:75, z:30, cost:500,   label:'Decorative Rocks',   type:'box',   color:0x7f8c8d, inc:10,  w:3, h:1.5,d:3,  need:20},
+  {id:22,x:70, z:-10,cost:10000, label:'Tiki Bar',           type:'box',   color:0xe67e22, inc:400, w:8, h:3,  d:8,  need:21},
+  {id:23,x:70, z:-18,cost:4000,  label:'Tiki Palm',          type:'palm',  color:0x27ae60, inc:100, w:2, h:8,  d:2,  need:22},
+  {id:24,x:100,z:0,  cost:40000, label:'Bridge Support',     type:'box',   color:0x7f8c8d, inc:1000,w:15,h:10, d:15, need:23},
+  {id:25,x:140,z:0,  cost:80000, label:'Bridge Roadway',     type:'floor', color:0x2d3436, inc:2500,w:80,h:0.8,d:15, need:24},
+  {id:26,x:185,z:12, cost:20000, label:'Mountain Pine',      type:'palm',  color:0x1a5276, inc:500, w:3, h:12, d:3,  need:25},
+  {id:27,x:200,z:0,  cost:200000,label:'Mountain Sign',      type:'box',   color:0xf1c40f, inc:8000,w:10,h:5,  d:1,  need:26},
 ];
 
-function fmt(n) {
-    if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
-    if (n >= 1000)    return '$' + (n/1000).toFixed(1) + 'K';
-    return '$' + Math.floor(n);
+// ── helpers ────────────────────────────────────────────────────────────────
+function $f(n){ return n>=1e6?'$'+(n/1e6).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(1)+'K':'$'+Math.floor(n); }
+
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'),2200);
 }
 
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2200);
+// ── start ──────────────────────────────────────────────────────────────────
+function startGame(){
+  document.getElementById('startScreen').style.display='none';
+  const hud=document.getElementById('hud');
+  hud.style.display='flex';
+  document.getElementById('card').style.display='block';
+  started=true;
+  init();
 }
 
-function startGame() {
-    document.getElementById('startScreen').style.display = 'none';
-    document.getElementById('gui').style.display = 'block';
-    document.getElementById('hint-card').style.display = 'block';
-    gameStarted = true;
-    init();
+// ── init ───────────────────────────────────────────────────────────────────
+function init(){
+  // Scene
+  scene=new THREE.Scene();
+  scene.background=new THREE.Color(0x87ceeb);
+  scene.fog=new THREE.FogExp2(0x87ceeb, 0.0018);
+
+  // Camera
+  cam=new THREE.PerspectiveCamera(65, innerWidth/innerHeight, 0.1, 3000);
+
+  // Renderer
+  renderer=new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled=true;
+  document.body.appendChild(renderer.domElement);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff, 1.0));
+  const sun=new THREE.DirectionalLight(0xfff8e7,1.0);
+  sun.position.set(80,120,60);
+  sun.castShadow=true;
+  scene.add(sun);
+
+  // Ground — big flat green plane, y=0
+  const ground=new THREE.Mesh(
+    new THREE.PlaneGeometry(3000,3000),
+    new THREE.MeshLambertMaterial({color:0x4CAF50})
+  );
+  ground.rotation.x=-Math.PI/2;
+  ground.position.y=0;
+  ground.receiveShadow=true;
+  scene.add(ground);
+
+  // Water border
+  const water=new THREE.Mesh(
+    new THREE.PlaneGeometry(10000,10000),
+    new THREE.MeshLambertMaterial({color:0x1565C0})
+  );
+  water.rotation.x=-Math.PI/2;
+  water.position.y=-0.5;
+  scene.add(water);
+
+  // GPS arrow
+  arrow=new THREE.Mesh(
+    new THREE.BoxGeometry(0.6,0.15,1),
+    new THREE.MeshBasicMaterial({color:0xffff00,transparent:true,opacity:0.7})
+  );
+  arrow.visible=false;
+  scene.add(arrow);
+
+  // Player — simple box character
+  player=new THREE.Group();
+
+  const body=new THREE.Mesh(
+    new THREE.BoxGeometry(1.2,2,1.2),
+    new THREE.MeshLambertMaterial({color:0x3949AB})
+  );
+  body.position.y=1.6;
+  body.castShadow=true;
+  player.add(body);
+
+  const head=new THREE.Mesh(
+    new THREE.BoxGeometry(1,1,1),
+    new THREE.MeshLambertMaterial({color:0xFFCC80})
+  );
+  head.position.y=3.1;
+  head.castShadow=true;
+  player.add(head);
+
+  player.position.set(0,0,30);
+  scene.add(player);
+
+  // Place first step free
+  STEPS[0].bought=true;
+  place(STEPS[0]);
+  nextPad();
+
+  loop();
 }
 
-function init() {
-    // Scene
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87CEEB);
-    scene.fog = new THREE.Fog(0x87CEEB, 100, 1500);
+// ── main loop ──────────────────────────────────────────────────────────────
+function loop(){
+  requestAnimationFrame(loop);
 
-    // Camera — positioned clearly above and behind player start
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
-    camera.position.set(0, 30, 75);
-    camera.lookAt(0, 0, 45);
+  // Move
+  const tgt=K['w']?0.7:K['s']?-0.35:0;
+  spd+=(tgt-spd)*0.13;
+  player.position.x+=Math.sin(player.rotation.y)*-spd;
+  player.position.z+=Math.cos(player.rotation.y)*-spd;
+  if(K['a']) player.rotation.y+=0.05;
+  if(K['d']) player.rotation.y-=0.05;
 
-    // Renderer
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.shadowMap.enabled = true;
-    document.body.appendChild(renderer.domElement);
+  // Jump
+  if(K[' ']&&!jumping){yv=0.42;jumping=true;}
+  if(jumping){
+    player.position.y+=yv;
+    yv-=0.022;
+    if(player.position.y<=0){player.position.y=0;jumping=false;yv=0;}
+  }
 
-    // Lights
-    const ambient = new THREE.AmbientLight(0xffffff, 0.9);
-    scene.add(ambient);
+  // Camera: sit behind & above player
+  const behind=40, above=20;
+  cam.position.x=player.position.x+Math.sin(player.rotation.y)*behind;
+  cam.position.y=player.position.y+above;
+  cam.position.z=player.position.z+Math.cos(player.rotation.y)*behind;
+  cam.lookAt(player.position.x, player.position.y+1, player.position.z);
 
-    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-    sun.position.set(50, 100, 50);
-    sun.castShadow = true;
-    scene.add(sun);
-
-    // Ground / Island
-    const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(2000, 2000),
-        new THREE.MeshLambertMaterial({ color: 0x3a9e4e })
-    );
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = 0;
-    ground.receiveShadow = true;
-    scene.add(ground);
-
-    // Ocean ring around island
-    const ocean = new THREE.Mesh(
-        new THREE.PlaneGeometry(10000, 10000),
-        new THREE.MeshLambertMaterial({ color: 0x1a6ea8 })
-    );
-    ocean.rotation.x = -Math.PI / 2;
-    ocean.position.y = -1;
-    scene.add(ocean);
-
-    // GPS line
-    gpsLine = new THREE.Mesh(
-        new THREE.BoxGeometry(0.5, 0.1, 1),
-        new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6 })
-    );
-    gpsLine.visible = false;
-    scene.add(gpsLine);
-
-    // Player
-    player = new THREE.Group();
-    const bodyMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1.2, 2.4, 1.2),
-        new THREE.MeshLambertMaterial({ color: 0x341f97 })
-    );
-    bodyMesh.position.y = 1.2;
-    player.add(bodyMesh);
-
-    // Head
-    const headMesh = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 1, 1),
-        new THREE.MeshLambertMaterial({ color: 0xffcc99 })
-    );
-    headMesh.position.y = 2.9;
-    player.add(headMesh);
-
-    scene.add(player);
-    player.position.set(0, 0, 45);
-
-    // Spawn first building free
-    buildSteps[0].bought = true;
-    spawnObject(buildSteps[0]);
-    refreshPads();
-
-    // Force one render immediately to confirm scene is working
-    renderer.render(scene, camera);
-
-    animate();
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    if (!player || !renderer || !scene || !camera) return;
-
-    // Movement
-    const targetSpeed = keys['w'] ? 0.7 : keys['s'] ? -0.35 : 0;
-    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
-
-    player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
-    player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
-
-    if (keys['a']) player.rotation.y += 0.05;
-    if (keys['d']) player.rotation.y -= 0.05;
-
-    // Jump
-    if (keys[' '] && !isJumping) { yVel = 0.45; isJumping = true; }
-    if (isJumping) {
-        player.position.y += yVel;
-        yVel -= 0.025;
-        if (player.position.y <= 0) { player.position.y = 0; isJumping = false; yVel = 0; }
+  // Pop-in scale
+  objs.forEach(o=>{
+    if(o.grp.scale.x<1){
+      const s=Math.min(o.grp.scale.x+0.055,1);
+      o.grp.scale.setScalar(s);
     }
+  });
 
-    // Camera — follows behind player based on rotation
-    const camDist = 40, camHeight = 22;
-    camera.position.x = player.position.x + Math.sin(player.rotation.y) * camDist;
-    camera.position.y = player.position.y + camHeight;
-    camera.position.z = player.position.z + Math.cos(player.rotation.y) * camDist;
-    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+  // Pad logic
+  if(activePad){
+    const d=player.position.distanceTo(activePad.position);
+    const afford=wallet>=activePad.step.cost;
 
-    // Scale pop-in
-    buildings.forEach(b => {
-        if (b.obj && b.obj.scale.x < 1) {
-            const s = Math.min(b.obj.scale.x + 0.05, 1);
-            b.obj.scale.set(s, s, s);
-        }
-    });
+    // draw GPS arrow along ground
+    const mid=new THREE.Vector3().addVectors(player.position,activePad.position).multiplyScalar(0.5);
+    arrow.position.set(mid.x,0.5,mid.z);
+    arrow.scale.z=d;
+    arrow.lookAt(activePad.position.x,0.5,activePad.position.z);
+    arrow.visible=true;
 
-    // Pad check
-    if (activePad) {
-        const dist = player.position.distanceTo(activePad.position);
-        const canAfford = wallet >= activePad.data.cost;
+    nearPad=d<6;
+    document.getElementById('buyprompt').style.display=(nearPad&&afford)?'block':'none';
 
-        // GPS arrow
-        const mid = new THREE.Vector3().addVectors(player.position, activePad.position).multiplyScalar(0.5);
-        gpsLine.position.set(mid.x, 0.5, mid.z);
-        gpsLine.scale.z = dist;
-        gpsLine.lookAt(new THREE.Vector3(activePad.position.x, 0.5, activePad.position.z));
-        gpsLine.visible = true;
-
-        inRangeOfPad = dist < 6;
-        document.getElementById('buy-prompt').style.display = (inRangeOfPad && canAfford) ? 'block' : 'none';
-
-        if (inRangeOfPad && canAfford && keys['e']) {
-            keys['e'] = false;
-            purchase(activePad.data);
-        }
-    } else {
-        gpsLine.visible = false;
-        document.getElementById('buy-prompt').style.display = 'none';
+    if(nearPad&&afford&&K['e']){
+      K['e']=false;
+      buy(activePad.step);
     }
+  } else {
+    arrow.visible=false;
+    document.getElementById('buyprompt').style.display='none';
+  }
 
-    renderer.render(scene, camera);
-    document.getElementById('m-val').innerText = fmt(wallet);
-    document.getElementById('i-val').innerText = fmt(income) + '/s';
+  renderer.render(scene,cam);
+  document.getElementById('mv').textContent=$f(wallet);
+  document.getElementById('iv').textContent=$f(income)+'/s';
 }
 
-function purchase(data) {
-    wallet -= data.cost;
-    data.bought = true;
-    income += (data.inc || 0);
-    spawnObject(data);
-    showToast('✅ ' + data.label + ' built!');
-    refreshPads();
-}
+// ── place object ───────────────────────────────────────────────────────────
+function place(s){
+  const grp=new THREE.Group();
 
-function spawnObject(s) {
-    const group = new THREE.Group();
+  // Main block
+  const mesh=new THREE.Mesh(
+    new THREE.BoxGeometry(s.w, s.h, s.d),
+    new THREE.MeshLambertMaterial({color:s.color})
+  );
+  mesh.position.y=s.h/2;
+  mesh.castShadow=true;
+  mesh.receiveShadow=true;
+  grp.add(mesh);
 
-    let h = 1.8, yOff = 0.9;
-    if (s.type === 'floor')  { h = 0.4; yOff = 0.2; }
-    if (s.type === 'palm' || s.type === 'nature') { h = 8; yOff = 4; }
-
-    const mesh = new THREE.Mesh(
-        new THREE.BoxGeometry(s.w, h, s.d),
-        new THREE.MeshLambertMaterial({ color: s.mat })
+  // Palm trunk
+  if(s.type==='palm'){
+    const trunk=new THREE.Mesh(
+      new THREE.CylinderGeometry(0.22,0.32,s.h*0.6,7),
+      new THREE.MeshLambertMaterial({color:0x8D6E63})
     );
-    mesh.position.y = yOff;
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    group.add(mesh);
+    trunk.position.y=s.h*0.3;
+    grp.add(trunk);
+  }
 
-    if (s.type === 'palm') {
-        const trunk = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.25, 0.35, 5, 6),
-            new THREE.MeshLambertMaterial({ color: 0x8B6914 })
-        );
-        trunk.position.y = 2.5;
-        group.add(trunk);
-    }
-
-    group.position.set(s.x, 0, s.z);
-    group.scale.set(0.01, 0.01, 0.01);
-    scene.add(group);
-    s.obj = group;
-    buildings.push(s);
+  grp.position.set(s.x,0,s.z);
+  grp.scale.setScalar(0.01);
+  scene.add(grp);
+  objs.push({grp,s});
 }
 
-function refreshPads() {
-    pads.forEach(p => scene.remove(p));
-    pads.length = 0;
-    activePad = null;
+// ── buy ────────────────────────────────────────────────────────────────────
+function buy(s){
+  wallet-=s.cost;
+  s.bought=true;
+  income+=s.inc||0;
+  place(s);
+  toast('✅ '+s.label+' built!');
+  nextPad();
+}
 
-    const next = buildSteps.find(s =>
-        !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs)?.bought)
+// ── next pad ───────────────────────────────────────────────────────────────
+function nextPad(){
+  pads.forEach(p=>scene.remove(p));
+  pads.length=0;
+  activePad=null;
+
+  const nxt=STEPS.find(s=>!s.bought&&(!s.need||STEPS.find(x=>x.id===s.need)?.bought));
+
+  if(nxt){
+    const pad=new THREE.Mesh(
+      new THREE.CylinderGeometry(3,3,0.3,32),
+      new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.92})
     );
+    pad.position.set(nxt.x,0.15,nxt.z);
+    pad.step=nxt;
+    scene.add(pad);
+    pads.push(pad);
+    activePad=pad;
 
-    if (next) {
-        const pad = new THREE.Mesh(
-            new THREE.CylinderGeometry(3, 3, 0.3, 32),
-            new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.9 })
-        );
-        pad.position.set(next.x, 0.15, next.z);
-        pad.data = next;
-        scene.add(pad);
-        pads.push(pad);
-        activePad = pad;
-
-        document.getElementById('hint-name').innerText = next.label;
-        document.getElementById('hint-cost').innerText = next.cost === 0 ? 'FREE' : fmt(next.cost);
-    } else {
-        document.getElementById('hint-name').innerText = '🏆 Resort Complete!';
-        document.getElementById('hint-cost').innerText = '';
-        showToast('🎉 You Win!');
-    }
+    document.getElementById('cname').textContent=nxt.label;
+    document.getElementById('ccost').textContent=nxt.cost===0?'FREE':$f(nxt.cost);
+  } else {
+    document.getElementById('cname').textContent='🏆 Resort Complete!';
+    document.getElementById('ccost').textContent='';
+    toast('🎉 You built the whole resort!');
+  }
 }
 
-setInterval(() => { if (gameStarted) wallet += income; }, 1000);
+// ── income tick ────────────────────────────────────────────────────────────
+setInterval(()=>{ if(started) wallet+=income; },1000);
 
-window.addEventListener('keydown', e => {
-    if (e.key === ' ') e.preventDefault();
-    keys[e.key.toLowerCase()] = true;
-});
-window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-window.addEventListener('resize', () => {
-    if (!camera || !renderer) return;
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+// ── input ──────────────────────────────────────────────────────────────────
+addEventListener('keydown',e=>{ if(e.key===' ')e.preventDefault(); K[e.key.toLowerCase()]=true; });
+addEventListener('keyup',  e=>{ K[e.key.toLowerCase()]=false; });
+addEventListener('resize', ()=>{
+  if(!cam||!renderer)return;
+  cam.aspect=innerWidth/innerHeight;
+  cam.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
 });
 </script>
 </body>
