@@ -79,8 +79,9 @@ function init() {
 
 function animate() {
     requestAnimationFrame(animate);
-    if (!player) return;
+    if (!player || !renderer) return;
 
+    // Movement Physics
     let targetSpeed = 0;
     if (keys['w']) targetSpeed = 0.8;
     if (keys['s']) targetSpeed = -0.4;
@@ -160,6 +161,7 @@ setInterval(() => { wallet += income; }, 1000);
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
 window.addEventListener('resize', () => {
+    if (!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
