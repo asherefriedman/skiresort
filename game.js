@@ -40,7 +40,6 @@ function init() {
     sun.position.set(50, 150, 50);
     scene.add(sun);
 
-    // Island
     const island = new THREE.Mesh(
         new THREE.CylinderGeometry(800, 820, 5, 64),
         new THREE.MeshPhongMaterial({ color: 0x2ecc71 })
@@ -48,7 +47,6 @@ function init() {
     island.position.y = -2.5;
     scene.add(island);
 
-    // Sea
     const sea = new THREE.Mesh(
         new THREE.PlaneGeometry(15000, 15000),
         new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.7 })
@@ -57,7 +55,6 @@ function init() {
     sea.position.y = -3.5;
     scene.add(sea);
 
-    // Player
     player = new THREE.Group();
     const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
     pMesh.position.y = 1.75;
@@ -65,7 +62,6 @@ function init() {
     scene.add(player);
     player.position.set(0, 5, 45);
 
-    // Initial item spawn
     buildSteps[0].bought = true;
     spawnObject(buildSteps[0]);
 
@@ -77,7 +73,6 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
 
-    // Smooth Movement
     let targetSpeed = 0;
     if (keys['w']) targetSpeed = 0.85;
     if (keys['s']) targetSpeed = -0.45;
@@ -89,7 +84,6 @@ function animate() {
     if (keys['a']) player.rotation.y += 0.06;
     if (keys['d']) player.rotation.y -= 0.06;
 
-    // Jump Physics
     if (keys[' '] && !isJumping) { yVel = 0.55; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
@@ -97,12 +91,10 @@ function animate() {
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    // Smooth Chase Camera
     const camPos = new THREE.Vector3(0, 12, 28).applyMatrix4(player.matrixWorld);
     camera.position.lerp(camPos, 0.15);
     camera.lookAt(player.position.x, player.position.y + 2.5, player.position.z);
 
-    // Pad Detection
     if (activePad) {
         if (player.position.distanceTo(activePad.position) < 5) {
             if (wallet >= activePad.data.cost) {
@@ -144,7 +136,6 @@ function refreshPads() {
     }
 }
 
-// Money Timer
 setInterval(() => { wallet += income; }, 1000);
 
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
