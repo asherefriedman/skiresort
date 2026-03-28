@@ -2,6 +2,7 @@
 let scene, camera, renderer, player, wallet = 200, income = 0;
 let activePad = null, gps, isJumping = false, yVel = 0;
 const keys = {}, buildings = [];
+let moveSpeed = 0
 
 // --- 2. THE STABLE 10-STEP LIST ---
 const buildSteps = [
