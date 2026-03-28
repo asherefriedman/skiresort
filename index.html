@@ -2,23 +2,20 @@
 <html>
 <head><title>Test</title></head>
 <body style="background:black">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
 <script>
-  const s = new THREE.Scene();
-  s.background = new THREE.Color(0x00ff00);
-  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 1000);
-  c.position.set(0, 5, 10);
-  c.lookAt(0, 0, 0);
-  const r = new THREE.WebGLRenderer();
-  r.setSize(innerWidth, innerHeight);
-  document.body.appendChild(r.domElement);
-  const mesh = new THREE.Mesh(
-    new THREE.BoxGeometry(2,2,2),
-    new THREE.MeshBasicMaterial({color:0xff0000})
-  );
-  s.add(mesh);
-  r.render(s, c);
-  document.body.innerHTML += '<p style="color:white;font-size:40px">IT WORKS</p>';
+window.onerror = function(msg, src, line) {
+  document.body.innerHTML += '<p style="color:red;font-size:20px">' + msg + ' | ' + src + ' line ' + line + '</p>';
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
+<script src="https://unpkg.com/three@0.140.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+<script>
+  if (typeof THREE === 'undefined') {
+    document.body.innerHTML += '<p style="color:orange;font-size:30px">❌ THREE STILL NOT LOADING - try the manual paste method</p>';
+  } else {
+    document.body.innerHTML += '<p style="color:lime;font-size:40px">✅ THREE LOADED! CDN WORKS!</p>';
+  }
 </script>
 </body>
 </html>
