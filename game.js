@@ -1,10 +1,8 @@
-// --- 1. GLOBALS ---
+// --- GLOBALS ---
 let scene, camera, renderer, player, wallet = 200, income = 0;
-let activePad = null, gps, isJumping = false, yVel = 0;
-let moveSpeed = 0;
+let activePad = null, gps, isJumping = false, yVel = 0, moveSpeed = 0;
 const keys = {}, buildings = [];
 
-// --- 2. THE MEGA 28-STEP LIST ---
 const buildSteps = [
     { id: 1, x: 0, z: 0, cost: 0, label: "Lobby Foundation", type: "floor", mat: 0x95a5a6, inc: 5, w: 40, d: 40 },
     { id: 2, x: 12, z: 8, cost: 100, label: "Reception Desk", type: "furniture", mat: 0x34495e, inc: 8, w: 10, d: 3, needs: 1 },
@@ -36,7 +34,6 @@ const buildSteps = [
     { id: 28, x: 200, z: 0, cost: 200000, label: "Mountain Sign", type: "furniture", mat: 0xf1c40f, inc: 8000, w: 10, d: 2, needs: 27 }
 ];
 
-// --- 3. INITIALIZATION ---
 function startGame() {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gui').style.display = 'block';
@@ -58,18 +55,15 @@ function init() {
     sun.position.set(50, 150, 50);
     scene.add(sun);
 
-    // Island & Sea
     const island = new THREE.Mesh(new THREE.CylinderGeometry(800, 820, 5, 32), new THREE.MeshStandardMaterial({ color: 0x2ecc71 }));
     island.position.y = -2.5; scene.add(island);
 
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshStandardMaterial({ color: 0x0984e3 }));
     sea.rotation.x = -Math.PI / 2; sea.position.y = -3; scene.add(sea);
 
-    // GPS Mesh
     gps = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.1, 1), new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6 }));
     scene.add(gps);
 
-    // Player
     player = new THREE.Group();
     const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
     pMesh.position.y = 1.75;
@@ -77,23 +71,20 @@ function init() {
     scene.add(player);
     player.position.set(0, 0, 45);
 
-    // Initial Step
     buildSteps[0].bought = true;
     spawnObject(buildSteps[0]);
-
     refreshPads();
     animate();
 }
 
-// --- 4. ENGINE ---
 function animate() {
     requestAnimationFrame(animate);
     if (!player) return;
 
-    // Movement & Rotation
-    if (keys['w']) moveSpeed = 0.7;
-    else if (keys['s']) moveSpeed = -0.4;
-    else moveSpeed *= 0.9; // Friction
+    let targetSpeed = 0;
+    if (keys['w']) targetSpeed = 0.8;
+    if (keys['s']) targetSpeed = -0.4;
+    moveSpeed += (targetSpeed - moveSpeed) * 0.1;
 
     player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
     player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
@@ -101,7 +92,6 @@ function animate() {
     if (keys['a']) player.rotation.y += 0.05;
     if (keys['d']) player.rotation.y -= 0.05;
 
-    // Jump Physics
     if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
@@ -109,18 +99,13 @@ function animate() {
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    // Camera
     camera.position.set(player.position.x, 25, player.position.z + 45);
     camera.lookAt(player.position);
 
-    // Object Pop-in Animation (Growth)
     buildings.forEach(b => {
-        if (b.obj && b.obj.scale.x < 1) {
-            b.obj.scale.addScalar(0.05);
-        }
+        if (b.obj && b.obj.scale.x < 1) b.obj.scale.addScalar(0.05);
     });
 
-    // GPS & Pad Logic
     if (activePad) {
         let dist = player.position.distanceTo(activePad.position);
         gps.position.set(player.position.x + (activePad.position.x - player.position.x)/2, 0.6, player.position.z + (activePad.position.z - player.position.z)/2);
@@ -149,7 +134,7 @@ function spawnObject(s) {
     mesh.position.y = (s.type === "palm" ? 5 : 0.6);
     group.add(mesh);
     group.position.set(s.x, 0, s.z);
-    group.scale.set(0.01, 0.01, 0.01); // Start tiny for animation
+    group.scale.set(0.01, 0.01, 0.01);
     scene.add(group);
     s.obj = group;
     buildings.push(s);
@@ -174,3 +159,8 @@ function refreshPads() {
 setInterval(() => { wallet += income; }, 1000);
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
