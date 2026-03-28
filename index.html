@@ -1,12 +1,35 @@
-<div id="startScreen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:white; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:100;">
-    <h1>🌴 MEGA RESORT TYCOON</h1>
-    <button onclick="startGame()" style="padding:15px 30px; font-size:20px; cursor:pointer;">Start Building</button>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Resort Tycoon</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #0fbcf9; font-family: sans-serif; }
+        #gui { position: fixed; top: 20px; left: 20px; color: white; text-shadow: 2px 2px 4px #000; z-index: 10; display: none; pointer-events: none; }
+        #m-val { color: #f1c40f; font-size: 28px; font-weight: bold; }
+        #i-val { color: #2ecc71; font-size: 18px; }
+        #hint { margin-top: 15px; background: rgba(0,0,0,0.6); padding: 12px; border-radius: 8px; border-left: 5px solid #ffff00; width: fit-content; }
+        
+        #startScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0984e3; color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        button { padding: 15px 40px; font-size: 22px; cursor: pointer; background: #f1c40f; border: none; border-radius: 50px; font-weight: bold; }
+    </style>
+</head>
+<body>
 
-<div id="gui" style="display:none; position:fixed; top:20px; left:20px; color:white; font-family:Arial, sans-serif; text-shadow:2px 2px 4px #000; z-index:10;">
-    <div style="font-size:28px; color:#f1c40f;">Money: $<span id="m-val">200</span></div>
-    <div style="font-size:18px; color:#2ecc71;">Income: $<span id="i-val">0</span>/s</div>
-    <div id="hint" style="margin-top:10px; background:rgba(0,0,0,0.6); padding:10px; border-radius:5px; border-left:5px solid #ffff00;">
-        Next: Lobby Foundation
+    <div id="startScreen">
+        <h1>🌴 MEGA RESORT</h1>
+        <button onclick="startGame()">START BUILDING</button>
     </div>
-</div>
+
+    <div id="gui">
+        <div>Money: $<span id="m-val">200</span></div>
+        <div>Income: $<span id="i-val">0</span>/s</div>
+        <div id="hint">Next: Lobby Foundation</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script src="game.js"></script>
+</body>
+</html>
