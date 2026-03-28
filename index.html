@@ -4,237 +4,435 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mega Resort Tycoon</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { overflow: hidden; background: #0fbcf9; font-family: 'DM Sans', sans-serif; }
 
-        body {
-            overflow: hidden;
-            background: #000;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        /* ── START SCREEN ── */
         #startScreen {
             position: fixed; inset: 0;
             background: linear-gradient(160deg, #0a3d62 0%, #0fbcf9 60%, #6dd5fa 100%);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            z-index: 100;
-            gap: 12px;
+            z-index: 100; gap: 12px;
         }
-
-        #startScreen::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-        }
-
         .start-logo {
             font-family: 'Bebas Neue', sans-serif;
             font-size: clamp(56px, 10vw, 110px);
-            color: #fff;
-            letter-spacing: 4px;
-            text-shadow: 0 8px 40px rgba(0,0,0,0.4), 0 2px 0 rgba(255,255,255,0.15);
-            line-height: 1;
-            text-align: center;
-            position: relative;
+            color: #fff; letter-spacing: 4px;
+            text-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            line-height: 1; text-align: center;
         }
-
         .start-sub {
-            font-size: 16px;
-            color: rgba(255,255,255,0.7);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
+            font-size: 16px; color: rgba(255,255,255,0.7);
+            letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px;
         }
-
         #startBtn {
-            padding: 18px 56px;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 26px;
-            letter-spacing: 3px;
-            cursor: pointer;
-            background: #f1c40f;
-            color: #1a1a2e;
-            border: none;
-            border-radius: 60px;
-            box-shadow: 0 6px 30px rgba(241,196,15,0.5), 0 2px 0 #c9a800;
-            transition: transform 0.12s, box-shadow 0.12s;
-            position: relative;
+            padding: 18px 56px; font-family: 'Bebas Neue', sans-serif;
+            font-size: 26px; letter-spacing: 3px; cursor: pointer;
+            background: #f1c40f; color: #1a1a2e; border: none;
+            border-radius: 60px; box-shadow: 0 6px 30px rgba(241,196,15,0.5);
+            transition: transform 0.12s;
         }
-        #startBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(241,196,15,0.6), 0 2px 0 #c9a800; }
-        #startBtn:active { transform: translateY(1px); }
+        #startBtn:hover { transform: translateY(-3px); }
 
         .controls-hint {
-            margin-top: 28px;
-            display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+            margin-top: 20px; display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
         }
         .ctrl {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 8px 14px;
-            color: rgba(255,255,255,0.85);
-            font-size: 13px;
-            display: flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px; padding: 8px 14px; color: rgba(255,255,255,0.85);
+            font-size: 13px; display: flex; align-items: center; gap: 6px;
         }
         .ctrl kbd {
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
-            padding: 2px 7px;
-            font-family: monospace;
-            font-size: 12px;
+            background: rgba(255,255,255,0.2); border-radius: 5px;
+            padding: 2px 7px; font-family: monospace; font-size: 12px;
         }
 
-        /* ── HUD ── */
+        canvas { position: fixed; top: 0; left: 0; z-index: 1; }
+
         #gui {
             position: fixed; top: 0; left: 0; right: 0;
-            display: none;
-            pointer-events: none;
-            z-index: 10;
+            display: none; pointer-events: none; z-index: 10;
         }
-
         #hud-bar {
             display: flex; align-items: center;
-            background: rgba(10,20,40,0.75);
-            backdrop-filter: blur(10px);
+            background: rgba(10,20,40,0.75); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 10px 24px;
-            gap: 32px;
+            padding: 10px 24px; gap: 32px;
         }
-
-        .hud-logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 22px;
-            color: #f1c40f;
-            letter-spacing: 2px;
-            margin-right: auto;
-        }
-
-        .hud-stat {
-            display: flex; flex-direction: column; align-items: flex-end;
-        }
-        .hud-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            color: rgba(255,255,255,0.45);
-        }
-        .hud-value {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 26px;
-            line-height: 1;
-        }
+        .hud-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #f1c40f; letter-spacing: 2px; margin-right: auto; }
+        .hud-stat { display: flex; flex-direction: column; align-items: flex-end; }
+        .hud-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.45); }
+        .hud-value { font-family: 'Bebas Neue', sans-serif; font-size: 26px; line-height: 1; }
         #m-val { color: #f1c40f; }
         #i-val { color: #2ecc71; }
 
-        /* ── NEXT BUILDING CARD ── */
         #hint-card {
-            position: fixed;
-            bottom: 24px; left: 50%; transform: translateX(-50%);
-            background: rgba(10,20,40,0.82);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-left: 4px solid #f1c40f;
-            border-radius: 12px;
-            padding: 14px 24px;
-            color: #fff;
-            display: none;
-            pointer-events: none;
-            z-index: 10;
-            white-space: nowrap;
-            text-align: center;
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(10,20,40,0.82); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1); border-left: 4px solid #f1c40f;
+            border-radius: 12px; padding: 14px 24px; color: #fff;
+            display: none; pointer-events: none; z-index: 10;
+            white-space: nowrap; text-align: center;
         }
         .hint-label { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
         .hint-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; }
         .hint-cost { font-size: 13px; color: #f1c40f; margin-top: 2px; }
 
-        /* ── BUY PROMPT ── */
         #buy-prompt {
-            position: fixed;
-            bottom: 110px; left: 50%; transform: translateX(-50%);
-            background: #f1c40f;
-            color: #1a1a2e;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 20px;
-            letter-spacing: 2px;
-            padding: 10px 28px;
-            border-radius: 40px;
-            display: none;
-            pointer-events: none;
-            z-index: 10;
+            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+            background: #f1c40f; color: #1a1a2e;
+            font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
+            padding: 10px 28px; border-radius: 40px;
+            display: none; pointer-events: none; z-index: 10;
             animation: pulse 1s ease-in-out infinite;
         }
         @keyframes pulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.04); } }
 
-        /* ── TOAST ── */
         #toast {
-            position: fixed;
-            top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
-            background: #2ecc71;
-            color: #fff;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 20px;
-            letter-spacing: 2px;
-            padding: 10px 28px;
-            border-radius: 40px;
-            opacity: 0;
-            transition: all 0.3s;
-            pointer-events: none;
-            z-index: 20;
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #2ecc71; color: #fff;
+            font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px;
+            padding: 10px 28px; border-radius: 40px;
+            opacity: 0; transition: all 0.3s; pointer-events: none; z-index: 20;
         }
-        #toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
-    <!-- START SCREEN -->
-    <div id="startScreen">
-        <div class="start-logo">🌴 MEGA<br>RESORT</div>
-        <div class="start-sub">Tycoon Edition</div>
-        <button id="startBtn" onclick="startGame()">START BUILDING</button>
-        <div class="controls-hint">
-            <div class="ctrl"><kbd>W</kbd><kbd>S</kbd> Move</div>
-            <div class="ctrl"><kbd>A</kbd><kbd>D</kbd> Turn</div>
-            <div class="ctrl"><kbd>Space</kbd> Jump</div>
-            <div class="ctrl"><kbd>E</kbd> Buy</div>
+<div id="startScreen">
+    <div class="start-logo">🌴 MEGA<br>RESORT</div>
+    <div class="start-sub">Tycoon Edition</div>
+    <button id="startBtn" onclick="startGame()">START BUILDING</button>
+    <div class="controls-hint">
+        <div class="ctrl"><kbd>W</kbd><kbd>S</kbd> Move</div>
+        <div class="ctrl"><kbd>A</kbd><kbd>D</kbd> Turn</div>
+        <div class="ctrl"><kbd>Space</kbd> Jump</div>
+        <div class="ctrl"><kbd>E</kbd> Buy</div>
+    </div>
+</div>
+
+<div id="gui">
+    <div id="hud-bar">
+        <div class="hud-logo">🌴 MEGA RESORT</div>
+        <div class="hud-stat">
+            <div class="hud-label">Balance</div>
+            <div class="hud-value" id="m-val">$200</div>
+        </div>
+        <div class="hud-stat">
+            <div class="hud-label">Income</div>
+            <div class="hud-value" id="i-val">$0/s</div>
         </div>
     </div>
+</div>
 
-    <!-- HUD -->
-    <div id="gui">
-        <div id="hud-bar">
-            <div class="hud-logo">🌴 MEGA RESORT</div>
-            <div class="hud-stat">
-                <div class="hud-label">Balance</div>
-                <div class="hud-value" id="m-val">$200</div>
-            </div>
-            <div class="hud-stat">
-                <div class="hud-label">Income</div>
-                <div class="hud-value" id="i-val">$0/s</div>
-            </div>
-        </div>
-    </div>
+<div id="hint-card">
+    <div class="hint-label">Next Unlock</div>
+    <div class="hint-name" id="hint-name">Lobby Foundation</div>
+    <div class="hint-cost" id="hint-cost">FREE</div>
+</div>
 
-    <!-- NEXT BUILDING CARD -->
-    <div id="hint-card">
-        <div class="hint-label">Next Unlock</div>
-        <div class="hint-name" id="hint-name">Lobby Foundation</div>
-        <div class="hint-cost" id="hint-cost">FREE</div>
-    </div>
+<div id="buy-prompt">Press E to Buy</div>
+<div id="toast"></div>
 
-    <!-- BUY PROMPT -->
-    <div id="buy-prompt">Press E to Buy</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
+<script>
+// ─── GLOBALS ────────────────────────────────────────────────────────────────
+let scene, camera, renderer, player;
+let wallet = 200, income = 0;
+let activePad = null, gpsLine = null;
+let isJumping = false, yVel = 0, moveSpeed = 0;
+let gameStarted = false, inRangeOfPad = false;
+const keys = {}, buildings = [], pads = [];
 
-    <!-- TOAST -->
-    <div id="toast"></div>
+const buildSteps = [
+    { id:1,  x:0,   z:0,   cost:0,      label:"Lobby Foundation",   type:"floor",     mat:0x95a5a6, inc:5,    w:40, d:40 },
+    { id:2,  x:12,  z:8,   cost:100,    label:"Reception Desk",     type:"furniture", mat:0x34495e, inc:8,    w:10, d:3,  needs:1 },
+    { id:3,  x:14,  z:10,  cost:150,    label:"Reception Computer", type:"furniture", mat:0x2d3436, inc:10,   w:2,  d:2,  needs:2 },
+    { id:4,  x:10,  z:10,  cost:150,    label:"Guest Registry",     type:"furniture", mat:0xffffff, inc:10,   w:1.5,d:1.5,needs:3 },
+    { id:5,  x:-5,  z:25,  cost:200,    label:"Entry Palm Tree L",  type:"palm",      mat:0x2ecc71, inc:2,    w:2,  d:2,  needs:4 },
+    { id:6,  x:5,   z:25,  cost:200,    label:"Entry Palm Tree R",  type:"palm",      mat:0x2ecc71, inc:2,    w:2,  d:2,  needs:5 },
+    { id:7,  x:-10, z:-10, cost:300,    label:"Lobby Sofa 1",       type:"furniture", mat:0xc0392b, inc:12,   w:6,  d:3,  needs:6 },
+    { id:8,  x:-10, z:-4,  cost:300,    label:"Lobby Sofa 2",       type:"furniture", mat:0xc0392b, inc:12,   w:6,  d:3,  needs:7 },
+    { id:9,  x:0,   z:19,  cost:800,    label:"Glass Front Wall",   type:"walls",     mat:0x81ecec, inc:20,   w:40, d:1,  needs:8 },
+    { id:10, x:0,   z:-40, cost:2500,   label:"Suite 101 Floor",    type:"floor",     mat:0xecf0f1, inc:50,   w:30, d:30, needs:9 },
+    { id:11, x:0,   z:-45, cost:1200,   label:"King Bed Frame",     type:"furniture", mat:0x3e2723, inc:40,   w:10, d:12, needs:10 },
+    { id:12, x:0,   z:-45, cost:600,    label:"Luxury Mattress",    type:"furniture", mat:0xffffff, inc:30,   w:9,  d:11, needs:11 },
+    { id:13, x:0,   z:-42, cost:200,    label:"Silk Pillows",       type:"furniture", mat:0xecf0f1, inc:10,   w:7,  d:2,  needs:12 },
+    { id:14, x:-8,  z:-48, cost:400,    label:"Suite Nightstand L", type:"furniture", mat:0x5d4037, inc:15,   w:3,  d:3,  needs:13 },
+    { id:15, x:8,   z:-48, cost:400,    label:"Suite Nightstand R", type:"furniture", mat:0x5d4037, inc:15,   w:3,  d:3,  needs:14 },
+    { id:16, x:0,   z:-30, cost:1800,   label:"Suite Smart TV",     type:"furniture", mat:0x1a1a1a, inc:80,   w:8,  d:1,  needs:15 },
+    { id:17, x:50,  z:0,   cost:8000,   label:"Pool Deck Tiles",    type:"floor",     mat:0xbdc3c7, inc:200,  w:50, d:60, needs:16 },
+    { id:18, x:50,  z:0,   cost:15000,  label:"Heated Pool Water",  type:"floor",     mat:0x00d2ff, inc:500,  w:30, d:40, needs:17 },
+    { id:19, x:38,  z:15,  cost:1000,   label:"Pool Lounge Chair",  type:"furniture", mat:0xffffff, inc:40,   w:3,  d:6,  needs:18 },
+    { id:20, x:75,  z:25,  cost:1500,   label:"Tropical Ferns",     type:"nature",    mat:0x27ae60, inc:20,   w:4,  d:4,  needs:19 },
+    { id:21, x:75,  z:30,  cost:500,    label:"Decorative Rocks",   type:"rock",      mat:0x7f8c8d, inc:10,   w:3,  d:3,  needs:20 },
+    { id:22, x:70,  z:-10, cost:10000,  label:"Outdoor Tiki Bar",   type:"furniture", mat:0xe67e22, inc:400,  w:8,  d:8,  needs:21 },
+    { id:23, x:70,  z:-18, cost:4000,   label:"Tiki Palm Tree",     type:"palm",      mat:0x2ecc71, inc:100,  w:2,  d:2,  needs:22 },
+    { id:24, x:100, z:0,   cost:40000,  label:"Bridge Support",     type:"floor",     mat:0x7f8c8d, inc:1000, w:15, d:15, needs:23 },
+    { id:25, x:140, z:0,   cost:80000,  label:"Bridge Cables",      type:"walls",     mat:0x34495e, inc:1500, w:1,  d:80, needs:24 },
+    { id:26, x:140, z:0,   cost:120000, label:"Bridge Roadway",     type:"bridge",    mat:0x2d3436, inc:2500, w:80, d:15, needs:25 },
+    { id:27, x:185, z:12,  cost:20000,  label:"Mountain Pine",      type:"nature",    mat:0x013220, inc:500,  w:3,  d:3,  needs:26 },
+    { id:28, x:200, z:0,   cost:200000, label:"Mountain Sign",      type:"furniture", mat:0xf1c40f, inc:8000, w:10, d:2,  needs:27 }
+];
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
-    <script src="game.js"></script>
+function fmt(n) {
+    if (n >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
+    if (n >= 1000)    return '$' + (n/1000).toFixed(1) + 'K';
+    return '$' + Math.floor(n);
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function startGame() {
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('gui').style.display = 'block';
+    document.getElementById('hint-card').style.display = 'block';
+    gameStarted = true;
+    init();
+}
+
+function init() {
+    // Scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB);
+    scene.fog = new THREE.Fog(0x87CEEB, 100, 1500);
+
+    // Camera — positioned clearly above and behind player start
+    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 3000);
+    camera.position.set(0, 30, 75);
+    camera.lookAt(0, 0, 45);
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.9);
+    scene.add(ambient);
+
+    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+    sun.position.set(50, 100, 50);
+    sun.castShadow = true;
+    scene.add(sun);
+
+    // Ground / Island
+    const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(2000, 2000),
+        new THREE.MeshLambertMaterial({ color: 0x3a9e4e })
+    );
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = 0;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Ocean ring around island
+    const ocean = new THREE.Mesh(
+        new THREE.PlaneGeometry(10000, 10000),
+        new THREE.MeshLambertMaterial({ color: 0x1a6ea8 })
+    );
+    ocean.rotation.x = -Math.PI / 2;
+    ocean.position.y = -1;
+    scene.add(ocean);
+
+    // GPS line
+    gpsLine = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.1, 1),
+        new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.6 })
+    );
+    gpsLine.visible = false;
+    scene.add(gpsLine);
+
+    // Player
+    player = new THREE.Group();
+    const bodyMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 2.4, 1.2),
+        new THREE.MeshLambertMaterial({ color: 0x341f97 })
+    );
+    bodyMesh.position.y = 1.2;
+    player.add(bodyMesh);
+
+    // Head
+    const headMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshLambertMaterial({ color: 0xffcc99 })
+    );
+    headMesh.position.y = 2.9;
+    player.add(headMesh);
+
+    scene.add(player);
+    player.position.set(0, 0, 45);
+
+    // Spawn first building free
+    buildSteps[0].bought = true;
+    spawnObject(buildSteps[0]);
+    refreshPads();
+
+    // Force one render immediately to confirm scene is working
+    renderer.render(scene, camera);
+
+    animate();
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (!player || !renderer || !scene || !camera) return;
+
+    // Movement
+    const targetSpeed = keys['w'] ? 0.7 : keys['s'] ? -0.35 : 0;
+    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
+
+    player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
+    player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
+
+    if (keys['a']) player.rotation.y += 0.05;
+    if (keys['d']) player.rotation.y -= 0.05;
+
+    // Jump
+    if (keys[' '] && !isJumping) { yVel = 0.45; isJumping = true; }
+    if (isJumping) {
+        player.position.y += yVel;
+        yVel -= 0.025;
+        if (player.position.y <= 0) { player.position.y = 0; isJumping = false; yVel = 0; }
+    }
+
+    // Camera — follows behind player based on rotation
+    const camDist = 40, camHeight = 22;
+    camera.position.x = player.position.x + Math.sin(player.rotation.y) * camDist;
+    camera.position.y = player.position.y + camHeight;
+    camera.position.z = player.position.z + Math.cos(player.rotation.y) * camDist;
+    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+
+    // Scale pop-in
+    buildings.forEach(b => {
+        if (b.obj && b.obj.scale.x < 1) {
+            const s = Math.min(b.obj.scale.x + 0.05, 1);
+            b.obj.scale.set(s, s, s);
+        }
+    });
+
+    // Pad check
+    if (activePad) {
+        const dist = player.position.distanceTo(activePad.position);
+        const canAfford = wallet >= activePad.data.cost;
+
+        // GPS arrow
+        const mid = new THREE.Vector3().addVectors(player.position, activePad.position).multiplyScalar(0.5);
+        gpsLine.position.set(mid.x, 0.5, mid.z);
+        gpsLine.scale.z = dist;
+        gpsLine.lookAt(new THREE.Vector3(activePad.position.x, 0.5, activePad.position.z));
+        gpsLine.visible = true;
+
+        inRangeOfPad = dist < 6;
+        document.getElementById('buy-prompt').style.display = (inRangeOfPad && canAfford) ? 'block' : 'none';
+
+        if (inRangeOfPad && canAfford && keys['e']) {
+            keys['e'] = false;
+            purchase(activePad.data);
+        }
+    } else {
+        gpsLine.visible = false;
+        document.getElementById('buy-prompt').style.display = 'none';
+    }
+
+    renderer.render(scene, camera);
+    document.getElementById('m-val').innerText = fmt(wallet);
+    document.getElementById('i-val').innerText = fmt(income) + '/s';
+}
+
+function purchase(data) {
+    wallet -= data.cost;
+    data.bought = true;
+    income += (data.inc || 0);
+    spawnObject(data);
+    showToast('✅ ' + data.label + ' built!');
+    refreshPads();
+}
+
+function spawnObject(s) {
+    const group = new THREE.Group();
+
+    let h = 1.8, yOff = 0.9;
+    if (s.type === 'floor')  { h = 0.4; yOff = 0.2; }
+    if (s.type === 'palm' || s.type === 'nature') { h = 8; yOff = 4; }
+
+    const mesh = new THREE.Mesh(
+        new THREE.BoxGeometry(s.w, h, s.d),
+        new THREE.MeshLambertMaterial({ color: s.mat })
+    );
+    mesh.position.y = yOff;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+
+    if (s.type === 'palm') {
+        const trunk = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.25, 0.35, 5, 6),
+            new THREE.MeshLambertMaterial({ color: 0x8B6914 })
+        );
+        trunk.position.y = 2.5;
+        group.add(trunk);
+    }
+
+    group.position.set(s.x, 0, s.z);
+    group.scale.set(0.01, 0.01, 0.01);
+    scene.add(group);
+    s.obj = group;
+    buildings.push(s);
+}
+
+function refreshPads() {
+    pads.forEach(p => scene.remove(p));
+    pads.length = 0;
+    activePad = null;
+
+    const next = buildSteps.find(s =>
+        !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs)?.bought)
+    );
+
+    if (next) {
+        const pad = new THREE.Mesh(
+            new THREE.CylinderGeometry(3, 3, 0.3, 32),
+            new THREE.MeshBasicMaterial({ color: 0xffff00, transparent: true, opacity: 0.9 })
+        );
+        pad.position.set(next.x, 0.15, next.z);
+        pad.data = next;
+        scene.add(pad);
+        pads.push(pad);
+        activePad = pad;
+
+        document.getElementById('hint-name').innerText = next.label;
+        document.getElementById('hint-cost').innerText = next.cost === 0 ? 'FREE' : fmt(next.cost);
+    } else {
+        document.getElementById('hint-name').innerText = '🏆 Resort Complete!';
+        document.getElementById('hint-cost').innerText = '';
+        showToast('🎉 You Win!');
+    }
+}
+
+setInterval(() => { if (gameStarted) wallet += income; }, 1000);
+
+window.addEventListener('keydown', e => {
+    if (e.key === ' ') e.preventDefault();
+    keys[e.key.toLowerCase()] = true;
+});
+window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+window.addEventListener('resize', () => {
+    if (!camera || !renderer) return;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+</script>
 </body>
 </html>
