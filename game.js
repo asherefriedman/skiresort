@@ -1,7 +1,6 @@
 // --- 1. GLOBALS ---
 let scene, camera, renderer, player, wallet = 200, income = 0;
 let activePad = null, gps, isJumping = false, yVel = 0;
-let moveSpeed = 0;
 const keys = {}, buildings = [];
 
 // --- 2. THE STABLE 10-STEP LIST ---
@@ -28,39 +27,31 @@ function startGame() {
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
-    scene.fog = new THREE.Fog(0x81ecec, 1, 3000);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-    sun.position.set(50, 150, 50);
-    scene.add(sun);
+    scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-    const island = new THREE.Mesh(
-        new THREE.CylinderGeometry(800, 820, 5, 64),
-        new THREE.MeshPhongMaterial({ color: 0x2ecc71 })
-    );
+    // Island & Sea (Visuals only, no complex math)
+    const island = new THREE.Mesh(new THREE.CylinderGeometry(800, 820, 5, 32), new THREE.MeshStandardMaterial({ color: 0x2ecc71 }));
     island.position.y = -2.5;
     scene.add(island);
 
-    const sea = new THREE.Mesh(
-        new THREE.PlaneGeometry(15000, 15000),
-        new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.7 })
-    );
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(10000, 10000), new THREE.MeshStandardMaterial({ color: 0x0984e3 }));
     sea.rotation.x = -Math.PI / 2;
-    sea.position.y = -3.5;
+    sea.position.y = -3;
     scene.add(sea);
 
+    // Player
     player = new THREE.Group();
-    const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
-    pMesh.position.y = 1.75;
+    const pMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), new THREE.MeshBasicMaterial({color: 0xff0000}));
+    pMesh.position.y = 1.5;
     player.add(pMesh);
     scene.add(player);
-    player.position.set(0, 5, 45);
+    player.position.set(0, 0, 40);
 
     buildSteps[0].bought = true;
     spawnObject(buildSteps[0]);
@@ -69,31 +60,29 @@ function init() {
     animate();
 }
 
-// --- 4. CORE ENGINE ---
+// --- 4. ENGINE ---
 function animate() {
     requestAnimationFrame(animate);
 
-    let targetSpeed = 0;
-    if (keys['w']) targetSpeed = 0.85;
-    if (keys['s']) targetSpeed = -0.45;
-    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
+    if (!player) return; // SAFETY CHECK
 
-    player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
-    player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
+    // Simple Controls
+    if (keys['w']) player.position.z -= 0.6;
+    if (keys['s']) player.position.z += 0.6;
+    if (keys['a']) player.position.x -= 0.6;
+    if (keys['d']) player.position.x += 0.6;
 
-    if (keys['a']) player.rotation.y += 0.06;
-    if (keys['d']) player.rotation.y -= 0.06;
-
-    if (keys[' '] && !isJumping) { yVel = 0.55; isJumping = true; }
+    // Jump
+    if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
     if (isJumping) {
         player.position.y += yVel;
         yVel -= 0.03;
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
     }
 
-    const camPos = new THREE.Vector3(0, 12, 28).applyMatrix4(player.matrixWorld);
-    camera.position.lerp(camPos, 0.15);
-    camera.lookAt(player.position.x, player.position.y + 2.5, player.position.z);
+    // Static Follow Camera (Rock solid, won't crash)
+    camera.position.set(player.position.x, 25, player.position.z + 45);
+    camera.lookAt(player.position);
 
     if (activePad) {
         if (player.position.distanceTo(activePad.position) < 5) {
@@ -114,25 +103,22 @@ function animate() {
 
 function spawnObject(s) {
     const geo = new THREE.BoxGeometry(s.w, (s.type === "palm" ? 10 : 1), s.d);
-    const mat = new THREE.MeshStandardMaterial({ color: s.mat });
+    const mat = new THREE.MeshStandardMaterial({color: s.mat});
     const mesh = new THREE.Mesh(geo, mat);
     mesh.position.set(s.x, (s.type === "palm" ? 5 : 0.5), s.z);
     scene.add(mesh);
-    s.obj = mesh;
 }
 
 function refreshPads() {
     scene.children.filter(c => c.isPad).forEach(p => scene.remove(p));
     const next = buildSteps.find(s => !s.bought && (!s.needs || buildSteps.find(x => x.id === s.needs).bought));
     if (next) {
-        activePad = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 0.5, 32), new THREE.MeshBasicMaterial({ color: 0xffff00 }));
+        activePad = new THREE.Mesh(new THREE.CylinderGeometry(3, 3, 0.5, 32), new THREE.MeshBasicMaterial({color: 0xffff00}));
         activePad.position.set(next.x, 0.1, next.z);
-        activePad.isPad = true;
+        activePad.isPad = true; 
         activePad.data = next;
         scene.add(activePad);
         document.getElementById('hint').innerText = `Next: ${next.label} ($${next.cost})`;
-    } else {
-        document.getElementById('hint').innerText = "All Built!";
     }
 }
 
@@ -140,8 +126,3 @@ setInterval(() => { wallet += income; }, 1000);
 
 window.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
 window.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
