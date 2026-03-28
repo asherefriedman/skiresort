@@ -27,27 +27,43 @@ function startGame() {
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
+    // Added Fog for depth
+    scene.fog = new THREE.Fog(0x81ecec, 1, 3000);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 5000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
+    sun.position.set(50, 150, 50);
+    scene.add(sun);
 
-    // Simple Ground
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.MeshBasicMaterial({color: 0x2ecc71}));
-    ground.rotation.x = -Math.PI/2;
-    ground.position.y = -0.1;
-    scene.add(ground);
+    // --- RESTORED ISLAND ---
+    const island = new THREE.Mesh(
+        new THREE.CylinderGeometry(800, 820, 5, 64), 
+        new THREE.MeshPhongMaterial({ color: 0x2ecc71 })
+    );
+    island.position.y = -2.5;
+    scene.add(island);
 
-    // Player
+    // --- RESTORED SEA ---
+    const sea = new THREE.Mesh(
+        new THREE.PlaneGeometry(15000, 15000), 
+        new THREE.MeshPhongMaterial({ color: 0x0984e3, transparent: true, opacity: 0.7 })
+    );
+    sea.rotation.x = -Math.PI/2; 
+    sea.position.y = -3.5;
+    scene.add(sea);
+
+    // Player (Back to Blue Capsule)
     player = new THREE.Group();
-    const pMesh = new THREE.Mesh(new THREE.BoxGeometry(1.5, 3, 1.5), new THREE.MeshBasicMaterial({color: 0xff0000}));
-    pMesh.position.y = 1.5;
+    const pMesh = new THREE.Mesh(new THREE.CapsuleGeometry(0.7, 2, 4, 8), new THREE.MeshStandardMaterial({ color: 0x341f97 }));
+    pMesh.position.y = 1.75;
     player.add(pMesh);
     scene.add(player);
-    player.position.set(0, 0, 40);
+    player.position.set(0, 10, 45); 
 
     // Force Start Item
     buildSteps[0].bought = true;
@@ -55,6 +71,51 @@ function init() {
 
     refreshPads();
     animate();
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+
+    // --- RESTORED SMOOTH MOVEMENT ---
+    let targetSpeed = 0;
+    if (keys['w']) targetSpeed = 0.85;
+    if (keys['s']) targetSpeed = -0.45;
+    moveSpeed += (targetSpeed - moveSpeed) * 0.15;
+
+    player.position.x += Math.sin(player.rotation.y) * -moveSpeed;
+    player.position.z += Math.cos(player.rotation.y) * -moveSpeed;
+
+    if (keys['a']) player.rotation.y += 0.06;
+    if (keys['d']) player.rotation.y -= 0.06;
+
+    // Jump Physics
+    if (keys[' '] && !isJumping) { yVel = 0.55; isJumping = true; }
+    if (isJumping) {
+        player.position.y += yVel;
+        yVel -= 0.03;
+        if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
+    }
+
+    // --- RESTORED CHASE CAMERA ---
+    const camPos = new THREE.Vector3(0, 12, 28).applyMatrix4(player.matrixWorld);
+    camera.position.lerp(camPos, 0.15);
+    camera.lookAt(player.position.x, player.position.y + 2.5, player.position.z);
+
+    if (activePad) {
+        if (player.position.distanceTo(activePad.position) < 5) {
+            if (wallet >= activePad.data.cost) {
+                wallet -= activePad.data.cost;
+                activePad.data.bought = true;
+                income += activePad.data.inc;
+                spawnObject(activePad.data);
+                refreshPads();
+            }
+        }
+    }
+
+    renderer.render(scene, camera);
+    document.getElementById('m-val').innerText = Math.floor(wallet);
+    document.getElementById('i-val').innerText = income;
 }
 
 function spawnObject(s) {
@@ -65,23 +126,6 @@ function spawnObject(s) {
     scene.add(mesh);
     s.obj = mesh;
 }
-
-function animate() {
-    requestAnimationFrame(animate);
-
-    // Basic Controls
-    if (keys['w']) player.position.z -= 0.6;
-    if (keys['s']) player.position.z += 0.6;
-    if (keys['a']) player.position.x -= 0.6;
-    if (keys['d']) player.position.x += 0.6;
-
-    // Jump
-    if (keys[' '] && !isJumping) { yVel = 0.5; isJumping = true; }
-    if (isJumping) {
-        player.position.y += yVel;
-        yVel -= 0.03;
-        if (player.position.y <= 0) { player.position.y = 0; isJumping = false; }
-    }
 
     camera.position.set(player.position.x, 20, player.position.z + 40);
     camera.lookAt(player.position);
