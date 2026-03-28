@@ -1,21 +1,417 @@
 <!DOCTYPE html>
-<html>
-<head><title>Test</title></head>
-<body style="background:black">
-<script>
-window.onerror = function(msg, src, line) {
-  document.body.innerHTML += '<p style="color:red;font-size:20px">' + msg + ' | ' + src + ' line ' + line + '</p>';
-};
-</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mega Resort Tycoon</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:#1a1a2e; font-family:'DM Sans',sans-serif; }
+
+canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!important; z-index:1; display:block; }
+
+#startScreen {
+    position:fixed; inset:0; z-index:200;
+    background:linear-gradient(150deg,#0a3d62 0%,#1289c4 50%,#6dd5fa 100%);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+}
+.s-title {
+    font-family:'Bebas Neue',sans-serif;
+    font-size:clamp(64px,12vw,120px);
+    color:#fff; letter-spacing:6px; line-height:0.95;
+    text-align:center; text-shadow:0 6px 40px rgba(0,0,0,0.35);
+}
+.s-sub { font-size:13px; color:rgba(255,255,255,0.55); letter-spacing:4px; text-transform:uppercase; margin-bottom:16px; }
+#playBtn {
+    padding:17px 58px; font-family:'Bebas Neue',sans-serif;
+    font-size:28px; letter-spacing:3px; background:#f1c40f;
+    color:#1a1a2e; border:none; border-radius:60px; cursor:pointer;
+    box-shadow:0 6px 28px rgba(241,196,15,0.45),0 2px 0 #b8970b;
+    transition:transform .14s ease,box-shadow .14s ease;
+}
+#playBtn:hover { transform:translateY(-4px); box-shadow:0 14px 36px rgba(241,196,15,0.55),0 2px 0 #b8970b; }
+#playBtn:active { transform:translateY(0); }
+.s-keys { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
+.s-key {
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
+    border-radius:8px; padding:7px 14px; color:rgba(255,255,255,0.82);
+    font-size:13px; display:flex; align-items:center; gap:6px;
+}
+.s-key kbd { background:rgba(255,255,255,0.18); border-radius:4px; padding:1px 7px; font-family:monospace; font-size:12px; font-weight:bold; }
+
+#hud {
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    display:none; align-items:center; gap:24px; padding:10px 24px;
+    background:rgba(6,12,26,0.8); backdrop-filter:blur(12px);
+    border-bottom:1px solid rgba(255,255,255,0.06); pointer-events:none;
+}
+.hud-brand { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#f1c40f; letter-spacing:2px; margin-right:auto; }
+.hud-block { display:flex; flex-direction:column; align-items:flex-end; line-height:1; }
+.hud-lbl { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.35); margin-bottom:2px; }
+.hud-val { font-family:'Bebas Neue',sans-serif; font-size:26px; }
+#v-money { color:#f1c40f; } #v-income { color:#2ecc71; }
+
+#nextCard {
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    z-index:50; display:none; flex-direction:column; align-items:center;
+    padding:12px 26px; background:rgba(6,12,26,0.85); backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.07); border-left:4px solid #f1c40f;
+    border-radius:12px; color:#fff; pointer-events:none; white-space:nowrap; text-align:center;
+}
+.nc-lbl { font-size:9px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.35); margin-bottom:3px; }
+.nc-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
+.nc-cost { font-size:12px; color:#f1c40f; margin-top:2px; }
+
+#buyPrompt {
+    position:fixed; bottom:108px; left:50%; transform:translateX(-50%);
+    z-index:50; display:none; padding:11px 30px; background:#f1c40f;
+    color:#1a1a2e; font-family:'Bebas Neue',sans-serif; font-size:22px;
+    letter-spacing:2px; border-radius:40px; pointer-events:none;
+    animation:buyPulse .9s ease-in-out infinite;
+}
+@keyframes buyPulse { 0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.06)} }
+
+#toast {
+    position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-14px);
+    z-index:50; padding:9px 26px; background:#27ae60; color:#fff;
+    font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px;
+    border-radius:40px; opacity:0; pointer-events:none;
+    transition:opacity .28s ease,transform .28s ease;
+}
+#toast.visible { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="startScreen">
+    <div class="s-title">🌴 MEGA<br>RESORT</div>
+    <div class="s-sub">Tycoon Edition</div>
+    <button id="playBtn" onclick="startGame()">START BUILDING</button>
+    <div class="s-keys">
+        <div class="s-key"><kbd>W</kbd><kbd>S</kbd> Move</div>
+        <div class="s-key"><kbd>A</kbd><kbd>D</kbd> Turn</div>
+        <div class="s-key"><kbd>Space</kbd> Jump</div>
+        <div class="s-key"><kbd>E</kbd> Buy</div>
+    </div>
+</div>
+
+<div id="hud">
+    <div class="hud-brand">🌴 Mega Resort</div>
+    <div class="hud-block"><div class="hud-lbl">Balance</div><div class="hud-val" id="v-money">$200</div></div>
+    <div class="hud-block"><div class="hud-lbl">Income/sec</div><div class="hud-val" id="v-income">$0</div></div>
+</div>
+
+<div id="nextCard">
+    <div class="nc-lbl">Next Unlock</div>
+    <div class="nc-name" id="nc-name">—</div>
+    <div class="nc-cost" id="nc-cost"></div>
+</div>
+
+<div id="buyPrompt">Press E to Buy</div>
+<div id="toast"></div>
+
+<!-- Three.js with fallbacks -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
-<script src="https://unpkg.com/three@0.140.0/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
+<script>if(typeof THREE==='undefined'){document.write('<script src="https://unpkg.com/three@0.140.0/build/three.min.js"><\/script>');}</script>
+<script>if(typeof THREE==='undefined'){document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"><\/script>');}</script>
+
 <script>
-  if (typeof THREE === 'undefined') {
-    document.body.innerHTML += '<p style="color:orange;font-size:30px">❌ THREE STILL NOT LOADING - try the manual paste method</p>';
-  } else {
-    document.body.innerHTML += '<p style="color:lime;font-size:40px">✅ THREE LOADED! CDN WORKS!</p>';
-  }
+'use strict';
+
+let scene, cam, ren, clock;
+let player;
+let arrowMesh, activePad=null;
+let wallet=200, income=0;
+let vspeed=0, hspeed=0, jumping=false;
+let gameRunning=false, nearPad=false;
+const KEYS={}, placed=[], padList=[];
+
+const STEPS=[
+  {id:1,  x:0,   z:0,   cost:0,      label:'Lobby Foundation',   type:'floor', color:0x7f8c8d, inc:5,    w:40,h:0.4,d:40, need:0},
+  {id:2,  x:12,  z:8,   cost:100,    label:'Reception Desk',     type:'block', color:0x2c3e50, inc:8,    w:10,h:2,  d:3,  need:1},
+  {id:3,  x:14,  z:10,  cost:150,    label:'Reception Computer', type:'block', color:0x1a1a2e, inc:10,   w:2, h:1.5,d:2,  need:2},
+  {id:4,  x:10,  z:10,  cost:150,    label:'Guest Registry',     type:'block', color:0xf5f5f5, inc:10,   w:2, h:1.2,d:2,  need:3},
+  {id:5,  x:-6,  z:18,  cost:200,    label:'Entry Palm L',       type:'palm',  color:0x27ae60, inc:2,    w:2, h:7,  d:2,  need:4},
+  {id:6,  x:6,   z:18,  cost:200,    label:'Entry Palm R',       type:'palm',  color:0x27ae60, inc:2,    w:2, h:7,  d:2,  need:5},
+  {id:7,  x:-10, z:-8,  cost:300,    label:'Lobby Sofa 1',       type:'block', color:0xc0392b, inc:12,   w:6, h:1.2,d:3,  need:6},
+  {id:8,  x:-10, z:-2,  cost:300,    label:'Lobby Sofa 2',       type:'block', color:0xc0392b, inc:12,   w:6, h:1.2,d:3,  need:7},
+  {id:9,  x:0,   z:17,  cost:800,    label:'Glass Front Wall',   type:'block', color:0x81ecec, inc:20,   w:40,h:5,  d:1,  need:8},
+  {id:10, x:0,   z:-40, cost:2500,   label:'Suite 101 Floor',    type:'floor', color:0xecf0f1, inc:50,   w:30,h:0.4,d:30, need:9},
+  {id:11, x:0,   z:-45, cost:1200,   label:'King Bed Frame',     type:'block', color:0x3e2723, inc:40,   w:10,h:2,  d:12, need:10},
+  {id:12, x:0,   z:-45, cost:600,    label:'Luxury Mattress',    type:'block', color:0xffffff, inc:30,   w:9, h:0.7,d:11, need:11},
+  {id:13, x:0,   z:-42, cost:200,    label:'Silk Pillows',       type:'block', color:0xdfe6e9, inc:10,   w:7, h:0.5,d:2,  need:12},
+  {id:14, x:-8,  z:-48, cost:400,    label:'Nightstand L',       type:'block', color:0x5d4037, inc:15,   w:3, h:2,  d:3,  need:13},
+  {id:15, x:8,   z:-48, cost:400,    label:'Nightstand R',       type:'block', color:0x5d4037, inc:15,   w:3, h:2,  d:3,  need:14},
+  {id:16, x:0,   z:-30, cost:1800,   label:'Suite Smart TV',     type:'block', color:0x111111, inc:80,   w:8, h:4,  d:1,  need:15},
+  {id:17, x:50,  z:0,   cost:8000,   label:'Pool Deck',          type:'floor', color:0xbdc3c7, inc:200,  w:50,h:0.4,d:60, need:16},
+  {id:18, x:50,  z:0,   cost:15000,  label:'Pool Water',         type:'floor', color:0x00bcd4, inc:500,  w:30,h:0.3,d:40, need:17},
+  {id:19, x:38,  z:15,  cost:1000,   label:'Lounge Chair',       type:'block', color:0xffffff, inc:40,   w:3, h:0.6,d:6,  need:18},
+  {id:20, x:75,  z:25,  cost:1500,   label:'Tropical Ferns',     type:'palm',  color:0x2ecc71, inc:20,   w:3, h:7,  d:3,  need:19},
+  {id:21, x:75,  z:30,  cost:500,    label:'Decorative Rocks',   type:'block', color:0x7f8c8d, inc:10,   w:3, h:1.5,d:3,  need:20},
+  {id:22, x:70,  z:-10, cost:10000,  label:'Tiki Bar',           type:'block', color:0xe67e22, inc:400,  w:8, h:3,  d:8,  need:21},
+  {id:23, x:70,  z:-18, cost:4000,   label:'Tiki Palm',          type:'palm',  color:0x27ae60, inc:100,  w:2, h:8,  d:2,  need:22},
+  {id:24, x:100, z:0,   cost:40000,  label:'Bridge Support',     type:'block', color:0x7f8c8d, inc:1000, w:15,h:10, d:15, need:23},
+  {id:25, x:140, z:0,   cost:80000,  label:'Bridge Roadway',     type:'floor', color:0x2d3436, inc:2500, w:80,h:0.8,d:15, need:24},
+  {id:26, x:185, z:12,  cost:20000,  label:'Mountain Pine',      type:'palm',  color:0x1b5e20, inc:500,  w:3, h:12, d:3,  need:25},
+  {id:27, x:200, z:0,   cost:200000, label:'Mountain Sign',      type:'block', color:0xf1c40f, inc:8000, w:10,h:5,  d:1,  need:26},
+];
+
+function fmtMoney(n){
+    n=Math.floor(n);
+    if(n>=1000000) return '$'+(n/1000000).toFixed(1)+'M';
+    if(n>=1000)    return '$'+(n/1000).toFixed(1)+'K';
+    return '$'+n;
+}
+
+let toastTimer=null;
+function showToast(msg){
+    const el=document.getElementById('toast');
+    el.textContent=msg;
+    el.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>el.classList.remove('visible'),2400);
+}
+
+function startGame(){
+    document.getElementById('startScreen').style.display='none';
+    document.getElementById('hud').style.display='flex';
+    document.getElementById('nextCard').style.display='flex';
+    gameRunning=true;
+    initThree();
+}
+
+function initThree(){
+    // Scene - sky blue background
+    scene=new THREE.Scene();
+    scene.background=new THREE.Color(0x87CEEB);
+    scene.fog=new THREE.Fog(0x87CEEB,200,1200);
+
+    // Camera - positioned to see player at origin
+    cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,2000);
+    cam.position.set(0,20,50);
+    cam.lookAt(0,0,0);
+
+    // Renderer
+    ren=new THREE.WebGLRenderer({antialias:true});
+    ren.setPixelRatio(Math.min(devicePixelRatio,2));
+    ren.setSize(innerWidth,innerHeight);
+    ren.shadowMap.enabled=true;
+    document.body.appendChild(ren.domElement);
+
+    clock=new THREE.Clock();
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff,0.9));
+    const sun=new THREE.DirectionalLight(0xfff8e1,1.0);
+    sun.position.set(80,150,80);
+    sun.castShadow=true;
+    scene.add(sun);
+
+    // Ground
+    const ground=new THREE.Mesh(
+        new THREE.PlaneGeometry(2000,2000),
+        new THREE.MeshLambertMaterial({color:0x4CAF50})
+    );
+    ground.rotation.x=-Math.PI/2;
+    ground.position.y=0;
+    ground.receiveShadow=true;
+    scene.add(ground);
+
+    // Ocean
+    const ocean=new THREE.Mesh(
+        new THREE.PlaneGeometry(10000,10000),
+        new THREE.MeshLambertMaterial({color:0x1565C0})
+    );
+    ocean.rotation.x=-Math.PI/2;
+    ocean.position.y=-0.8;
+    scene.add(ocean);
+
+    // GPS arrow
+    arrowMesh=new THREE.Mesh(
+        new THREE.BoxGeometry(0.5,0.12,1),
+        new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.75})
+    );
+    arrowMesh.visible=false;
+    scene.add(arrowMesh);
+
+    // Player
+    player=new THREE.Group();
+    player.position.set(0,0,0);
+
+    const body=new THREE.Mesh(
+        new THREE.BoxGeometry(1.2,2.0,1.2),
+        new THREE.MeshLambertMaterial({color:0x3949AB})
+    );
+    body.position.y=1.4;
+    body.castShadow=true;
+    player.add(body);
+
+    const head=new THREE.Mesh(
+        new THREE.BoxGeometry(0.9,0.9,0.9),
+        new THREE.MeshLambertMaterial({color:0xFFCC80})
+    );
+    head.position.y=3.0;
+    head.castShadow=true;
+    player.add(head);
+
+    scene.add(player);
+
+    // First building free
+    STEPS[0].bought=true;
+    placeObject(STEPS[0]);
+    spawnNextPad();
+
+    // Do one render immediately to confirm it works
+    ren.render(scene,cam);
+
+    animate();
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+
+    const dt=Math.min(clock.getDelta(),0.05);
+
+    // Move
+    const tgt=KEYS['w']?8:KEYS['s']?-4:0;
+    hspeed+=(tgt-hspeed)*0.14;
+    player.position.x-=Math.sin(player.rotation.y)*hspeed*dt;
+    player.position.z-=Math.cos(player.rotation.y)*hspeed*dt;
+
+    if(KEYS['a']) player.rotation.y+=0.055;
+    if(KEYS['d']) player.rotation.y-=0.055;
+
+    // Jump
+    if(KEYS[' ']&&!jumping){vspeed=7;jumping=true;}
+    if(jumping){
+        player.position.y+=vspeed*dt;
+        vspeed-=22*dt;
+        if(player.position.y<=0){player.position.y=0;jumping=false;vspeed=0;}
+    }
+
+    // Camera behind player
+    const ry=player.rotation.y;
+    cam.position.x=player.position.x+Math.sin(ry)*32;
+    cam.position.y=player.position.y+18;
+    cam.position.z=player.position.z+Math.cos(ry)*32;
+    cam.lookAt(player.position.x,player.position.y+1.5,player.position.z);
+
+    // Pop-in
+    for(const p of placed){
+        if(p.grp.scale.x<1){
+            const ns=Math.min(p.grp.scale.x+0.07,1);
+            p.grp.scale.setScalar(ns);
+        }
+    }
+
+    // Pad logic
+    if(activePad){
+        const dist=player.position.distanceTo(activePad.position);
+        const afford=wallet>=activePad.stepData.cost;
+
+        const mx=(player.position.x+activePad.position.x)*0.5;
+        const mz=(player.position.z+activePad.position.z)*0.5;
+        arrowMesh.position.set(mx,0.3,mz);
+        arrowMesh.scale.z=dist;
+        arrowMesh.lookAt(activePad.position.x,0.3,activePad.position.z);
+        arrowMesh.visible=true;
+
+        nearPad=dist<6;
+        document.getElementById('buyPrompt').style.display=(nearPad&&afford)?'block':'none';
+
+        if(nearPad&&afford&&KEYS['e']){
+            KEYS['e']=false;
+            doBuy(activePad.stepData);
+        }
+    } else {
+        arrowMesh.visible=false;
+        document.getElementById('buyPrompt').style.display='none';
+    }
+
+    ren.render(scene,cam);
+    document.getElementById('v-money').textContent=fmtMoney(wallet);
+    document.getElementById('v-income').textContent=fmtMoney(income)+'/s';
+}
+
+function placeObject(s){
+    const grp=new THREE.Group();
+
+    const mesh=new THREE.Mesh(
+        new THREE.BoxGeometry(s.w,s.h,s.d),
+        new THREE.MeshLambertMaterial({color:s.color})
+    );
+    mesh.position.y=s.h/2;
+    mesh.castShadow=true;
+    mesh.receiveShadow=true;
+    grp.add(mesh);
+
+    if(s.type==='palm'){
+        const trunk=new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22,0.32,s.h*0.55,7),
+            new THREE.MeshLambertMaterial({color:0x8D6E63})
+        );
+        trunk.position.y=s.h*0.275;
+        grp.add(trunk);
+    }
+
+    grp.position.set(s.x,0,s.z);
+    grp.scale.setScalar(0.01);
+    scene.add(grp);
+    s.grp=grp;
+    placed.push({grp,step:s});
+}
+
+function doBuy(s){
+    wallet-=s.cost;
+    s.bought=true;
+    income+=s.inc;
+    placeObject(s);
+    showToast('✅ '+s.label+' built!');
+    spawnNextPad();
+}
+
+function spawnNextPad(){
+    padList.forEach(p=>scene.remove(p));
+    padList.length=0;
+    activePad=null;
+
+    const next=STEPS.find(s=>
+        !s.bought&&(s.need===0||STEPS.find(x=>x.id===s.need)?.bought)
+    );
+
+    if(next){
+        const pad=new THREE.Mesh(
+            new THREE.CylinderGeometry(3,3,0.28,32),
+            new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.9})
+        );
+        pad.position.set(next.x,0.14,next.z);
+        pad.stepData=next;
+        scene.add(pad);
+        padList.push(pad);
+        activePad=pad;
+        document.getElementById('nc-name').textContent=next.label;
+        document.getElementById('nc-cost').textContent=next.cost===0?'FREE':fmtMoney(next.cost);
+    } else {
+        document.getElementById('nc-name').textContent='🏆 Resort Complete!';
+        document.getElementById('nc-cost').textContent='';
+        showToast('🎉 You completed the resort!');
+    }
+}
+
+setInterval(()=>{ if(gameRunning) wallet+=income; },1000);
+
+window.addEventListener('keydown',e=>{
+    if(e.key===' ')e.preventDefault();
+    KEYS[e.key.toLowerCase()]=true;
+});
+window.addEventListener('keyup',e=>{ KEYS[e.key.toLowerCase()]=false; });
+window.addEventListener('resize',()=>{
+    if(!cam||!ren)return;
+    cam.aspect=innerWidth/innerHeight;
+    cam.updateProjectionMatrix();
+    ren.setSize(innerWidth,innerHeight);
+});
 </script>
 </body>
 </html>
