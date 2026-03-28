@@ -68,19 +68,28 @@ function startGame() {
 function init() {
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0fbcf9);
-    scene.fog = new THREE.Fog(0x81ecec, 10, 3000);
+    scene.fog = new THREE.Fog(0x81ecec, 50, 2000);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000);
+    // Set initial camera position explicitly so it's not at origin
+    camera.position.set(0, 25, 90);
+    camera.lookAt(0, 0, 45);
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    // FIX: make canvas sit behind the HUD
+    renderer.domElement.style.position = 'fixed';
+    renderer.domElement.style.top = '0';
+    renderer.domElement.style.left = '0';
+    renderer.domElement.style.zIndex = '0';
     document.body.appendChild(renderer.domElement);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
     const sun = new THREE.DirectionalLight(0xfff4e0, 1.2);
     sun.position.set(100, 200, 80);
     sun.castShadow = true;
@@ -159,9 +168,15 @@ function animate() {
         if (player.position.y <= 0) { player.position.y = 0; isJumping = false; yVel = 0; }
     }
 
-    camera.position.set(player.position.x, player.position.y + 25, player.position.z + 45);
-    camera.lookAt(player.position);
+    // Camera follow — behind and above player
+    camera.position.set(
+        player.position.x - Math.sin(player.rotation.y) * -45,
+        player.position.y + 25,
+        player.position.z - Math.cos(player.rotation.y) * -45
+    );
+    camera.lookAt(player.position.x, player.position.y + 2, player.position.z);
 
+    // Pop-in animation
     buildings.forEach(b => {
         if (b.obj && b.obj.scale.x < 1) {
             const next = Math.min(b.obj.scale.x + 0.06, 1);
@@ -169,11 +184,14 @@ function animate() {
         }
     });
 
+    // Pad proximity
     if (activePad) {
         const dist = player.position.distanceTo(activePad.position);
         const canAfford = wallet >= activePad.data.cost;
 
-        const mid = new THREE.Vector3().addVectors(player.position, activePad.position).multiplyScalar(0.5);
+        const mid = new THREE.Vector3()
+            .addVectors(player.position, activePad.position)
+            .multiplyScalar(0.5);
         gpsLine.position.set(mid.x, 0.6, mid.z);
         gpsLine.scale.z = dist;
         gpsLine.lookAt(activePad.position.x, 0.6, activePad.position.z);
