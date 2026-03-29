@@ -55,7 +55,6 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
     <div class="hud-block"><div class="hud-lbl">Income/sec</div><div class="hud-val" id="v-income">$0</div></div>
 </div>
 <div id="progress"><div id="progress-bar"></div></div>
-
 <div id="nextCard">
     <div class="nc-lbl">Next Unlock</div>
     <div class="nc-name" id="nc-name">—</div>
@@ -65,189 +64,145 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
-<script>if(typeof THREE==='undefined'){document.write('<scr'+'ipt src="https://unpkg.com/three@0.140.0/build/three.min.js"><\/scr'+'ipt>');}</script>
-<script>if(typeof THREE==='undefined'){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"><\/scr'+'ipt>');}</script>
+<script src="https://unpkg.com/three@0.140.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
 
 <script>
-'use strict';
+// ALL variables declared ONCE at the top — fixes the duplicate declaration crash
+let scene, cam, ren, clock, player;
+let gpsGroup, activePad = null;
+let wallet = 200, income = 0;
+let vspeed = 0, hspeed = 0, jumping = false;
+let gameRunning = false, nearPad = false;  // declared ONCE here only
+const KEYS = {}, placed = [], padList = [], colliders = [];
 
-let scene,cam,ren,clock,player;
-let gpsGroup,activePad=null;
-let wallet=200,income=0;
-let vspeed=0,hspeed=0,jumping=false;
-let gameRunning=false,nearPad=false;
-const KEYS={},placed=[],padList=[],colliders=[];
+const PLAYER_R = 0.7, PLAYER_H = 3.4, PAD_FLOAT = 1.2;
 
-const PLAYER_R=0.7, PLAYER_H=3.4, PAD_FLOAT=1.2;
-
-// ─── COLOUR PALETTE (Roblox-realistic) ───────────────────────────────────────
-const C={
-  // Structural
-  concreteLight: 0xd6cfc7,
-  concreteMid:   0xb0a89e,
-  concreteDark:  0x8c8278,
-  marble:        0xf0ede8,
-  marbleDark:    0xe0dbd4,
-  // Wood
-  oakLight:      0xc8a96e,
-  oakMid:        0xa07840,
-  oakDark:       0x7a5230,
-  mahogany:      0x6b3a2a,
-  // Glass
-  glassBlue:     0xadd8f0,
-  glassTeal:     0x80d4d4,
-  // Metal
-  steel:         0x9eb3c2,
-  steelDark:     0x6e8899,
-  gold:          0xd4a844,
-  chrome:        0xc8d4dc,
-  // Fabric
-  cream:         0xf5f0e8,
-  navy:          0x2c3e6b,
-  burgundy:      0x8b2635,
-  teal:          0x2a7a7a,
-  charcoal:      0x3a3a3a,
-  // Nature
-  grassGreen:    0x4a9e4a,
-  palmGreen:     0x2d8a3e,
-  trunkBrown:    0x8B6914,
-  // Pool
-  poolBlue:      0x00b4d8,
-  poolTile:      0xb8d4e0,
-  // Misc
-  white:         0xffffff,
-  offWhite:      0xf8f5f0,
-  yellow:        0xf1c40f,
-  orange:        0xe67e22,
-  red:           0xc0392b,
-  black:         0x1a1a1a,
-  ivory:         0xfffff0,
+const C = {
+    concreteLight:0xd6cfc7, concreteMid:0xb0a89e, concreteDark:0x8c8278,
+    marble:0xf0ede8, marbleDark:0xe0dbd4,
+    oakLight:0xc8a96e, oakMid:0xa07840, oakDark:0x7a5230, mahogany:0x6b3a2a,
+    glassBlue:0xadd8f0, glassTeal:0x80d4d4,
+    steel:0x9eb3c2, steelDark:0x6e8899, gold:0xd4a844, chrome:0xc8d4dc,
+    cream:0xf5f0e8, navy:0x2c3e6b, burgundy:0x8b2635, teal:0x2a7a7a, charcoal:0x3a3a3a,
+    grassGreen:0x4a9e4a, palmGreen:0x2d8a3e, trunkBrown:0x8B6914,
+    poolBlue:0x00b4d8, poolTile:0xb8d4e0,
+    white:0xffffff, offWhite:0xf8f5f0, yellow:0xf1c40f, orange:0xe67e22,
+    red:0xc0392b, black:0x1a1a1a, ivory:0xfffff0,
 };
 
-const STEPS=[
-// ══ LOBBY ══════════════════════════════════════════════════════════════════
-{id:1,  x:0,   z:0,   cost:0,     label:'Lobby Foundation',     type:'floor', color:C.concreteMid,  inc:5,   w:54,h:0.6,d:54, need:0,  ox:0,  oz:30},
-{id:2,  x:0,   z:0,   cost:60,    label:'Marble Lobby Floor',   type:'floor', color:C.marble,       inc:10,  w:52,h:0.3,d:52, need:1,  ox:0,  oz:29},
-{id:3,  x:0,   z:24,  cost:200,   label:'Glass Entry Wall',     type:'wall',  color:C.glassBlue,    inc:20,  w:54,h:7,d:0.8, need:2,  ox:0,  oz:-8, doorX:0,  doorW:5,doorH:5.5},
-{id:4,  x:-26, z:0,   cost:200,   label:'Left Lobby Wall',      type:'wall',  color:C.offWhite,     inc:20,  w:0.8,h:7,d:54, need:3,  ox:5,  oz:0,  doorX:0,  doorW:5,doorH:5.5},
-{id:5,  x:26,  z:0,   cost:200,   label:'Right Lobby Wall',     type:'wall',  color:C.offWhite,     inc:20,  w:0.8,h:7,d:54, need:4,  ox:-5, oz:0,  doorX:0,  doorW:5,doorH:5.5},
-{id:6,  x:0,   z:-26, cost:200,   label:'Back Lobby Wall',      type:'wall',  color:C.offWhite,     inc:20,  w:54,h:7,d:0.8, need:5,  ox:0,  oz:6,  doorX:0,  doorW:5,doorH:5.5},
-{id:7,  x:0,   z:12,  cost:300,   label:'Reception Desk',       type:'block', color:C.mahogany,     inc:20,  w:16,h:2.2,d:3, need:6,  ox:11, oz:0},
-{id:8,  x:0,   z:12,  cost:120,   label:'Desk Marble Top',      type:'block', color:C.marble,       inc:8,   w:16,h:0.2,d:3.2,need:7, ox:11, oz:0},
-{id:9,  x:4,   z:12,  cost:80,    label:'Desk Computer',        type:'block', color:C.charcoal,     inc:8,   w:1.8,h:1.5,d:0.3,need:8,ox:11, oz:0},
-{id:10, x:-4,  z:12,  cost:60,    label:'Desk Phone',           type:'block', color:C.charcoal,     inc:5,   w:1,h:1.2,d:0.8,need:9, ox:11, oz:0},
-{id:11, x:-18, z:8,   cost:300,   label:'Lobby Sofa A',         type:'block', color:C.navy,         inc:18,  w:7,h:1.4,d:3,  need:10, ox:-9, oz:0},
-{id:12, x:-18, z:2,   cost:300,   label:'Lobby Sofa B',         type:'block', color:C.navy,         inc:18,  w:7,h:1.4,d:3,  need:11, ox:-9, oz:0},
-{id:13, x:-18, z:5,   cost:180,   label:'Coffee Table',         type:'block', color:C.oakMid,       inc:12,  w:4,h:0.9,d:2,  need:12, ox:-9, oz:0},
-{id:14, x:18,  z:8,   cost:300,   label:'Lobby Sofa C',         type:'block', color:C.burgundy,     inc:18,  w:7,h:1.4,d:3,  need:13, ox:9,  oz:0},
-{id:15, x:18,  z:2,   cost:300,   label:'Lobby Sofa D',         type:'block', color:C.burgundy,     inc:18,  w:7,h:1.4,d:3,  need:14, ox:9,  oz:0},
-{id:16, x:0,   z:-18, cost:400,   label:'Grand Piano',          type:'block', color:C.black,        inc:40,  w:6,h:2.2,d:4.5,need:15, ox:7,  oz:0},
-{id:17, x:0,   z:-18, cost:100,   label:'Piano Bench',          type:'block', color:C.oakDark,      inc:8,   w:2,h:0.9,d:1.5,need:16, ox:5,  oz:0},
-{id:18, x:-20, z:-18, cost:280,   label:'Lobby Palm L',         type:'palm',  color:C.palmGreen,    inc:12,  w:2,h:7,d:2,    need:17, ox:-5, oz:0},
-{id:19, x:20,  z:-18, cost:280,   label:'Lobby Palm R',         type:'palm',  color:C.palmGreen,    inc:12,  w:2,h:7,d:2,    need:18, ox:5,  oz:0},
-{id:20, x:0,   z:0,   cost:600,   label:'Lobby Ceiling',        type:'floor', color:C.offWhite,     inc:15,  w:54,h:0.5,d:54, need:19, ox:0,  oz:30},
-
-// ══ HOTEL SUITE ════════════════════════════════════════════════════════════
-{id:21, x:0,   z:-68, cost:4000,  label:'Suite Floor',          type:'floor', color:C.oakLight,     inc:80,  w:32,h:0.5,d:32, need:20, ox:0,  oz:-20},
-{id:22, x:-14, z:-68, cost:500,   label:'Suite Wall Left',      type:'wall',  color:C.offWhite,     inc:20,  w:0.8,h:7,d:32, need:21, ox:5,  oz:0,  doorX:0, doorW:4,doorH:5.5},
-{id:23, x:14,  z:-68, cost:500,   label:'Suite Wall Right',     type:'wall',  color:C.offWhite,     inc:20,  w:0.8,h:7,d:32, need:22, ox:-5, oz:0,  doorX:0, doorW:4,doorH:5.5},
-{id:24, x:0,   z:-52, cost:500,   label:'Suite Entry Wall',     type:'wall',  color:C.offWhite,     inc:20,  w:32,h:7,d:0.8, need:23, ox:0,  oz:-6, doorX:0, doorW:4,doorH:5.5},
-{id:25, x:0,   z:-84, cost:500,   label:'Suite Back Wall',      type:'wall',  color:C.offWhite,     inc:20,  w:32,h:7,d:0.8, need:24, ox:0,  oz:6,  doorX:0, doorW:4,doorH:5.5},
-{id:26, x:0,   z:-73, cost:1800,  label:'King Bed Frame',       type:'block', color:C.mahogany,     inc:60,  w:13,h:2.4,d:14, need:25, ox:10, oz:0},
-{id:27, x:0,   z:-73, cost:900,   label:'Plush Mattress',       type:'block', color:C.cream,        inc:35,  w:12,h:1.0,d:13, need:26, ox:10, oz:0},
-{id:28, x:0,   z:-65, cost:250,   label:'Pillows',              type:'block', color:C.white,        inc:15,  w:9,h:0.7,d:2.5,need:27, ox:10, oz:0},
-{id:29, x:-10, z:-77, cost:600,   label:'Nightstand L',         type:'block', color:C.oakMid,       inc:20,  w:3,h:2.2,d:3,  need:28, ox:-7, oz:0},
-{id:30, x:10,  z:-77, cost:600,   label:'Nightstand R',         type:'block', color:C.oakMid,       inc:20,  w:3,h:2.2,d:3,  need:29, ox:7,  oz:0},
-{id:31, x:-10, z:-77, cost:350,   label:'Lamp L',               type:'block', color:C.gold,         inc:12,  w:0.8,h:3.2,d:0.8,need:30,ox:-7, oz:0},
-{id:32, x:10,  z:-77, cost:350,   label:'Lamp R',               type:'block', color:C.gold,         inc:12,  w:0.8,h:3.2,d:0.8,need:31,ox:7,  oz:0},
-{id:33, x:0,   z:-55, cost:2200,  label:'Smart TV Wall',        type:'block', color:C.charcoal,     inc:100, w:12,h:5,d:0.5, need:32, ox:0,  oz:5},
-{id:34, x:-11, z:-62, cost:700,   label:'Suite Armchair',       type:'block', color:C.teal,         inc:28,  w:3.5,h:2.8,d:3.5,need:33,ox:-8, oz:0},
-{id:35, x:11,  z:-62, cost:700,   label:'Suite Desk',           type:'block', color:C.oakDark,      inc:28,  w:6,h:2,d:3,    need:34, ox:8,  oz:0},
-{id:36, x:0,   z:-88, cost:1500,  label:'Bathroom Floor',       type:'floor', color:C.concreteMid,  inc:35,  w:16,h:0.5,d:12, need:35, ox:0,  oz:-8},
-{id:37, x:4,   z:-92, cost:1000,  label:'Freestanding Bathtub', type:'block', color:C.white,        inc:55,  w:7,h:1.8,d:4,   need:36, ox:8,  oz:0},
-{id:38, x:-5,  z:-90, cost:500,   label:'Sink & Vanity',        type:'block', color:C.marble,       inc:22,  w:4,h:2.2,d:2.5, need:37, ox:-8, oz:0},
-{id:39, x:-5,  z:-86, cost:350,   label:'Toilet',               type:'block', color:C.white,        inc:15,  w:2,h:2,d:2.5,  need:38, ox:-8, oz:0},
-
-// ══ POOL AREA ══════════════════════════════════════════════════════════════
-{id:40, x:80,  z:0,   cost:12000, label:'Pool Deck',            type:'floor', color:C.poolTile,     inc:300, w:64,h:0.5,d:74, need:39, ox:0,  oz:-40},
-{id:41, x:80,  z:0,   cost:20000, label:'Swimming Pool',        type:'floor', color:C.poolBlue,     inc:700, w:38,h:0.6,d:46, need:40, ox:24, oz:0},
-{id:42, x:80,  z:0,   cost:2000,  label:'Pool Edge Tiles',      type:'floor', color:C.white,        inc:50,  w:42,h:0.4,d:50, need:41, ox:24, oz:0},
-{id:43, x:59,  z:18,  cost:1400,  label:'Lounge Chair A',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:42, ox:-6, oz:0},
-{id:44, x:59,  z:8,   cost:1400,  label:'Lounge Chair B',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:43, ox:-6, oz:0},
-{id:45, x:59,  z:-2,  cost:1400,  label:'Lounge Chair C',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:44, ox:-6, oz:0},
-{id:46, x:59,  z:-12, cost:1400,  label:'Lounge Chair D',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:45, ox:-6, oz:0},
-{id:47, x:101, z:18,  cost:1400,  label:'Lounge Chair E',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:46, ox:6,  oz:0},
-{id:48, x:101, z:5,   cost:1400,  label:'Lounge Chair F',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:47, ox:6,  oz:0},
-{id:49, x:101, z:-8,  cost:1400,  label:'Lounge Chair G',       type:'block', color:C.cream,        inc:50,  w:3,h:0.7,d:7,   need:48, ox:6,  oz:0},
-{id:50, x:59,  z:13,  cost:900,   label:'Pool Umbrella A',      type:'block', color:C.red,          inc:22,  w:0.5,h:5,d:0.5, need:49, ox:-4, oz:0},
-{id:51, x:59,  z:-7,  cost:900,   label:'Pool Umbrella B',      type:'block', color:C.red,          inc:22,  w:0.5,h:5,d:0.5, need:50, ox:-4, oz:0},
-{id:52, x:101, z:10,  cost:900,   label:'Pool Umbrella C',      type:'block', color:C.orange,       inc:22,  w:0.5,h:5,d:0.5, need:51, ox:4,  oz:0},
-{id:53, x:101, z:-4,  cost:900,   label:'Pool Umbrella D',      type:'block', color:C.orange,       inc:22,  w:0.5,h:5,d:0.5, need:52, ox:4,  oz:0},
-{id:54, x:80,  z:-42, cost:15000, label:'Pool Bar',             type:'block', color:C.oakDark,      inc:600, w:14,h:3.2,d:5,  need:53, ox:0,  oz:-8},
-{id:55, x:80,  z:-42, cost:2500,  label:'Pool Bar Top',         type:'block', color:C.marble,       inc:60,  w:14,h:0.3,d:5.2,need:54, ox:0,  oz:6},
-{id:56, x:80,  z:-38, cost:3000,  label:'Bar Stools',           type:'block', color:C.trunkBrown,   inc:90,  w:12,h:2.2,d:1.5,need:55, ox:0,  oz:5},
-{id:57, x:65,  z:-36, cost:2200,  label:'Pool Palm A',          type:'palm',  color:C.palmGreen,    inc:55,  w:2,h:9,d:2,    need:56, ox:-5, oz:0},
-{id:58, x:95,  z:-36, cost:2200,  label:'Pool Palm B',          type:'palm',  color:C.palmGreen,    inc:55,  w:2,h:9,d:2,    need:57, ox:5,  oz:0},
-{id:59, x:65,  z:36,  cost:2200,  label:'Pool Palm C',          type:'palm',  color:C.palmGreen,    inc:55,  w:2,h:9,d:2,    need:58, ox:-5, oz:0},
-{id:60, x:95,  z:36,  cost:2200,  label:'Pool Palm D',          type:'palm',  color:C.palmGreen,    inc:55,  w:2,h:9,d:2,    need:59, ox:5,  oz:0},
-{id:61, x:80,  z:44,  cost:6000,  label:'Hot Tub',              type:'block', color:C.poolBlue,     inc:250, w:9,h:2.2,d:9,  need:60, ox:8,  oz:0},
-{id:62, x:80,  z:44,  cost:1800,  label:'Hot Tub Surround',     type:'block', color:C.poolTile,     inc:40,  w:11,h:1.2,d:11, need:61, ox:8,  oz:0},
-
-// ══ RESTAURANT ═════════════════════════════════════════════════════════════
-{id:63, x:-80, z:0,   cost:18000, label:'Restaurant Floor',     type:'floor', color:C.oakLight,     inc:500, w:52,h:0.5,d:52, need:62, ox:0,  oz:-30},
-{id:64, x:-54, z:0,   cost:800,   label:'Restaurant Wall Front',type:'wall',  color:C.offWhite,     inc:25,  w:0.8,h:7,d:52, need:63, ox:5,  oz:0,  doorX:0, doorW:4,doorH:5.5},
-{id:65, x:-106,z:0,   cost:800,   label:'Restaurant Wall Back', type:'wall',  color:C.offWhite,     inc:25,  w:0.8,h:7,d:52, need:64, ox:-5, oz:0,  doorX:0, doorW:4,doorH:5.5},
-{id:66, x:-80, z:26,  cost:800,   label:'Restaurant Wall Side A',type:'wall', color:C.offWhite,     inc:25,  w:52,h:7,d:0.8, need:65, ox:0,  oz:-6, doorX:0, doorW:4,doorH:5.5},
-{id:67, x:-80, z:-26, cost:800,   label:'Restaurant Wall Side B',type:'wall', color:C.offWhite,     inc:25,  w:52,h:7,d:0.8, need:66, ox:0,  oz:6,  doorX:0, doorW:4,doorH:5.5},
-{id:68, x:-70, z:8,   cost:2200,  label:'Dining Table A',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:67, ox:7,  oz:0},
-{id:69, x:-70, z:-5,  cost:2200,  label:'Dining Table B',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:68, ox:7,  oz:0},
-{id:70, x:-80, z:8,   cost:2200,  label:'Dining Table C',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:69, ox:-7, oz:0},
-{id:71, x:-80, z:-5,  cost:2200,  label:'Dining Table D',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:70, ox:-7, oz:0},
-{id:72, x:-90, z:8,   cost:2200,  label:'Dining Table E',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:71, ox:-8, oz:0},
-{id:73, x:-90, z:-5,  cost:2200,  label:'Dining Table F',       type:'block', color:C.oakMid,       inc:70,  w:4.5,h:2,d:4.5,need:72, ox:-8, oz:0},
-{id:74, x:-80, z:-20, cost:10000, label:'Open Kitchen',         type:'block', color:C.steel,        inc:400, w:24,h:3.5,d:6, need:73, ox:0,  oz:-7},
-{id:75, x:-80, z:-20, cost:3500,  label:'Kitchen Counter',      type:'block', color:C.marble,       inc:120, w:22,h:0.4,d:5.5,need:74,ox:0,  oz:7},
-{id:76, x:-80, z:22,  cost:6000,  label:'Restaurant Bar',       type:'block', color:C.mahogany,     inc:300, w:18,h:3.2,d:4.5,need:75,ox:0,  oz:-7},
-{id:77, x:-80, z:22,  cost:2500,  label:'Bar Counter Top',      type:'block', color:C.marble,       inc:80,  w:18,h:0.3,d:4.7,need:76,ox:0,  oz:6},
-{id:78, x:-64, z:0,   cost:1600,  label:'Restaurant Palm A',    type:'palm',  color:C.palmGreen,    inc:35,  w:2,h:7,d:2,    need:77, ox:5,  oz:0},
-{id:79, x:-96, z:0,   cost:1600,  label:'Restaurant Palm B',    type:'palm',  color:C.palmGreen,    inc:35,  w:2,h:7,d:2,    need:78, ox:-5, oz:0},
-
-// ══ BRIDGE ═════════════════════════════════════════════════════════════════
-{id:80, x:0,  z:-130, cost:60000,  label:'Bridge Approach',      type:'floor', color:C.concreteMid,  inc:1200, w:22,h:1.2,d:24, need:79, ox:0,  oz:-16},
-{id:81, x:-8, z:-160, cost:90000,  label:'Bridge Tower L',       type:'block', color:C.steelDark,    inc:2000, w:3.5,h:35,d:3.5,need:80, ox:-8, oz:0},
-{id:82, x:8,  z:-160, cost:90000,  label:'Bridge Tower R',       type:'block', color:C.steelDark,    inc:2000, w:3.5,h:35,d:3.5,need:81, ox:8,  oz:0},
-{id:83, x:-8, z:-160, cost:50000,  label:'Tower Crossbeam Top',  type:'block', color:C.steelDark,    inc:800,  w:20,h:2,d:2,    need:82, ox:-8, oz:0},
-{id:84, x:0,  z:-160, cost:100000, label:'Bridge Roadway',       type:'floor', color:C.concreteDark, inc:3500, w:20,h:1.2,d:130,need:83, ox:14, oz:0},
-{id:85, x:-9, z:-160, cost:25000,  label:'Bridge Railing L',     type:'block', color:C.chrome,       inc:500,  w:0.8,h:2.5,d:130,need:84,ox:-12, oz:0},
-{id:86, x:9,  z:-160, cost:25000,  label:'Bridge Railing R',     type:'block', color:C.chrome,       inc:500,  w:0.8,h:2.5,d:130,need:85,ox:12, oz:0},
-{id:87, x:-8, z:-130, cost:15000,  label:'Bridge Lamp L A',      type:'block', color:C.gold,         inc:200,  w:0.5,h:5,d:0.5, need:86, ox:-10, oz:0},
-{id:88, x:8,  z:-130, cost:15000,  label:'Bridge Lamp R A',      type:'block', color:C.gold,         inc:200,  w:0.5,h:5,d:0.5, need:87, ox:10,  oz:0},
-{id:89, x:-8, z:-190, cost:15000,  label:'Bridge Lamp L B',      type:'block', color:C.gold,         inc:200,  w:0.5,h:5,d:0.5, need:88, ox:-10, oz:0},
-{id:90, x:8,  z:-190, cost:15000,  label:'Bridge Lamp R B',      type:'block', color:C.gold,         inc:200,  w:0.5,h:5,d:0.5, need:89, ox:10,  oz:0},
-
-// ══ MOUNTAIN RESORT ════════════════════════════════════════════════════════
-{id:91, x:0,   z:-260, cost:250000,label:'Mountain Base',        type:'floor', color:C.concreteMid,  inc:6000, w:90,h:0.6,d:90, need:90, ox:0,  oz:-50},
-{id:92, x:0,   z:-280, cost:80000, label:'Lodge Outer Walls',    type:'wall',  color:C.oakDark,      inc:2500, w:44,h:12,d:44, need:91, ox:26, oz:0,  doorX:0, doorW:6,doorH:8},
-{id:93, x:0,   z:-280, cost:40000, label:'Lodge Floor Inside',   type:'floor', color:C.oakLight,     inc:1000, w:42,h:0.4,d:42, need:92, ox:0,  oz:0},
-{id:94, x:0,   z:-280, cost:55000, label:'Lodge Roof',           type:'block', color:C.mahogany,     inc:2000, w:46,h:5,d:46,  need:93, ox:26, oz:0},
-{id:95, x:-14, z:-274, cost:12000, label:'Stone Fireplace',      type:'block', color:C.concreteDark, inc:600,  w:5,h:7,d:5,    need:94, ox:-9, oz:0},
-{id:96, x:0,   z:-275, cost:9000,  label:'Lodge Sofa Set',       type:'block', color:C.burgundy,     inc:500,  w:10,h:2.2,d:4.5,need:95,ox:8,  oz:0},
-{id:97, x:0,   z:-270, cost:6000,  label:'Lodge Rug',            type:'floor', color:C.burgundy,     inc:200,  w:8,h:0.15,d:6, need:96, ox:8,  oz:0},
-{id:98, x:14,  z:-274, cost:7000,  label:'Lodge Bar',            type:'block', color:C.oakDark,      inc:400,  w:8,h:3,d:4,    need:97, ox:9,  oz:0},
-{id:99, x:-24, z:-266, cost:10000, label:'Ski Rack',             type:'block', color:C.steelDark,    inc:350,  w:7,h:4,d:1.5,  need:98, ox:-10, oz:0},
-{id:100,x:24,  z:-266, cost:10000, label:'Equipment Store',      type:'block', color:C.steelDark,    inc:350,  w:7,h:5,d:7,    need:99, ox:10,  oz:0},
-{id:101,x:-35, z:-295, cost:9000,  label:'Mountain Pine A',      type:'palm',  color:0x1b5e20,       inc:220,  w:3,h:16,d:3,   need:100,ox:-8,  oz:0},
-{id:102,x:35,  z:-295, cost:9000,  label:'Mountain Pine B',      type:'palm',  color:0x1b5e20,       inc:220,  w:3,h:16,d:3,   need:101,ox:8,   oz:0},
-{id:103,x:-20, z:-310, cost:9000,  label:'Mountain Pine C',      type:'palm',  color:0x1b5e20,       inc:220,  w:3,h:16,d:3,   need:102,ox:-8,  oz:0},
-{id:104,x:20,  z:-310, cost:9000,  label:'Mountain Pine D',      type:'palm',  color:0x1b5e20,       inc:220,  w:3,h:16,d:3,   need:103,ox:8,   oz:0},
-{id:105,x:0,   z:-248, cost:600000,label:'GRAND RESORT SIGN',    type:'block', color:C.gold,         inc:25000,w:22,h:7,d:2,   need:104,ox:0,   oz:7},
+const STEPS = [
+    {id:1,  x:0,   z:0,   cost:0,      label:'Lobby Foundation',      type:'floor', color:0xb0a89e, inc:5,    w:54,  h:0.6,  d:54,  need:0,  ox:0,   oz:30},
+    {id:2,  x:0,   z:0,   cost:60,     label:'Marble Lobby Floor',    type:'floor', color:0xf0ede8, inc:10,   w:52,  h:0.3,  d:52,  need:1,  ox:0,   oz:29},
+    {id:3,  x:0,   z:24,  cost:200,    label:'Glass Entry Wall',      type:'wall',  color:0xadd8f0, inc:20,   w:54,  h:7,    d:0.8, need:2,  ox:0,   oz:-8,  doorX:0,  doorW:5, doorH:5.5},
+    {id:4,  x:-26, z:0,   cost:200,    label:'Left Lobby Wall',       type:'wall',  color:0xf8f5f0, inc:20,   w:0.8, h:7,    d:54,  need:3,  ox:5,   oz:0,   doorX:0,  doorW:5, doorH:5.5},
+    {id:5,  x:26,  z:0,   cost:200,    label:'Right Lobby Wall',      type:'wall',  color:0xf8f5f0, inc:20,   w:0.8, h:7,    d:54,  need:4,  ox:-5,  oz:0,   doorX:0,  doorW:5, doorH:5.5},
+    {id:6,  x:0,   z:-26, cost:200,    label:'Back Lobby Wall',       type:'wall',  color:0xf8f5f0, inc:20,   w:54,  h:7,    d:0.8, need:5,  ox:0,   oz:6,   doorX:0,  doorW:5, doorH:5.5},
+    {id:7,  x:0,   z:12,  cost:300,    label:'Reception Desk',        type:'block', color:0x6b3a2a, inc:20,   w:16,  h:2.2,  d:3,   need:6,  ox:11,  oz:0},
+    {id:8,  x:0,   z:12,  cost:120,    label:'Desk Marble Top',       type:'block', color:0xf0ede8, inc:8,    w:16,  h:0.2,  d:3.2, need:7,  ox:11,  oz:0},
+    {id:9,  x:4,   z:12,  cost:80,     label:'Desk Computer',         type:'block', color:0x3a3a3a, inc:8,    w:1.8, h:1.5,  d:0.3, need:8,  ox:11,  oz:0},
+    {id:10, x:-4,  z:12,  cost:60,     label:'Desk Phone',            type:'block', color:0x3a3a3a, inc:5,    w:1,   h:1.2,  d:0.8, need:9,  ox:11,  oz:0},
+    {id:11, x:-18, z:8,   cost:300,    label:'Lobby Sofa A',          type:'block', color:0x2c3e6b, inc:18,   w:7,   h:1.4,  d:3,   need:10, ox:-9,  oz:0},
+    {id:12, x:-18, z:2,   cost:300,    label:'Lobby Sofa B',          type:'block', color:0x2c3e6b, inc:18,   w:7,   h:1.4,  d:3,   need:11, ox:-9,  oz:0},
+    {id:13, x:-18, z:5,   cost:180,    label:'Coffee Table',          type:'block', color:0xa07840, inc:12,   w:4,   h:0.9,  d:2,   need:12, ox:-9,  oz:0},
+    {id:14, x:18,  z:8,   cost:300,    label:'Lobby Sofa C',          type:'block', color:0x8b2635, inc:18,   w:7,   h:1.4,  d:3,   need:13, ox:9,   oz:0},
+    {id:15, x:18,  z:2,   cost:300,    label:'Lobby Sofa D',          type:'block', color:0x8b2635, inc:18,   w:7,   h:1.4,  d:3,   need:14, ox:9,   oz:0},
+    {id:16, x:0,   z:-18, cost:400,    label:'Grand Piano',           type:'block', color:0x1a1a1a, inc:40,   w:6,   h:2.2,  d:4.5, need:15, ox:7,   oz:0},
+    {id:17, x:0,   z:-18, cost:100,    label:'Piano Bench',           type:'block', color:0x7a5230, inc:8,    w:2,   h:0.9,  d:1.5, need:16, ox:5,   oz:0},
+    {id:18, x:-20, z:-18, cost:280,    label:'Lobby Palm L',          type:'palm',  color:0x2d8a3e, inc:12,   w:2,   h:7,    d:2,   need:17, ox:-5,  oz:0},
+    {id:19, x:20,  z:-18, cost:280,    label:'Lobby Palm R',          type:'palm',  color:0x2d8a3e, inc:12,   w:2,   h:7,    d:2,   need:18, ox:5,   oz:0},
+    {id:20, x:0,   z:0,   cost:600,    label:'Lobby Ceiling',         type:'floor', color:0xf8f5f0, inc:15,   w:54,  h:0.5,  d:54,  need:19, ox:0,   oz:30},
+    {id:21, x:0,   z:-68, cost:4000,   label:'Suite Floor',           type:'floor', color:0xc8a96e, inc:80,   w:32,  h:0.5,  d:32,  need:20, ox:0,   oz:-20},
+    {id:22, x:-14, z:-68, cost:500,    label:'Suite Wall Left',       type:'wall',  color:0xf8f5f0, inc:20,   w:0.8, h:7,    d:32,  need:21, ox:5,   oz:0,   doorX:0,  doorW:4, doorH:5.5},
+    {id:23, x:14,  z:-68, cost:500,    label:'Suite Wall Right',      type:'wall',  color:0xf8f5f0, inc:20,   w:0.8, h:7,    d:32,  need:22, ox:-5,  oz:0,   doorX:0,  doorW:4, doorH:5.5},
+    {id:24, x:0,   z:-52, cost:500,    label:'Suite Entry Wall',      type:'wall',  color:0xf8f5f0, inc:20,   w:32,  h:7,    d:0.8, need:23, ox:0,   oz:-6,  doorX:0,  doorW:4, doorH:5.5},
+    {id:25, x:0,   z:-84, cost:500,    label:'Suite Back Wall',       type:'wall',  color:0xf8f5f0, inc:20,   w:32,  h:7,    d:0.8, need:24, ox:0,   oz:6,   doorX:0,  doorW:4, doorH:5.5},
+    {id:26, x:0,   z:-73, cost:1800,   label:'King Bed Frame',        type:'block', color:0x6b3a2a, inc:60,   w:13,  h:2.4,  d:14,  need:25, ox:10,  oz:0},
+    {id:27, x:0,   z:-73, cost:900,    label:'Plush Mattress',        type:'block', color:0xf5f0e8, inc:35,   w:12,  h:1.0,  d:13,  need:26, ox:10,  oz:0},
+    {id:28, x:0,   z:-65, cost:250,    label:'Pillows',               type:'block', color:0xffffff, inc:15,   w:9,   h:0.7,  d:2.5, need:27, ox:10,  oz:0},
+    {id:29, x:-10, z:-77, cost:600,    label:'Nightstand L',          type:'block', color:0xa07840, inc:20,   w:3,   h:2.2,  d:3,   need:28, ox:-7,  oz:0},
+    {id:30, x:10,  z:-77, cost:600,    label:'Nightstand R',          type:'block', color:0xa07840, inc:20,   w:3,   h:2.2,  d:3,   need:29, ox:7,   oz:0},
+    {id:31, x:-10, z:-77, cost:350,    label:'Lamp L',                type:'block', color:0xd4a844, inc:12,   w:0.8, h:3.2,  d:0.8, need:30, ox:-7,  oz:0},
+    {id:32, x:10,  z:-77, cost:350,    label:'Lamp R',                type:'block', color:0xd4a844, inc:12,   w:0.8, h:3.2,  d:0.8, need:31, ox:7,   oz:0},
+    {id:33, x:0,   z:-55, cost:2200,   label:'Smart TV Wall',         type:'block', color:0x1a1a1a, inc:100,  w:12,  h:5,    d:0.5, need:32, ox:0,   oz:5},
+    {id:34, x:-11, z:-62, cost:700,    label:'Suite Armchair',        type:'block', color:0x2a7a7a, inc:28,   w:3.5, h:2.8,  d:3.5, need:33, ox:-8,  oz:0},
+    {id:35, x:11,  z:-62, cost:700,    label:'Suite Desk',            type:'block', color:0x7a5230, inc:28,   w:6,   h:2,    d:3,   need:34, ox:8,   oz:0},
+    {id:36, x:0,   z:-88, cost:1500,   label:'Bathroom Floor',        type:'floor', color:0xb0a89e, inc:35,   w:16,  h:0.5,  d:12,  need:35, ox:0,   oz:-8},
+    {id:37, x:4,   z:-92, cost:1000,   label:'Freestanding Bathtub',  type:'block', color:0xffffff, inc:55,   w:7,   h:1.8,  d:4,   need:36, ox:8,   oz:0},
+    {id:38, x:-5,  z:-90, cost:500,    label:'Sink & Vanity',         type:'block', color:0xf0ede8, inc:22,   w:4,   h:2.2,  d:2.5, need:37, ox:-8,  oz:0},
+    {id:39, x:-5,  z:-86, cost:350,    label:'Toilet',                type:'block', color:0xffffff, inc:15,   w:2,   h:2,    d:2.5, need:38, ox:-8,  oz:0},
+    {id:40, x:80,  z:0,   cost:12000,  label:'Pool Deck',             type:'floor', color:0xb8d4e0, inc:300,  w:64,  h:0.5,  d:74,  need:39, ox:0,   oz:-40},
+    {id:41, x:80,  z:0,   cost:20000,  label:'Swimming Pool',         type:'floor', color:0x00b4d8, inc:700,  w:38,  h:0.6,  d:46,  need:40, ox:24,  oz:0},
+    {id:42, x:80,  z:0,   cost:2000,   label:'Pool Edge Tiles',       type:'floor', color:0xffffff, inc:50,   w:42,  h:0.4,  d:50,  need:41, ox:24,  oz:0},
+    {id:43, x:59,  z:18,  cost:1400,   label:'Lounge Chair A',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:42, ox:-6,  oz:0},
+    {id:44, x:59,  z:8,   cost:1400,   label:'Lounge Chair B',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:43, ox:-6,  oz:0},
+    {id:45, x:59,  z:-2,  cost:1400,   label:'Lounge Chair C',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:44, ox:-6,  oz:0},
+    {id:46, x:59,  z:-12, cost:1400,   label:'Lounge Chair D',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:45, ox:-6,  oz:0},
+    {id:47, x:101, z:18,  cost:1400,   label:'Lounge Chair E',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:46, ox:6,   oz:0},
+    {id:48, x:101, z:5,   cost:1400,   label:'Lounge Chair F',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:47, ox:6,   oz:0},
+    {id:49, x:101, z:-8,  cost:1400,   label:'Lounge Chair G',        type:'block', color:0xf5f0e8, inc:50,   w:3,   h:0.7,  d:7,   need:48, ox:6,   oz:0},
+    {id:50, x:59,  z:13,  cost:900,    label:'Pool Umbrella A',       type:'block', color:0xc0392b, inc:22,   w:0.5, h:5,    d:0.5, need:49, ox:-4,  oz:0},
+    {id:51, x:59,  z:-7,  cost:900,    label:'Pool Umbrella B',       type:'block', color:0xc0392b, inc:22,   w:0.5, h:5,    d:0.5, need:50, ox:-4,  oz:0},
+    {id:52, x:101, z:10,  cost:900,    label:'Pool Umbrella C',       type:'block', color:0xe67e22, inc:22,   w:0.5, h:5,    d:0.5, need:51, ox:4,   oz:0},
+    {id:53, x:101, z:-4,  cost:900,    label:'Pool Umbrella D',       type:'block', color:0xe67e22, inc:22,   w:0.5, h:5,    d:0.5, need:52, ox:4,   oz:0},
+    {id:54, x:80,  z:-42, cost:15000,  label:'Pool Bar',              type:'block', color:0x7a5230, inc:600,  w:14,  h:3.2,  d:5,   need:53, ox:0,   oz:-8},
+    {id:55, x:80,  z:-42, cost:2500,   label:'Pool Bar Top',          type:'block', color:0xf0ede8, inc:60,   w:14,  h:0.3,  d:5.2, need:54, ox:0,   oz:6},
+    {id:56, x:80,  z:-38, cost:3000,   label:'Bar Stools',            type:'block', color:0x8B6914, inc:90,   w:12,  h:2.2,  d:1.5, need:55, ox:0,   oz:5},
+    {id:57, x:65,  z:-36, cost:2200,   label:'Pool Palm A',           type:'palm',  color:0x2d8a3e, inc:55,   w:2,   h:9,    d:2,   need:56, ox:-5,  oz:0},
+    {id:58, x:95,  z:-36, cost:2200,   label:'Pool Palm B',           type:'palm',  color:0x2d8a3e, inc:55,   w:2,   h:9,    d:2,   need:57, ox:5,   oz:0},
+    {id:59, x:65,  z:36,  cost:2200,   label:'Pool Palm C',           type:'palm',  color:0x2d8a3e, inc:55,   w:2,   h:9,    d:2,   need:58, ox:-5,  oz:0},
+    {id:60, x:95,  z:36,  cost:2200,   label:'Pool Palm D',           type:'palm',  color:0x2d8a3e, inc:55,   w:2,   h:9,    d:2,   need:59, ox:5,   oz:0},
+    {id:61, x:80,  z:44,  cost:6000,   label:'Hot Tub',               type:'block', color:0x00b4d8, inc:250,  w:9,   h:2.2,  d:9,   need:60, ox:8,   oz:0},
+    {id:62, x:80,  z:44,  cost:1800,   label:'Hot Tub Surround',      type:'block', color:0xb8d4e0, inc:40,   w:11,  h:1.2,  d:11,  need:61, ox:8,   oz:0},
+    {id:63, x:-80, z:0,   cost:18000,  label:'Restaurant Floor',      type:'floor', color:0xc8a96e, inc:500,  w:52,  h:0.5,  d:52,  need:62, ox:0,   oz:-30},
+    {id:64, x:-54, z:0,   cost:800,    label:'Restaurant Wall Front', type:'wall',  color:0xf8f5f0, inc:25,   w:0.8, h:7,    d:52,  need:63, ox:5,   oz:0,   doorX:0, doorW:4, doorH:5.5},
+    {id:65, x:-106,z:0,   cost:800,    label:'Restaurant Wall Back',  type:'wall',  color:0xf8f5f0, inc:25,   w:0.8, h:7,    d:52,  need:64, ox:-5,  oz:0,   doorX:0, doorW:4, doorH:5.5},
+    {id:66, x:-80, z:26,  cost:800,    label:'Restaurant Wall Side A',type:'wall',  color:0xf8f5f0, inc:25,   w:52,  h:7,    d:0.8, need:65, ox:0,   oz:-6,  doorX:0, doorW:4, doorH:5.5},
+    {id:67, x:-80, z:-26, cost:800,    label:'Restaurant Wall Side B',type:'wall',  color:0xf8f5f0, inc:25,   w:52,  h:7,    d:0.8, need:66, ox:0,   oz:6,   doorX:0, doorW:4, doorH:5.5},
+    {id:68, x:-70, z:8,   cost:2200,   label:'Dining Table A',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:67, ox:7,   oz:0},
+    {id:69, x:-70, z:-5,  cost:2200,   label:'Dining Table B',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:68, ox:7,   oz:0},
+    {id:70, x:-80, z:8,   cost:2200,   label:'Dining Table C',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:69, ox:-7,  oz:0},
+    {id:71, x:-80, z:-5,  cost:2200,   label:'Dining Table D',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:70, ox:-7,  oz:0},
+    {id:72, x:-90, z:8,   cost:2200,   label:'Dining Table E',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:71, ox:-8,  oz:0},
+    {id:73, x:-90, z:-5,  cost:2200,   label:'Dining Table F',        type:'block', color:0xa07840, inc:70,   w:4.5, h:2,    d:4.5, need:72, ox:-8,  oz:0},
+    {id:74, x:-80, z:-20, cost:10000,  label:'Open Kitchen',          type:'block', color:0x9eb3c2, inc:400,  w:24,  h:3.5,  d:6,   need:73, ox:0,   oz:-7},
+    {id:75, x:-80, z:-20, cost:3500,   label:'Kitchen Counter',       type:'block', color:0xf0ede8, inc:120,  w:22,  h:0.4,  d:5.5, need:74, ox:0,   oz:7},
+    {id:76, x:-80, z:22,  cost:6000,   label:'Restaurant Bar',        type:'block', color:0x6b3a2a, inc:300,  w:18,  h:3.2,  d:4.5, need:75, ox:0,   oz:-7},
+    {id:77, x:-80, z:22,  cost:2500,   label:'Bar Counter Top',       type:'block', color:0xf0ede8, inc:80,   w:18,  h:0.3,  d:4.7, need:76, ox:0,   oz:6},
+    {id:78, x:-64, z:0,   cost:1600,   label:'Restaurant Palm A',     type:'palm',  color:0x2d8a3e, inc:35,   w:2,   h:7,    d:2,   need:77, ox:5,   oz:0},
+    {id:79, x:-96, z:0,   cost:1600,   label:'Restaurant Palm B',     type:'palm',  color:0x2d8a3e, inc:35,   w:2,   h:7,    d:2,   need:78, ox:-5,  oz:0},
+    {id:80, x:0,   z:-130,cost:60000,  label:'Bridge Approach',       type:'floor', color:0xb0a89e, inc:1200, w:22,  h:1.2,  d:24,  need:79, ox:0,   oz:-16},
+    {id:81, x:-8,  z:-160,cost:90000,  label:'Bridge Tower L',        type:'block', color:0x6e8899, inc:2000, w:3.5, h:35,   d:3.5, need:80, ox:-8,  oz:0},
+    {id:82, x:8,   z:-160,cost:90000,  label:'Bridge Tower R',        type:'block', color:0x6e8899, inc:2000, w:3.5, h:35,   d:3.5, need:81, ox:8,   oz:0},
+    {id:83, x:-8,  z:-160,cost:50000,  label:'Tower Crossbeam',       type:'block', color:0x6e8899, inc:800,  w:20,  h:2,    d:2,   need:82, ox:-8,  oz:0},
+    {id:84, x:0,   z:-160,cost:100000, label:'Bridge Roadway',        type:'floor', color:0x8c8278, inc:3500, w:20,  h:1.2,  d:130, need:83, ox:14,  oz:0},
+    {id:85, x:-9,  z:-160,cost:25000,  label:'Bridge Railing L',      type:'block', color:0xc8d4dc, inc:500,  w:0.8, h:2.5,  d:130, need:84, ox:-12, oz:0},
+    {id:86, x:9,   z:-160,cost:25000,  label:'Bridge Railing R',      type:'block', color:0xc8d4dc, inc:500,  w:0.8, h:2.5,  d:130, need:85, ox:12,  oz:0},
+    {id:87, x:-8,  z:-130,cost:15000,  label:'Bridge Lamp L A',       type:'block', color:0xd4a844, inc:200,  w:0.5, h:5,    d:0.5, need:86, ox:-10, oz:0},
+    {id:88, x:8,   z:-130,cost:15000,  label:'Bridge Lamp R A',       type:'block', color:0xd4a844, inc:200,  w:0.5, h:5,    d:0.5, need:87, ox:10,  oz:0},
+    {id:89, x:-8,  z:-190,cost:15000,  label:'Bridge Lamp L B',       type:'block', color:0xd4a844, inc:200,  w:0.5, h:5,    d:0.5, need:88, ox:-10, oz:0},
+    {id:90, x:8,   z:-190,cost:15000,  label:'Bridge Lamp R B',       type:'block', color:0xd4a844, inc:200,  w:0.5, h:5,    d:0.5, need:89, ox:10,  oz:0},
+    {id:91, x:0,   z:-260,cost:250000, label:'Mountain Base',         type:'floor', color:0xb0a89e, inc:6000, w:90,  h:0.6,  d:90,  need:90, ox:0,   oz:-50},
+    {id:92, x:0,   z:-280,cost:80000,  label:'Lodge Outer Walls',     type:'wall',  color:0x7a5230, inc:2500, w:44,  h:12,   d:44,  need:91, ox:26,  oz:0,   doorX:0, doorW:6, doorH:8},
+    {id:93, x:0,   z:-280,cost:40000,  label:'Lodge Floor Inside',    type:'floor', color:0xc8a96e, inc:1000, w:42,  h:0.4,  d:42,  need:92, ox:0,   oz:0},
+    {id:94, x:0,   z:-280,cost:55000,  label:'Lodge Roof',            type:'block', color:0x6b3a2a, inc:2000, w:46,  h:5,    d:46,  need:93, ox:26,  oz:0},
+    {id:95, x:-14, z:-274,cost:12000,  label:'Stone Fireplace',       type:'block', color:0x8c8278, inc:600,  w:5,   h:7,    d:5,   need:94, ox:-9,  oz:0},
+    {id:96, x:0,   z:-275,cost:9000,   label:'Lodge Sofa Set',        type:'block', color:0x8b2635, inc:500,  w:10,  h:2.2,  d:4.5, need:95, ox:8,   oz:0},
+    {id:97, x:14,  z:-274,cost:7000,   label:'Lodge Bar',             type:'block', color:0x7a5230, inc:400,  w:8,   h:3,    d:4,   need:96, ox:9,   oz:0},
+    {id:98, x:-24, z:-266,cost:10000,  label:'Ski Rack',              type:'block', color:0x6e8899, inc:350,  w:7,   h:4,    d:1.5, need:97, ox:-10, oz:0},
+    {id:99, x:24,  z:-266,cost:10000,  label:'Equipment Store',       type:'block', color:0x6e8899, inc:350,  w:7,   h:5,    d:7,   need:98, ox:10,  oz:0},
+    {id:100,x:-35, z:-295,cost:9000,   label:'Mountain Pine A',       type:'palm',  color:0x1b5e20, inc:220,  w:3,   h:16,   d:3,   need:99, ox:-8,  oz:0},
+    {id:101,x:35,  z:-295,cost:9000,   label:'Mountain Pine B',       type:'palm',  color:0x1b5e20, inc:220,  w:3,   h:16,   d:3,   need:100,ox:8,   oz:0},
+    {id:102,x:-20, z:-310,cost:9000,   label:'Mountain Pine C',       type:'palm',  color:0x1b5e20, inc:220,  w:3,   h:16,   d:3,   need:101,ox:-8,  oz:0},
+    {id:103,x:20,  z:-310,cost:9000,   label:'Mountain Pine D',       type:'palm',  color:0x1b5e20, inc:220,  w:3,   h:16,   d:3,   need:102,ox:8,   oz:0},
+    {id:104,x:0,   z:-248,cost:600000, label:'GRAND RESORT SIGN',     type:'block', color:0xd4a844, inc:25000,w:22,  h:7,    d:2,   need:103,ox:0,   oz:7},
 ];
 
-// ─── helpers ──────────────────────────────────────────────────────────────────
+// ── helpers ───────────────────────────────────────────────────────────────────
 function fmtMoney(n){
     n=Math.floor(n);
-    if(n>=1000000)return'$'+(n/1e6).toFixed(1)+'M';
-    if(n>=1000)return'$'+(n/1000).toFixed(1)+'K';
+    if(n>=1e6) return'$'+(n/1e6).toFixed(1)+'M';
+    if(n>=1000) return'$'+(n/1000).toFixed(1)+'K';
     return'$'+n;
 }
 let toastTimer=null;
@@ -262,7 +217,7 @@ function updateProgress(){
     document.getElementById('progress-bar').style.width=((done/STEPS.length)*100)+'%';
 }
 
-// ─── start ────────────────────────────────────────────────────────────────────
+// ── startGame — defined at top level so onclick can find it ───────────────────
 function startGame(){
     document.getElementById('startScreen').style.display='none';
     document.getElementById('hud').style.display='flex';
@@ -270,8 +225,6 @@ function startGame(){
     gameRunning=true;
     initThree();
 }
-
-let gameRunning=false,nearPad=false;
 
 function initThree(){
     scene=new THREE.Scene();
@@ -290,7 +243,6 @@ function initThree(){
     document.body.appendChild(ren.domElement);
     clock=new THREE.Clock();
 
-    // Lighting — warm sun + cool fill
     scene.add(new THREE.AmbientLight(0xd4e8ff,0.7));
     const sun=new THREE.DirectionalLight(0xfff4d0,1.2);
     sun.position.set(100,200,80);
@@ -300,28 +252,16 @@ function initThree(){
     sun.shadow.camera.top=400;   sun.shadow.camera.bottom=-400;
     sun.shadow.camera.far=1000;
     scene.add(sun);
-    // Fill light from opposite side
     const fill=new THREE.DirectionalLight(0xadd8ff,0.4);
     fill.position.set(-80,100,-60);
     scene.add(fill);
 
-    // Ground — gradient-like by using two planes
     const ground=new THREE.Mesh(
         new THREE.PlaneGeometry(4000,4000),
         new THREE.MeshLambertMaterial({color:0x5aaa5a})
     );
     ground.rotation.x=-Math.PI/2; ground.receiveShadow=true;
     scene.add(ground);
-
-    // Paths between areas
-    [[0,-35,60,8],[40,0,8,50],[0,38,60,8],[-40,0,8,50]].forEach(([x,z,w,d])=>{
-        const path=new THREE.Mesh(
-            new THREE.PlaneGeometry(w,d),
-            new THREE.MeshLambertMaterial({color:0xd4c4a0})
-        );
-        path.rotation.x=-Math.PI/2; path.position.set(x,0.05,z);
-        scene.add(path);
-    });
 
     const ocean=new THREE.Mesh(
         new THREE.PlaneGeometry(20000,20000),
@@ -330,33 +270,23 @@ function initThree(){
     ocean.rotation.x=-Math.PI/2; ocean.position.y=-1.2;
     scene.add(ocean);
 
-    // GPS group
     gpsGroup=new THREE.Group();
     gpsGroup.renderOrder=999;
     scene.add(gpsGroup);
 
-    // Player — blocky Roblox style
+    // Roblox-style player
     player=new THREE.Group();
     player.position.set(0,0,0);
-
-    // Torso
-    const torso=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.8,0.9),
-        new THREE.MeshLambertMaterial({color:0x3949AB}));
+    const torso=new THREE.Mesh(new THREE.BoxGeometry(1.4,1.8,0.9),new THREE.MeshLambertMaterial({color:0x3949AB}));
     torso.position.y=1.9; torso.castShadow=true; player.add(torso);
-    // Head
-    const head=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.0,1.0),
-        new THREE.MeshLambertMaterial({color:0xFFCC80}));
+    const head=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.0,1.0),new THREE.MeshLambertMaterial({color:0xFFCC80}));
     head.position.y=3.3; head.castShadow=true; player.add(head);
-    // Legs
     [-0.35,0.35].forEach(ox=>{
-        const leg=new THREE.Mesh(new THREE.BoxGeometry(0.55,1.2,0.55),
-            new THREE.MeshLambertMaterial({color:0x1a237e}));
+        const leg=new THREE.Mesh(new THREE.BoxGeometry(0.55,1.2,0.55),new THREE.MeshLambertMaterial({color:0x1a237e}));
         leg.position.set(ox,0.6,0); player.add(leg);
     });
-    // Arms
     [-0.95,0.95].forEach(ox=>{
-        const arm=new THREE.Mesh(new THREE.BoxGeometry(0.45,1.5,0.45),
-            new THREE.MeshLambertMaterial({color:0x3949AB}));
+        const arm=new THREE.Mesh(new THREE.BoxGeometry(0.45,1.5,0.45),new THREE.MeshLambertMaterial({color:0x3949AB}));
         arm.position.set(ox,1.9,0); player.add(arm);
     });
     scene.add(player);
@@ -369,18 +299,17 @@ function initThree(){
     animate();
 }
 
-// GPS — single dashed line, depthTest:false always visible
 const gpsMat=new THREE.MeshBasicMaterial({color:0xffff00,depthTest:false,depthWrite:false,transparent:true,opacity:1});
 
 function rebuildGPS(){
     while(gpsGroup.children.length) gpsGroup.remove(gpsGroup.children[0]);
     if(!activePad) return;
-    const fx=player.position.x,fz=player.position.z;
-    const tx=activePad.position.x,tz=activePad.position.z;
-    const dx=tx-fx,dz=tz-fz;
+    const fx=player.position.x, fz=player.position.z;
+    const tx=activePad.position.x, tz=activePad.position.z;
+    const dx=tx-fx, dz=tz-fz;
     const dist=Math.sqrt(dx*dx+dz*dz);
     if(dist<1) return;
-    const nx=dx/dist,nz=dz/dist;
+    const nx=dx/dist, nz=dz/dist;
     const angle=Math.atan2(nx,nz);
     const SEG=2.2,GAP=1.4,STEP=SEG+GAP;
     const geo=new THREE.BoxGeometry(0.5,0.28,SEG);
@@ -396,7 +325,6 @@ function rebuildGPS(){
     }
 }
 
-// ── 3D collision ──────────────────────────────────────────────────────────────
 function testAABB(px,py,pz){
     for(const c of colliders){
         if(px+PLAYER_R>c.minX&&px-PLAYER_R<c.maxX&&
@@ -465,115 +393,75 @@ function animate(){
     document.getElementById('v-income').textContent=fmtMoney(income)+'/s';
 }
 
-// ── Place object — walls get door gaps ───────────────────────────────────────
 function placeObject(s){
     const grp=new THREE.Group();
 
     if(s.type==='wall'){
-        // Build wall with a door gap cut out
-        // Door is centered at s.doorX along the wall's length axis
-        // We build the wall as up to 3 segments: left of door, above door, right of door
-        const isZWall = s.w > s.d; // true = wall runs along X axis; false = along Z
-        const wallLen = isZWall ? s.w : s.d;
-        const wallH   = s.h;
-        const wallThk = isZWall ? s.d : s.w;
-        const dw = s.doorW||4;
-        const dh = s.doorH||5.5;
-        const dc = s.doorX||0; // center of door relative to wall center
-
+        const isZWall=s.w>s.d;
+        const wallLen=isZWall?s.w:s.d;
+        const wallThk=isZWall?s.d:s.w;
+        const dw=s.doorW||4, dh=s.doorH||5.5, dc=s.doorX||0;
         const mat=new THREE.MeshLambertMaterial({color:s.color});
+        const frameMat=new THREE.MeshLambertMaterial({color:0xd4a844});
 
-        // Left segment
-        const leftW=wallLen/2+dc-dw/2;
-        if(leftW>0.1){
-            const seg=new THREE.Mesh(
-                isZWall?new THREE.BoxGeometry(leftW,wallH,wallThk):new THREE.BoxGeometry(wallThk,wallH,leftW),
-                mat
-            );
-            seg.position.y=wallH/2;
-            seg.position.x=isZWall?(-wallLen/2+leftW/2+0):0;
-            seg.position.z=isZWall?0:(-wallLen/2+leftW/2);
-            seg.castShadow=true; seg.receiveShadow=true;
-            grp.add(seg);
-        }
-        // Right segment
-        const rightW=wallLen/2-dc-dw/2;
-        if(rightW>0.1){
-            const seg=new THREE.Mesh(
-                isZWall?new THREE.BoxGeometry(rightW,wallH,wallThk):new THREE.BoxGeometry(wallThk,wallH,rightW),
-                mat
-            );
-            seg.position.y=wallH/2;
-            seg.position.x=isZWall?(wallLen/2-rightW/2):0;
-            seg.position.z=isZWall?0:(wallLen/2-rightW/2);
-            seg.castShadow=true; seg.receiveShadow=true;
-            grp.add(seg);
-        }
-        // Above door segment
-        const aboveH=wallH-dh;
-        if(aboveH>0.1){
-            const seg=new THREE.Mesh(
-                isZWall?new THREE.BoxGeometry(dw,aboveH,wallThk):new THREE.BoxGeometry(wallThk,aboveH,dw),
-                mat
-            );
-            seg.position.y=dh+aboveH/2;
-            seg.position.x=isZWall?dc:0;
-            seg.position.z=isZWall?0:dc;
-            seg.castShadow=true; seg.receiveShadow=true;
-            grp.add(seg);
-        }
-        // Door frame (thin gold border)
-        const frameMat=new THREE.MeshLambertMaterial({color:C.gold});
-        const frameThk=0.2;
-        // Top bar
-        const ftop=new THREE.Mesh(
-            isZWall?new THREE.BoxGeometry(dw+frameThk*2,frameThk,wallThk+0.1):new THREE.BoxGeometry(wallThk+0.1,frameThk,dw+frameThk*2),
-            frameMat
-        );
-        ftop.position.y=dh; ftop.position.x=isZWall?dc:0; ftop.position.z=isZWall?0:dc;
-        grp.add(ftop);
-        // Left post
-        const fl=new THREE.Mesh(
-            isZWall?new THREE.BoxGeometry(frameThk,dh,wallThk+0.1):new THREE.BoxGeometry(wallThk+0.1,dh,frameThk),
-            frameMat
-        );
-        fl.position.y=dh/2;
-        fl.position.x=isZWall?(dc-dw/2):0;
-        fl.position.z=isZWall?0:(dc-dw/2);
-        grp.add(fl);
-        // Right post
-        const fr=new THREE.Mesh(
-            isZWall?new THREE.BoxGeometry(frameThk,dh,wallThk+0.1):new THREE.BoxGeometry(wallThk+0.1,dh,frameThk),
-            frameMat
-        );
-        fr.position.y=dh/2;
-        fr.position.x=isZWall?(dc+dw/2):0;
-        fr.position.z=isZWall?0:(dc+dw/2);
-        grp.add(fr);
+        const addSeg=(lx,lz,sw,sh,sd)=>{
+            if(sw<0.1||sd<0.1) return;
+            const m=new THREE.Mesh(new THREE.BoxGeometry(sw,sh,sd),mat);
+            m.position.set(lx,sh/2,lz);
+            m.castShadow=true; m.receiveShadow=true;
+            grp.add(m);
+        };
 
-        // Colliders: left block + right block + above block (NO collider in door gap)
-        const addWallCol=(lx,lz,lw,ld,lh)=>{
+        const leftLen=wallLen/2+dc-dw/2;
+        const rightLen=wallLen/2-dc-dw/2;
+        const aboveH=s.h-dh;
+
+        if(isZWall){
+            addSeg(-wallLen/2+leftLen/2, 0, leftLen, s.h, wallThk);
+            addSeg(wallLen/2-rightLen/2, 0, rightLen, s.h, wallThk);
+            addSeg(dc, dh+aboveH/2-(aboveH/2>0?0:999), dw, Math.max(0.01,aboveH), wallThk);
+        } else {
+            addSeg(0, -wallLen/2+leftLen/2, wallThk, s.h, leftLen);
+            addSeg(0, wallLen/2-rightLen/2, wallThk, s.h, rightLen);
+            addSeg(0, dc, wallThk, Math.max(0.01,aboveH), dw);
+        }
+
+        // Gold door frame
+        const ft=0.22;
+        const mkFrame=(gx,gy,gz,fw,fh,fd)=>{
+            const m=new THREE.Mesh(new THREE.BoxGeometry(fw,fh,fd),frameMat);
+            m.position.set(gx,gy,gz); grp.add(m);
+        };
+        if(isZWall){
+            mkFrame(dc,        dh+ft/2,  0, dw+ft*2, ft,        wallThk+0.1); // top
+            mkFrame(dc-dw/2,   dh/2,     0, ft,       dh,        wallThk+0.1); // left
+            mkFrame(dc+dw/2,   dh/2,     0, ft,       dh,        wallThk+0.1); // right
+        } else {
+            mkFrame(0, dh+ft/2,  dc, wallThk+0.1, ft,  dw+ft*2);
+            mkFrame(0, dh/2, dc-dw/2, wallThk+0.1, dh, ft);
+            mkFrame(0, dh/2, dc+dw/2, wallThk+0.1, dh, ft);
+        }
+
+        // Colliders — walls around door gap, never inside gap
+        const addCol=(cx,cz,cw,ch,cd)=>{
+            if(cw<0.1||cd<0.1) return;
             colliders.push({
-                minX:s.x+lx-lw/2, maxX:s.x+lx+lw/2,
-                minY:0, maxY:lh,
-                minZ:s.z+lz-ld/2, maxZ:s.z+lz+ld/2,
+                minX:s.x+cx-cw/2, maxX:s.x+cx+cw/2,
+                minY:0, maxY:ch,
+                minZ:s.z+cz-cd/2, maxZ:s.z+cz+cd/2,
             });
         };
-        if(leftW>0.1){
-            if(isZWall) addWallCol(-wallLen/2+leftW/2,0,leftW,wallThk,wallH);
-            else        addWallCol(0,-wallLen/2+leftW/2,wallThk,leftW,wallH);
-        }
-        if(rightW>0.1){
-            if(isZWall) addWallCol(wallLen/2-rightW/2,0,rightW,wallThk,wallH);
-            else        addWallCol(0,wallLen/2-rightW/2,wallThk,rightW,wallH);
-        }
-        if(aboveH>0.1){
-            if(isZWall) addWallCol(dc,0,dw,wallThk,wallH);
-            else        addWallCol(0,dc,wallThk,dw,wallH);
+        if(isZWall){
+            addCol(-wallLen/2+leftLen/2, 0, leftLen, s.h, wallThk);
+            addCol(wallLen/2-rightLen/2, 0, rightLen, s.h, wallThk);
+            if(aboveH>0.1) addCol(dc, dh+aboveH/2, dw, aboveH, wallThk);
+        } else {
+            addCol(0, -wallLen/2+leftLen/2, wallThk, s.h, leftLen);
+            addCol(0, wallLen/2-rightLen/2, wallThk, s.h, rightLen);
+            if(aboveH>0.1) addCol(0, dc, wallThk, aboveH, dw);
         }
 
     } else {
-        // Normal object
         const mesh=new THREE.Mesh(
             new THREE.BoxGeometry(s.w,s.h,s.d),
             new THREE.MeshLambertMaterial({color:s.color})
@@ -582,29 +470,26 @@ function placeObject(s){
         mesh.castShadow=true; mesh.receiveShadow=true;
         grp.add(mesh);
 
-        // Roblox-style details per type
         if(s.type==='palm'){
-            // Trunk with slight taper
             const trunk=new THREE.Mesh(
                 new THREE.CylinderGeometry(0.18,0.32,s.h*0.6,8),
-                new THREE.MeshLambertMaterial({color:C.trunkBrown})
+                new THREE.MeshLambertMaterial({color:0x8B6914})
             );
             trunk.position.y=s.h*0.3; grp.add(trunk);
-            // Extra foliage layers
-            [0,0.8,1.5].forEach((yoff,i)=>{
+            [0,0.8,1.5].forEach((yo,i)=>{
                 const r=1.8-i*0.4;
                 const leaf=new THREE.Mesh(
                     new THREE.CylinderGeometry(r,r*1.2,0.6,7),
                     new THREE.MeshLambertMaterial({color:s.color})
                 );
-                leaf.position.y=s.h-0.5-yoff; grp.add(leaf);
+                leaf.position.y=s.h-0.5-yo; grp.add(leaf);
             });
         }
 
         if(s.type!=='floor'){
             colliders.push({
                 minX:s.x-s.w/2, maxX:s.x+s.w/2,
-                minY:0,          maxY:s.h,
+                minY:0, maxY:s.h,
                 minZ:s.z-s.d/2, maxZ:s.z+s.d/2,
             });
         }
@@ -613,14 +498,12 @@ function placeObject(s){
     grp.position.set(s.x,0,s.z);
     grp.scale.setScalar(0.01);
     scene.add(grp);
-    s.grp=grp;
-    placed.push({grp,step:s});
+    s.grp=grp; placed.push({grp,step:s});
 }
 
 function doBuy(s){
     wallet-=s.cost; s.bought=true; income+=s.inc;
-    placeObject(s);
-    showToast('✅ '+s.label+' built!');
+    placeObject(s); showToast('✅ '+s.label+' built!');
     spawnNextPad(); updateProgress();
 }
 
