@@ -13,7 +13,7 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
 .s-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(64px,12vw,120px); color:#fff; letter-spacing:6px; line-height:0.95; text-align:center; text-shadow:0 6px 40px rgba(0,0,0,0.35); }
 .s-sub { font-size:13px; color:rgba(255,255,255,0.55); letter-spacing:4px; text-transform:uppercase; margin-bottom:16px; }
 #playBtn { padding:17px 58px; font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; background:#f1c40f; color:#1a1a2e; border:none; border-radius:60px; cursor:pointer; box-shadow:0 6px 28px rgba(241,196,15,0.45),0 2px 0 #b8970b; transition:transform .14s,box-shadow .14s; }
-#playBtn:hover { transform:translateY(-4px); box-shadow:0 14px 36px rgba(241,196,15,0.55),0 2px 0 #b8970b; }
+#playBtn:hover { transform:translateY(-4px); }
 .s-keys { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
 .s-key { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:7px 14px; color:rgba(255,255,255,0.82); font-size:13px; display:flex; align-items:center; gap:6px; }
 .s-key kbd { background:rgba(255,255,255,0.18); border-radius:4px; padding:1px 7px; font-family:monospace; font-size:12px; font-weight:bold; }
@@ -31,6 +31,8 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
 @keyframes buyPulse { 0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.06)} }
 #toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-14px); z-index:50; padding:9px 26px; background:#27ae60; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; border-radius:40px; opacity:0; pointer-events:none; transition:opacity .28s,transform .28s; }
 #toast.visible { opacity:1; transform:translateX(-50%) translateY(0); }
+#progress { position:fixed; top:58px; left:0; right:0; z-index:50; height:3px; background:rgba(255,255,255,0.08); pointer-events:none; }
+#progress-bar { height:100%; background:#f1c40f; width:0%; transition:width .4s; }
 </style>
 </head>
 <body>
@@ -52,6 +54,7 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
     <div class="hud-block"><div class="hud-lbl">Balance</div><div class="hud-val" id="v-money">$200</div></div>
     <div class="hud-block"><div class="hud-lbl">Income/sec</div><div class="hud-val" id="v-income">$0</div></div>
 </div>
+<div id="progress"><div id="progress-bar"></div></div>
 
 <div id="nextCard">
     <div class="nc-lbl">Next Unlock</div>
@@ -78,47 +81,117 @@ let gameRunning=false, nearPad=false;
 const KEYS={}, placed=[], padList=[];
 const colliders=[];
 
-// Player dimensions
-const PLAYER_R = 0.7;  // horizontal radius
-const PLAYER_H = 3.4;  // total height feet-to-head
+const PLAYER_R=0.7;
+const PLAYER_H=3.4;
+const PAD_FLOAT=1.2;
 
-// Fixed vertical distance the pad floats above its parent object
-const PAD_FLOAT = 1.2;
-
-// All steps — pad positions are intentionally offset AWAY from
-// the parent object so the player can always reach them
+// ── STEPS ────────────────────────────────────────────────────────────────────
+// padOffX/Z: offset from parent object center so pad is always reachable
 const STEPS=[
-  // Lobby area — pads placed at the EDGE of each object so player can walk up
-  {id:1,  x:0,    z:0,    cost:0,      label:'Lobby Foundation',   type:'floor', color:0x7f8c8d, inc:5,    w:40,  h:0.4,  d:40,   need:0,  padOffX:0,   padOffZ:22},
-  {id:2,  x:12,   z:8,    cost:100,    label:'Reception Desk',     type:'block', color:0x2c3e50, inc:8,    w:10,  h:2,    d:3,    need:1,  padOffX:0,   padOffZ:4},
-  {id:3,  x:14,   z:10,   cost:150,    label:'Reception Computer', type:'block', color:0x1a1a2e, inc:10,   w:2,   h:1.5,  d:2,    need:2,  padOffX:4,   padOffZ:0},
-  {id:4,  x:10,   z:10,   cost:150,    label:'Guest Registry',     type:'block', color:0xf5f5f5, inc:10,   w:2,   h:1.2,  d:2,    need:3,  padOffX:-4,  padOffZ:0},
-  {id:5,  x:-6,   z:18,   cost:200,    label:'Entry Palm L',       type:'palm',  color:0x27ae60, inc:2,    w:2,   h:7,    d:2,    need:4,  padOffX:-5,  padOffZ:0},
-  {id:6,  x:6,    z:18,   cost:200,    label:'Entry Palm R',       type:'palm',  color:0x27ae60, inc:2,    w:2,   h:7,    d:2,    need:5,  padOffX:5,   padOffZ:0},
-  {id:7,  x:-10,  z:-8,   cost:300,    label:'Lobby Sofa 1',       type:'block', color:0xc0392b, inc:12,   w:6,   h:1.2,  d:3,    need:6,  padOffX:-6,  padOffZ:0},
-  {id:8,  x:-10,  z:-2,   cost:300,    label:'Lobby Sofa 2',       type:'block', color:0xc0392b, inc:12,   w:6,   h:1.2,  d:3,    need:7,  padOffX:-6,  padOffZ:0},
-  {id:9,  x:0,    z:17,   cost:800,    label:'Glass Front Wall',   type:'block', color:0x81ecec, inc:20,   w:40,  h:5,    d:1,    need:8,  padOffX:0,   padOffZ:-5},
-  // Suite area
-  {id:10, x:0,    z:-40,  cost:2500,   label:'Suite 101 Floor',    type:'floor', color:0xecf0f1, inc:50,   w:30,  h:0.4,  d:30,   need:9,  padOffX:0,   padOffZ:-16},
-  {id:11, x:0,    z:-45,  cost:1200,   label:'King Bed Frame',     type:'block', color:0x3e2723, inc:40,   w:10,  h:2,    d:12,   need:10, padOffX:8,   padOffZ:0},
-  {id:12, x:0,    z:-45,  cost:600,    label:'Luxury Mattress',    type:'block', color:0xffffff, inc:30,   w:9,   h:0.7,  d:11,   need:11, padOffX:7,   padOffZ:0},
-  {id:13, x:0,    z:-42,  cost:200,    label:'Silk Pillows',       type:'block', color:0xdfe6e9, inc:10,   w:7,   h:0.5,  d:2,    need:12, padOffX:6,   padOffZ:0},
-  {id:14, x:-8,   z:-48,  cost:400,    label:'Nightstand L',       type:'block', color:0x5d4037, inc:15,   w:3,   h:2,    d:3,    need:13, padOffX:-5,  padOffZ:0},
-  {id:15, x:8,    z:-48,  cost:400,    label:'Nightstand R',       type:'block', color:0x5d4037, inc:15,   w:3,   h:2,    d:3,    need:14, padOffX:5,   padOffZ:0},
-  {id:16, x:0,    z:-30,  cost:1800,   label:'Suite Smart TV',     type:'block', color:0x111111, inc:80,   w:8,   h:4,    d:1,    need:15, padOffX:0,   padOffZ:4},
-  // Pool area
-  {id:17, x:50,   z:0,    cost:8000,   label:'Pool Deck',          type:'floor', color:0xbdc3c7, inc:200,  w:50,  h:0.4,  d:60,   need:16, padOffX:0,   padOffZ:-32},
-  {id:18, x:50,   z:0,    cost:15000,  label:'Pool Water',         type:'floor', color:0x00bcd4, inc:500,  w:30,  h:0.3,  d:40,   need:17, padOffX:18,  padOffZ:0},
-  {id:19, x:38,   z:15,   cost:1000,   label:'Lounge Chair',       type:'block', color:0xffffff, inc:40,   w:3,   h:0.6,  d:6,    need:18, padOffX:-5,  padOffZ:0},
-  {id:20, x:75,   z:25,   cost:1500,   label:'Tropical Ferns',     type:'palm',  color:0x2ecc71, inc:20,   w:3,   h:7,    d:3,    need:19, padOffX:5,   padOffZ:0},
-  {id:21, x:75,   z:30,   cost:500,    label:'Decorative Rocks',   type:'block', color:0x7f8c8d, inc:10,   w:3,   h:1.5,  d:3,    need:20, padOffX:5,   padOffZ:0},
-  {id:22, x:70,   z:-10,  cost:10000,  label:'Tiki Bar',           type:'block', color:0xe67e22, inc:400,  w:8,   h:3,    d:8,    need:21, padOffX:7,   padOffZ:0},
-  {id:23, x:70,   z:-18,  cost:4000,   label:'Tiki Palm',          type:'palm',  color:0x27ae60, inc:100,  w:2,   h:8,    d:2,    need:22, padOffX:5,   padOffZ:0},
-  // Bridge
-  {id:24, x:100,  z:0,    cost:40000,  label:'Bridge Support',     type:'block', color:0x7f8c8d, inc:1000, w:15,  h:10,   d:15,   need:23, padOffX:10,  padOffZ:0},
-  {id:25, x:140,  z:0,    cost:80000,  label:'Bridge Roadway',     type:'floor', color:0x2d3436, inc:2500, w:80,  h:0.8,  d:15,   need:24, padOffX:0,   padOffZ:10},
-  {id:26, x:185,  z:12,   cost:20000,  label:'Mountain Pine',      type:'palm',  color:0x1b5e20, inc:500,  w:3,   h:12,   d:3,    need:25, padOffX:6,   padOffZ:0},
-  {id:27, x:200,  z:0,    cost:200000, label:'Mountain Sign',      type:'block', color:0xf1c40f, inc:8000, w:10,  h:5,    d:1,    need:26, padOffX:0,   padOffZ:5},
+  // ── LOBBY ──────────────────────────────────────────────────────────────────
+  {id:1,   x:0,    z:0,    cost:0,       label:'Lobby Foundation',        type:'floor', color:0x95a5a6, inc:5,     w:50,  h:0.4,  d:50,  need:0,  padOffX:0,   padOffZ:28},
+  {id:2,   x:0,    z:0,    cost:50,      label:'Lobby Marble Floor',      type:'floor', color:0xecf0f1, inc:8,     w:48,  h:0.1,  d:48,  need:1,  padOffX:0,   padOffZ:26},
+  {id:3,   x:0,    z:10,   cost:100,     label:'Front Desk',              type:'block', color:0x2c3e50, inc:12,    w:14,  h:2,    d:3,   need:2,  padOffX:10,  padOffZ:0},
+  {id:4,   x:0,    z:10,   cost:80,      label:'Desk Computer',           type:'block', color:0x1a1a2e, inc:8,     w:2,   h:1.4,  d:1,   need:3,  padOffX:9,   padOffZ:0},
+  {id:5,   x:5,    z:10,   cost:60,      label:'Desk Phone',              type:'block', color:0x2d3436, inc:5,     w:1,   h:1.2,  d:1,   need:4,  padOffX:8,   padOffZ:0},
+  {id:6,   x:-5,   z:10,   cost:120,     label:'Guest Registry Book',     type:'block', color:0xf5f5f5, inc:6,     w:1.5, h:1.3,  d:1,   need:5,  padOffX:-9,  padOffZ:0},
+  {id:7,   x:-18,  z:5,    cost:200,     label:'Lobby Sofa A',            type:'block', color:0xc0392b, inc:14,    w:7,   h:1.2,  d:3,   need:6,  padOffX:-8,  padOffZ:0},
+  {id:8,   x:-18,  z:-3,   cost:200,     label:'Lobby Sofa B',            type:'block', color:0xc0392b, inc:14,    w:7,   h:1.2,  d:3,   need:7,  padOffX:-8,  padOffZ:0},
+  {id:9,   x:-18,  z:1,    cost:150,     label:'Coffee Table',            type:'block', color:0x5d4037, inc:10,    w:4,   h:0.8,  d:2,   need:8,  padOffX:-8,  padOffZ:0},
+  {id:10,  x:18,   z:5,    cost:200,     label:'Lobby Sofa C',            type:'block', color:0xc0392b, inc:14,    w:7,   h:1.2,  d:3,   need:9,  padOffX:8,   padOffZ:0},
+  {id:11,  x:18,   z:-3,   cost:200,     label:'Lobby Sofa D',            type:'block', color:0xc0392b, inc:14,    w:7,   h:1.2,  d:3,   need:10, padOffX:8,   padOffZ:0},
+  {id:12,  x:0,    z:-18,  cost:300,     label:'Grand Piano',             type:'block', color:0x1a1a1a, inc:30,    w:6,   h:2,    d:4,   need:11, padOffX:7,   padOffZ:0},
+  {id:13,  x:0,    z:-18,  cost:100,     label:'Piano Bench',             type:'block', color:0x3e2723, inc:8,     w:2,   h:0.8,  d:1.5, need:12, padOffX:5,   padOffZ:0},
+  {id:14,  x:-20,  z:-18,  cost:250,     label:'Lobby Plant L',           type:'palm',  color:0x27ae60, inc:10,    w:2,   h:6,    d:2,   need:13, padOffX:-5,  padOffZ:0},
+  {id:15,  x:20,   z:-18,  cost:250,     label:'Lobby Plant R',           type:'palm',  color:0x27ae60, inc:10,    w:2,   h:6,    d:2,   need:14, padOffX:5,   padOffZ:0},
+  {id:16,  x:0,    z:22,   cost:800,     label:'Glass Entry Wall',        type:'block', color:0xadd8e6, inc:25,    w:50,  h:6,    d:1,   need:15, padOffX:0,   padOffZ:-8},
+  {id:17,  x:-22,  z:0,    cost:800,     label:'Left Side Wall',          type:'block', color:0xdfe6e9, inc:20,    w:1,   h:6,    d:50,  need:16, padOffX:4,   padOffZ:0},
+  {id:18,  x:22,   z:0,    cost:800,     label:'Right Side Wall',         type:'block', color:0xdfe6e9, inc:20,    w:1,   h:6,    d:50,  need:17, padOffX:-4,  padOffZ:0},
+  {id:19,  x:0,    z:-23,  cost:800,     label:'Back Wall',               type:'block', color:0xdfe6e9, inc:20,    w:50,  h:6,    d:1,   need:18, padOffX:0,   padOffZ:5},
+  {id:20,  x:0,    z:10,   cost:400,     label:'Lobby Chandelier Base',   type:'block', color:0xf1c40f, inc:20,    w:4,   h:0.5,  d:4,   need:19, padOffX:6,   padOffZ:0},
+
+  // ── HOTEL ROOMS ─────────────────────────────────────────────────────────────
+  {id:21,  x:0,    z:-60,  cost:3000,    label:'Room 101 Floor',          type:'floor', color:0xecf0f1, inc:60,    w:30,  h:0.4,  d:28,  need:20, padOffX:0,   padOffZ:-16},
+  {id:22,  x:0,    z:-65,  cost:1500,    label:'King Bed Frame',          type:'block', color:0x3e2723, inc:50,    w:12,  h:2,    d:14,  need:21, padOffX:10,  padOffZ:0},
+  {id:23,  x:0,    z:-65,  cost:800,     label:'Luxury Mattress',         type:'block', color:0xffffff, inc:35,    w:11,  h:0.8,  d:13,  need:22, padOffX:9,   padOffZ:0},
+  {id:24,  x:0,    z:-59,  cost:200,     label:'Silk Pillows',            type:'block', color:0xdfe6e9, inc:12,    w:8,   h:0.6,  d:2,   need:23, padOffX:8,   padOffZ:0},
+  {id:25,  x:-10,  z:-68,  cost:500,     label:'Nightstand Left',         type:'block', color:0x5d4037, inc:18,    w:3,   h:2,    d:3,   need:24, padOffX:-6,  padOffZ:0},
+  {id:26,  x:10,   z:-68,  cost:500,     label:'Nightstand Right',        type:'block', color:0x5d4037, inc:18,    w:3,   h:2,    d:3,   need:25, padOffX:6,   padOffZ:0},
+  {id:27,  x:-10,  z:-68,  cost:300,     label:'Bedside Lamp L',          type:'block', color:0xf1c40f, inc:10,    w:0.8, h:2.8,  d:0.8, need:26, padOffX:-6,  padOffZ:0},
+  {id:28,  x:10,   z:-68,  cost:300,     label:'Bedside Lamp R',          type:'block', color:0xf1c40f, inc:10,    w:0.8, h:2.8,  d:0.8, need:27, padOffX:6,   padOffZ:0},
+  {id:29,  x:0,    z:-50,  cost:2000,    label:'Smart TV & Stand',        type:'block', color:0x111111, inc:90,    w:10,  h:4,    d:1,   need:28, padOffX:0,   padOffZ:5},
+  {id:30,  x:-12,  z:-58,  cost:600,     label:'Armchair',                type:'block', color:0x8e44ad, inc:22,    w:3,   h:2.5,  d:3,   need:29, padOffX:-6,  padOffZ:0},
+  {id:31,  x:12,   z:-58,  cost:600,     label:'Room Desk',               type:'block', color:0x5d4037, inc:22,    w:5,   h:2,    d:3,   need:30, padOffX:6,   padOffZ:0},
+  {id:32,  x:12,   z:-58,  cost:250,     label:'Desk Chair',              type:'block', color:0x2c3e50, inc:12,    w:2,   h:2.5,  d:2,   need:31, padOffX:7,   padOffZ:0},
+  {id:33,  x:0,    z:-74,  cost:1200,    label:'Bathroom Floor',          type:'floor', color:0xbdc3c7, inc:30,    w:14,  h:0.4,  d:10,  need:32, padOffX:0,   padOffZ:-7},
+  {id:34,  x:0,    z:-76,  cost:800,     label:'Bathtub',                 type:'block', color:0xffffff, inc:45,    w:6,   h:1.5,  d:4,   need:33, padOffX:6,   padOffZ:0},
+  {id:35,  x:-5,   z:-73,  cost:400,     label:'Sink & Vanity',           type:'block', color:0xecf0f1, inc:20,    w:3,   h:2,    d:2,   need:34, padOffX:-6,  padOffZ:0},
+  {id:36,  x:5,    z:-73,  cost:300,     label:'Toilet',                  type:'block', color:0xffffff, inc:15,    w:2,   h:2,    d:2,   need:35, padOffX:6,   padOffZ:0},
+
+  // ── POOL AREA ───────────────────────────────────────────────────────────────
+  {id:37,  x:70,   z:0,    cost:10000,   label:'Pool Deck Tiles',         type:'floor', color:0xbdc3c7, inc:250,   w:60,  h:0.4,  d:70,  need:36, padOffX:0,   padOffZ:-38},
+  {id:38,  x:70,   z:0,    cost:18000,   label:'Swimming Pool',           type:'floor', color:0x00bcd4, inc:600,   w:36,  h:0.5,  d:44,  need:37, padOffX:22,  padOffZ:0},
+  {id:39,  x:48,   z:20,   cost:1200,    label:'Lounge Chair A',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:38, padOffX:-5,  padOffZ:0},
+  {id:40,  x:48,   z:10,   cost:1200,    label:'Lounge Chair B',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:39, padOffX:-5,  padOffZ:0},
+  {id:41,  x:48,   z:0,    cost:1200,    label:'Lounge Chair C',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:40, padOffX:-5,  padOffZ:0},
+  {id:42,  x:48,   z:-10,  cost:1200,    label:'Lounge Chair D',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:41, padOffX:-5,  padOffZ:0},
+  {id:43,  x:48,   z:15,   cost:800,     label:'Pool Umbrella A',         type:'block', color:0xe74c3c, inc:20,    w:0.5, h:4,    d:0.5, need:42, padOffX:-4,  padOffZ:0},
+  {id:44,  x:48,   z:-5,   cost:800,     label:'Pool Umbrella B',         type:'block', color:0xe74c3c, inc:20,    w:0.5, h:4,    d:0.5, need:43, padOffX:-4,  padOffZ:0},
+  {id:45,  x:92,   z:20,   cost:1200,    label:'Lounge Chair E',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:44, padOffX:5,   padOffZ:0},
+  {id:46,  x:92,   z:0,    cost:1200,    label:'Lounge Chair F',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:45, padOffX:5,   padOffZ:0},
+  {id:47,  x:92,   z:-15,  cost:1200,    label:'Lounge Chair G',          type:'block', color:0xffffff, inc:45,    w:3,   h:0.7,  d:7,   need:46, padOffX:5,   padOffZ:0},
+  {id:48,  x:70,   z:-38,  cost:12000,   label:'Pool Bar',                type:'block', color:0xe67e22, inc:500,   w:12,  h:3,    d:5,   need:47, padOffX:0,   padOffZ:-8},
+  {id:49,  x:70,   z:-38,  cost:3000,    label:'Bar Stools Row',          type:'block', color:0x8B6914, inc:80,    w:10,  h:2,    d:1.5, need:48, padOffX:0,   padOffZ:5},
+  {id:50,  x:55,   z:-32,  cost:2000,    label:'Pool Palm A',             type:'palm',  color:0x27ae60, inc:50,    w:2,   h:8,    d:2,   need:49, padOffX:-5,  padOffZ:0},
+  {id:51,  x:85,   z:-32,  cost:2000,    label:'Pool Palm B',             type:'palm',  color:0x27ae60, inc:50,    w:2,   h:8,    d:2,   need:50, padOffX:5,   padOffZ:0},
+  {id:52,  x:55,   z:32,   cost:2000,    label:'Pool Palm C',             type:'palm',  color:0x27ae60, inc:50,    w:2,   h:8,    d:2,   need:51, padOffX:-5,  padOffZ:0},
+  {id:53,  x:85,   z:32,   cost:2000,    label:'Pool Palm D',             type:'palm',  color:0x27ae60, inc:50,    w:2,   h:8,    d:2,   need:52, padOffX:5,   padOffZ:0},
+  {id:54,  x:70,   z:40,   cost:5000,    label:'Hot Tub',                 type:'block', color:0x0097a7, inc:200,   w:8,   h:2,    d:8,   need:53, padOffX:7,   padOffZ:0},
+  {id:55,  x:70,   z:40,   cost:1500,    label:'Hot Tub Steps',           type:'block', color:0xbdc3c7, inc:30,    w:4,   h:1,    d:2,   need:54, padOffX:7,   padOffZ:0},
+
+  // ── RESTAURANT ──────────────────────────────────────────────────────────────
+  {id:56,  x:-70,  z:0,    cost:15000,   label:'Restaurant Floor',        type:'floor', color:0xd4a574, inc:400,   w:50,  h:0.4,  d:50,  need:55, padOffX:0,   padOffZ:-28},
+  {id:57,  x:-70,  z:5,    cost:2000,    label:'Dining Table A',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:56, padOffX:6,   padOffZ:0},
+  {id:58,  x:-70,  z:5,    cost:1600,    label:'Dining Chairs A',         type:'block', color:0x2c3e50, inc:40,    w:5.5, h:2.5,  d:5.5, need:57, padOffX:7,   padOffZ:0},
+  {id:59,  x:-70,  z:-8,   cost:2000,    label:'Dining Table B',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:58, padOffX:6,   padOffZ:0},
+  {id:60,  x:-70,  z:-8,   cost:1600,    label:'Dining Chairs B',         type:'block', color:0x2c3e50, inc:40,    w:5.5, h:2.5,  d:5.5, need:59, padOffX:7,   padOffZ:0},
+  {id:61,  x:-58,  z:5,    cost:2000,    label:'Dining Table C',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:60, padOffX:6,   padOffZ:0},
+  {id:62,  x:-58,  z:-8,   cost:2000,    label:'Dining Table D',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:61, padOffX:6,   padOffZ:0},
+  {id:63,  x:-82,  z:5,    cost:2000,    label:'Dining Table E',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:62, padOffX:-6,  padOffZ:0},
+  {id:64,  x:-82,  z:-8,   cost:2000,    label:'Dining Table F',          type:'block', color:0x5d4037, inc:60,    w:4,   h:1.8,  d:4,   need:63, padOffX:-6,  padOffZ:0},
+  {id:65,  x:-70,  z:-18,  cost:8000,    label:'Restaurant Kitchen',      type:'block', color:0x95a5a6, inc:300,   w:20,  h:3,    d:6,   need:64, padOffX:0,   padOffZ:-8},
+  {id:66,  x:-70,  z:-18,  cost:3000,    label:'Kitchen Equipment',       type:'block', color:0x7f8c8d, inc:150,   w:16,  h:2.5,  d:2,   need:65, padOffX:0,   padOffZ:7},
+  {id:67,  x:-70,  z:22,   cost:5000,    label:'Restaurant Bar',          type:'block', color:0x8B4513, inc:250,   w:16,  h:3,    d:4,   need:66, padOffX:0,   padOffZ:6},
+  {id:68,  x:-70,  z:22,   cost:2000,    label:'Bar Stools',              type:'block', color:0x5d4037, inc:80,    w:14,  h:2,    d:1.5, need:67, padOffX:0,   padOffZ:-5},
+  {id:69,  x:-95,  z:0,    cost:1500,    label:'Restaurant Palm A',       type:'palm',  color:0x27ae60, inc:30,    w:2,   h:7,    d:2,   need:68, padOffX:-5,  padOffZ:0},
+  {id:70,  x:-95,  z:-15,  cost:1500,    label:'Restaurant Palm B',       type:'palm',  color:0x27ae60, inc:30,    w:2,   h:7,    d:2,   need:69, padOffX:-5,  padOffZ:0},
+
+  // ── BRIDGE ──────────────────────────────────────────────────────────────────
+  {id:71,  x:0,    z:-120, cost:50000,   label:'Bridge Approach',         type:'floor', color:0x7f8c8d, inc:1000,  w:20,  h:1,    d:20,  need:70, padOffX:0,   padOffZ:-14},
+  {id:72,  x:0,    z:-145, cost:60000,   label:'Bridge Tower Base L',     type:'block', color:0x5d6d7e, inc:1200,  w:4,   h:6,    d:4,   need:71, padOffX:-6,  padOffZ:0},
+  {id:73,  x:0,    z:-145, cost:60000,   label:'Bridge Tower Base R',     type:'block', color:0x5d6d7e, inc:1200,  w:4,   h:6,    d:4,   need:72, padOffX:6,   padOffZ:0},
+  {id:74,  x:-8,   z:-145, cost:80000,   label:'Bridge Tower Left',       type:'block', color:0x4a5568, inc:1500,  w:3,   h:30,   d:3,   need:73, padOffX:-7,  padOffZ:0},
+  {id:75,  x:8,    z:-145, cost:80000,   label:'Bridge Tower Right',      type:'block', color:0x4a5568, inc:1500,  w:3,   h:30,   d:3,   need:74, padOffX:7,   padOffZ:0},
+  {id:76,  x:0,    z:-145, cost:40000,   label:'Bridge Cable L',          type:'block', color:0x718096, inc:800,   w:0.5, h:0.5,  d:60,  need:75, padOffX:-5,  padOffZ:0},
+  {id:77,  x:0,    z:-145, cost:40000,   label:'Bridge Cable R',          type:'block', color:0x718096, inc:800,   w:0.5, h:0.5,  d:60,  need:76, padOffX:5,   padOffZ:0},
+  {id:78,  x:0,    z:-145, cost:120000,  label:'Bridge Roadway',          type:'floor', color:0x2d3436, inc:3000,  w:18,  h:1,    d:120, need:77, padOffX:12,  padOffZ:0},
+  {id:79,  x:0,    z:-145, cost:20000,   label:'Bridge Railing L',        type:'block', color:0x95a5a6, inc:400,   w:0.8, h:2,    d:120, need:78, padOffX:-12, padOffZ:0},
+  {id:80,  x:0,    z:-145, cost:20000,   label:'Bridge Railing R',        type:'block', color:0x95a5a6, inc:400,   w:0.8, h:2,    d:120, need:79, padOffX:12,  padOffZ:0},
+  {id:81,  x:0,    z:-145, cost:15000,   label:'Bridge Lamp Posts',       type:'block', color:0xf1c40f, inc:200,   w:0.5, h:5,    d:0.5, need:80, padOffX:-6,  padOffZ:0},
+
+  // ── MOUNTAIN RESORT ─────────────────────────────────────────────────────────
+  {id:82,  x:0,    z:-220, cost:200000,  label:'Mountain Base Floor',     type:'floor', color:0xa0856c, inc:5000,  w:80,  h:0.4,  d:80,  need:81, padOffX:0,   padOffZ:-45},
+  {id:83,  x:0,    z:-240, cost:50000,   label:'Mountain Lodge Walls',    type:'block', color:0x8B6914, inc:2000,  w:40,  h:10,   d:40,  need:82, padOffX:24,  padOffZ:0},
+  {id:84,  x:0,    z:-240, cost:30000,   label:'Lodge Roof',              type:'block', color:0x5d4037, inc:1500,  w:42,  h:4,    d:42,  need:83, padOffX:25,  padOffZ:0},
+  {id:85,  x:-15,  z:-230, cost:10000,   label:'Lodge Fireplace',         type:'block', color:0x7f8c8d, inc:500,   w:4,   h:5,    d:4,   need:84, padOffX:-8,  padOffZ:0},
+  {id:86,  x:0,    z:-230, cost:8000,    label:'Lodge Sofa Set',          type:'block', color:0x8B4513, inc:400,   w:8,   h:2,    d:4,   need:85, padOffX:8,   padOffZ:0},
+  {id:87,  x:-25,  z:-220, cost:6000,    label:'Ski Rack',                type:'block', color:0x2c3e50, inc:300,   w:6,   h:3,    d:1,   need:86, padOffX:-9,  padOffZ:0},
+  {id:88,  x:25,   z:-220, cost:6000,    label:'Equipment Store',         type:'block', color:0x2c3e50, inc:300,   w:6,   h:4,    d:6,   need:87, padOffX:9,   padOffZ:0},
+  {id:89,  x:-30,  z:-250, cost:8000,    label:'Mountain Pine A',         type:'palm',  color:0x1b5e20, inc:200,   w:3,   h:14,   d:3,   need:88, padOffX:-7,  padOffZ:0},
+  {id:90,  x:30,   z:-250, cost:8000,    label:'Mountain Pine B',         type:'palm',  color:0x1b5e20, inc:200,   w:3,   h:14,   d:3,   need:89, padOffX:7,   padOffZ:0},
+  {id:91,  x:-20,  z:-270, cost:8000,    label:'Mountain Pine C',         type:'palm',  color:0x1b5e20, inc:200,   w:3,   h:14,   d:3,   need:90, padOffX:-7,  padOffZ:0},
+  {id:92,  x:20,   z:-270, cost:8000,    label:'Mountain Pine D',         type:'palm',  color:0x1b5e20, inc:200,   w:3,   h:14,   d:3,   need:91, padOffX:7,   padOffZ:0},
+  {id:93,  x:0,    z:-200, cost:500000,  label:'GRAND RESORT SIGN',       type:'block', color:0xf1c40f, inc:20000, w:20,  h:6,    d:2,   need:92, padOffX:0,   padOffZ:6},
 ];
 
 function fmtMoney(n){
@@ -137,6 +210,12 @@ function showToast(msg){
     toastTimer=setTimeout(()=>el.classList.remove('visible'),2400);
 }
 
+function updateProgress(){
+    const total=STEPS.length;
+    const done=STEPS.filter(s=>s.bought).length;
+    document.getElementById('progress-bar').style.width=((done/total)*100)+'%';
+}
+
 function startGame(){
     document.getElementById('startScreen').style.display='none';
     document.getElementById('hud').style.display='flex';
@@ -148,9 +227,9 @@ function startGame(){
 function initThree(){
     scene=new THREE.Scene();
     scene.background=new THREE.Color(0x87CEEB);
-    scene.fog=new THREE.Fog(0x87CEEB,200,1200);
+    scene.fog=new THREE.Fog(0x87CEEB,300,1500);
 
-    cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,2000);
+    cam=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,0.1,3000);
     cam.position.set(0,20,50);
     cam.lookAt(0,0,0);
 
@@ -168,31 +247,27 @@ function initThree(){
     sun.castShadow=true;
     scene.add(sun);
 
-    // Ground
     const ground=new THREE.Mesh(
-        new THREE.PlaneGeometry(2000,2000),
+        new THREE.PlaneGeometry(3000,3000),
         new THREE.MeshLambertMaterial({color:0x4CAF50})
     );
     ground.rotation.x=-Math.PI/2;
     ground.receiveShadow=true;
     scene.add(ground);
 
-    // Ocean
     const ocean=new THREE.Mesh(
-        new THREE.PlaneGeometry(10000,10000),
+        new THREE.PlaneGeometry(20000,20000),
         new THREE.MeshLambertMaterial({color:0x1565C0})
     );
     ocean.rotation.x=-Math.PI/2;
     ocean.position.y=-0.8;
     scene.add(ocean);
 
-    // GPS group — rendered on top of everything using depthTest:false
+    // GPS — single dashed line only, depthTest:false so it shows through everything
     gpsGroup=new THREE.Group();
-    // Render last so it draws over all geometry
     gpsGroup.renderOrder=999;
     scene.add(gpsGroup);
 
-    // Player
     player=new THREE.Group();
     player.position.set(0,0,0);
     const body=new THREE.Mesh(
@@ -213,20 +288,14 @@ function initThree(){
     STEPS[0].bought=true;
     placeObject(STEPS[0]);
     spawnNextPad();
+    updateProgress();
     ren.render(scene,cam);
     animate();
 }
 
-// ── Materials that always render on top (depthTest off) ─────────────────────
+// GPS material — depthTest:false = always visible through everything
 const gpsMat=new THREE.MeshBasicMaterial({
     color:0xffff00,
-    depthTest:false,   // KEY: draws over all geometry — always visible
-    depthWrite:false,
-    transparent:true,
-    opacity:1.0
-});
-const gpsArrowMat=new THREE.MeshBasicMaterial({
-    color:0xff6600,
     depthTest:false,
     depthWrite:false,
     transparent:true,
@@ -241,164 +310,88 @@ function rebuildGPS(){
     const tx=activePad.position.x, tz=activePad.position.z;
     const dx=tx-fx, dz=tz-fz;
     const dist=Math.sqrt(dx*dx+dz*dz);
-    if(dist<0.5) return;
+    if(dist<1) return;
 
     const nx=dx/dist, nz=dz/dist;
     const angle=Math.atan2(nx,nz);
 
-    // Draw dashed segments floating at Y=8 so they're always above objects
-    // depthTest:false means they render over everything anyway
-    const SEG=2.0, GAP=1.2, STEP=SEG+GAP;
-    const segGeo=new THREE.BoxGeometry(0.6,0.3,SEG);
-    const count=Math.floor((dist-2)/STEP);
+    // Single clean dashed line — bright yellow, floats at Y=1 above ground
+    // depthTest:false means it renders through walls/objects always
+    const SEG=2.2, GAP=1.4, STEP=SEG+GAP;
+    const segGeo=new THREE.BoxGeometry(0.5,0.25,SEG);
+    const count=Math.floor((dist-3)/STEP);
     for(let i=0;i<count;i++){
-        const t=2.0+(i+0.5)*STEP;
+        const t=3+(i+0.5)*STEP;
         if(t>=dist-2) break;
         const seg=new THREE.Mesh(segGeo,gpsMat);
-        seg.position.set(fx+nx*t, 8, fz+nz*t);
+        seg.position.set(fx+nx*t, 1.0, fz+nz*t);
         seg.rotation.y=angle;
         seg.renderOrder=999;
         gpsGroup.add(seg);
     }
-
-    // Bouncing arrow cone above the pad
-    const bob=Math.sin(Date.now()*0.004)*0.5;
-    const arrY=activePad.position.y+4+bob;
-
-    // Vertical pole
-    const poleH=arrY-activePad.position.y;
-    const pole=new THREE.Mesh(
-        new THREE.BoxGeometry(0.2,poleH,0.2),
-        gpsMat
-    );
-    pole.position.set(tx, activePad.position.y+poleH/2, tz);
-    pole.renderOrder=999;
-    gpsGroup.add(pole);
-
-    // Cone
-    const arr=new THREE.Mesh(new THREE.ConeGeometry(1.0,2.0,8),gpsArrowMat);
-    arr.position.set(tx,arrY,tz);
-    arr.renderOrder=999;
-    gpsGroup.add(arr);
-
-    // Direction indicator ring on the ground pointing toward pad
-    const ring=new THREE.Mesh(
-        new THREE.TorusGeometry(2,0.25,6,24),
-        gpsArrowMat
-    );
-    ring.rotation.x=-Math.PI/2;
-    ring.position.set(tx,0.2,tz);
-    ring.renderOrder=999;
-    gpsGroup.add(ring);
 }
 
-// ── Collision — blocks movement AND jumping into objects ─────────────────────
-// The trick: we check the player's FUTURE position before applying it.
-// We move X and Z separately, testing each axis independently.
-// This gives proper wall-sliding.
-// We also check vertical: if jumping UP into the bottom of an object, stop.
-
-function testCollision(px, py, pz){
-    // player occupies:
-    //   X: [px-PLAYER_R, px+PLAYER_R]
-    //   Y: [py, py+PLAYER_H]
-    //   Z: [pz-PLAYER_R, pz+PLAYER_R]
+// ── Full 3D collision ─────────────────────────────────────────────────────────
+function testAABB(px,py,pz){
     for(const c of colliders){
-        // Check all three axes overlap
-        const overlapX = px+PLAYER_R > c.minX && px-PLAYER_R < c.maxX;
-        const overlapY = py+PLAYER_H > c.minY && py < c.maxY;
-        const overlapZ = pz+PLAYER_R > c.minZ && pz-PLAYER_R < c.maxZ;
-        if(overlapX && overlapY && overlapZ) return true;
+        if(px+PLAYER_R>c.minX && px-PLAYER_R<c.maxX &&
+           py+PLAYER_H>c.minY && py<c.maxY &&
+           pz+PLAYER_R>c.minZ && pz-PLAYER_R<c.maxZ) return true;
     }
     return false;
 }
 
-function resolveMovement(prevX, prevY, prevZ, newX, newY, newZ){
-    // Try full move
-    if(!testCollision(newX, newY, newZ)){
-        player.position.set(newX, newY, newZ);
-        return;
-    }
-    // Try X only
-    if(!testCollision(newX, prevY, prevZ)){
-        player.position.x=newX;
-        return;
-    }
-    // Try Z only
-    if(!testCollision(prevX, prevY, newZ)){
-        player.position.z=newZ;
-        return;
-    }
-    // Try Y only (vertical — jumping up into ceiling)
-    if(!testCollision(prevX, newY, prevZ)){
-        player.position.y=newY;
-        return;
-    }
-    // Fully blocked — stay put
-    player.position.set(prevX, prevY, prevZ);
-    // Kill vertical speed if blocked vertically
-    if(newY !== prevY) vspeed=0;
+function resolveMovement(ox,oy,oz,nx,ny,nz){
+    if(!testAABB(nx,ny,nz)){ player.position.set(nx,ny,nz); return; }
+    if(!testAABB(nx,oy,oz)){ player.position.x=nx; return; }
+    if(!testAABB(ox,oy,nz)){ player.position.z=nz; return; }
+    if(!testAABB(ox,ny,oz)){ player.position.y=ny; return; }
+    player.position.set(ox,oy,oz);
+    if(ny!==oy){ vspeed=0; }
 }
 
 function animate(){
     requestAnimationFrame(animate);
     const dt=Math.min(clock.getDelta(),0.05);
 
-    const prevX=player.position.x;
-    const prevY=player.position.y;
-    const prevZ=player.position.z;
+    const ox=player.position.x, oy=player.position.y, oz=player.position.z;
 
-    // Movement
     const tgt=KEYS['w']?16:KEYS['s']?-8:0;
     hspeed+=(tgt-hspeed)*0.16;
-    let newX=prevX - Math.sin(player.rotation.y)*hspeed*dt;
-    let newZ=prevZ - Math.cos(player.rotation.y)*hspeed*dt;
+    let nx=ox-Math.sin(player.rotation.y)*hspeed*dt;
+    let nz=oz-Math.cos(player.rotation.y)*hspeed*dt;
 
     if(KEYS['a']) player.rotation.y+=0.06;
     if(KEYS['d']) player.rotation.y-=0.06;
 
-    // Jump
     if(KEYS[' ']&&!jumping){vspeed=11;jumping=true;}
-    let newY=prevY;
+    let ny=oy;
     if(jumping){
-        newY=prevY+vspeed*dt;
+        ny=oy+vspeed*dt;
         vspeed-=26*dt;
-        if(newY<=0){newY=0;jumping=false;vspeed=0;}
+        if(ny<=0){ny=0;jumping=false;vspeed=0;}
     }
 
-    // Resolve with collision
-    resolveMovement(prevX,prevY,prevZ,newX,newY,newZ);
+    resolveMovement(ox,oy,oz,nx,ny,nz);
 
-    // If vertical was blocked while going up, kill jump
-    if(jumping && player.position.y < newY - 0.01){
-        vspeed = -1;
-    }
-    // Land check
-    if(jumping && player.position.y <= 0){
-        player.position.y=0;
-        jumping=false;
-        vspeed=0;
-    }
+    if(jumping&&player.position.y<ny-0.01) vspeed=-1;
+    if(jumping&&player.position.y<=0){player.position.y=0;jumping=false;vspeed=0;}
 
-    // Camera
     const ry=player.rotation.y;
     cam.position.x=player.position.x+Math.sin(ry)*32;
     cam.position.y=player.position.y+18;
     cam.position.z=player.position.z+Math.cos(ry)*32;
     cam.lookAt(player.position.x,player.position.y+1.5,player.position.z);
 
-    // Pop-in
     for(const p of placed){
         if(p.grp.scale.x<1){
-            const ns=Math.min(p.grp.scale.x+0.07,1);
+            const ns=Math.min(p.grp.scale.x+0.06,1);
             p.grp.scale.setScalar(ns);
         }
     }
 
-    // GPS — always rebuild
     rebuildGPS();
 
-    // Buy logic
     if(activePad){
         const dist=player.position.distanceTo(activePad.position);
         const afford=wallet>=activePad.stepData.cost;
@@ -443,16 +436,11 @@ function placeObject(s){
     s.grp=grp;
     placed.push({grp,step:s});
 
-    // Register collider for ALL non-floor objects
-    // minY=0 (sits on ground), maxY=s.h (top surface)
     if(s.type!=='floor'){
         colliders.push({
-            minX: s.x - s.w/2,
-            maxX: s.x + s.w/2,
-            minY: 0,
-            maxY: s.h,
-            minZ: s.z - s.d/2,
-            maxZ: s.z + s.d/2,
+            minX:s.x-s.w/2, maxX:s.x+s.w/2,
+            minY:0,          maxY:s.h,
+            minZ:s.z-s.d/2, maxZ:s.z+s.d/2,
         });
     }
 }
@@ -464,6 +452,7 @@ function doBuy(s){
     placeObject(s);
     showToast('✅ '+s.label+' built!');
     spawnNextPad();
+    updateProgress();
 }
 
 function spawnNextPad(){
@@ -475,18 +464,15 @@ function spawnNextPad(){
 
     if(next){
         const parent=STEPS.find(x=>x.id===next.need);
-
-        // Pad position: parent object position + offset (clear of the object)
-        // Pad Y: exactly PAD_FLOAT above the parent object's top surface
-        const padX = parent ? parent.x + (next.padOffX||0) : next.x + (next.padOffX||0);
-        const padZ = parent ? parent.z + (next.padOffZ||0) : next.z + (next.padOffZ||0);
-        const padY = parent ? parent.h + PAD_FLOAT : PAD_FLOAT;
+        const padX=parent ? parent.x+(next.padOffX||0) : next.x+(next.padOffX||0);
+        const padZ=parent ? parent.z+(next.padOffZ||0) : next.z+(next.padOffZ||0);
+        const padY=parent ? parent.h+PAD_FLOAT : PAD_FLOAT;
 
         const pad=new THREE.Mesh(
             new THREE.CylinderGeometry(2.5,2.5,0.3,32),
             new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.95})
         );
-        pad.position.set(padX, padY, padZ);
+        pad.position.set(padX,padY,padZ);
         pad.stepData=next;
         scene.add(pad);
         padList.push(pad);
@@ -494,9 +480,9 @@ function spawnNextPad(){
         document.getElementById('nc-name').textContent=next.label;
         document.getElementById('nc-cost').textContent=next.cost===0?'FREE':fmtMoney(next.cost);
     } else {
-        document.getElementById('nc-name').textContent='🏆 Resort Complete!';
+        document.getElementById('nc-name').textContent='🏆 Grand Resort Complete!';
         document.getElementById('nc-cost').textContent='';
-        showToast('🎉 You completed the resort!');
+        showToast('🎉 You built the entire Grand Resort!');
     }
 }
 
