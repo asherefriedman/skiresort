@@ -8,77 +8,28 @@
 <style>
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html, body { width:100%; height:100%; overflow:hidden; background:#1a1a2e; font-family:'DM Sans',sans-serif; }
-
 canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!important; z-index:1; display:block; }
-
-#startScreen {
-    position:fixed; inset:0; z-index:200;
-    background:linear-gradient(150deg,#0a3d62 0%,#1289c4 50%,#6dd5fa 100%);
-    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
-}
-.s-title {
-    font-family:'Bebas Neue',sans-serif;
-    font-size:clamp(64px,12vw,120px);
-    color:#fff; letter-spacing:6px; line-height:0.95;
-    text-align:center; text-shadow:0 6px 40px rgba(0,0,0,0.35);
-}
+#startScreen { position:fixed; inset:0; z-index:200; background:linear-gradient(150deg,#0a3d62 0%,#1289c4 50%,#6dd5fa 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+.s-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(64px,12vw,120px); color:#fff; letter-spacing:6px; line-height:0.95; text-align:center; text-shadow:0 6px 40px rgba(0,0,0,0.35); }
 .s-sub { font-size:13px; color:rgba(255,255,255,0.55); letter-spacing:4px; text-transform:uppercase; margin-bottom:16px; }
-#playBtn {
-    padding:17px 58px; font-family:'Bebas Neue',sans-serif;
-    font-size:28px; letter-spacing:3px; background:#f1c40f;
-    color:#1a1a2e; border:none; border-radius:60px; cursor:pointer;
-    box-shadow:0 6px 28px rgba(241,196,15,0.45),0 2px 0 #b8970b;
-    transition:transform .14s ease,box-shadow .14s ease;
-}
+#playBtn { padding:17px 58px; font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; background:#f1c40f; color:#1a1a2e; border:none; border-radius:60px; cursor:pointer; box-shadow:0 6px 28px rgba(241,196,15,0.45),0 2px 0 #b8970b; transition:transform .14s,box-shadow .14s; }
 #playBtn:hover { transform:translateY(-4px); box-shadow:0 14px 36px rgba(241,196,15,0.55),0 2px 0 #b8970b; }
-#playBtn:active { transform:translateY(0); }
 .s-keys { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-top:10px; }
-.s-key {
-    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);
-    border-radius:8px; padding:7px 14px; color:rgba(255,255,255,0.82);
-    font-size:13px; display:flex; align-items:center; gap:6px;
-}
+.s-key { background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); border-radius:8px; padding:7px 14px; color:rgba(255,255,255,0.82); font-size:13px; display:flex; align-items:center; gap:6px; }
 .s-key kbd { background:rgba(255,255,255,0.18); border-radius:4px; padding:1px 7px; font-family:monospace; font-size:12px; font-weight:bold; }
-
-#hud {
-    position:fixed; top:0; left:0; right:0; z-index:50;
-    display:none; align-items:center; gap:24px; padding:10px 24px;
-    background:rgba(6,12,26,0.8); backdrop-filter:blur(12px);
-    border-bottom:1px solid rgba(255,255,255,0.06); pointer-events:none;
-}
+#hud { position:fixed; top:0; left:0; right:0; z-index:50; display:none; align-items:center; gap:24px; padding:10px 24px; background:rgba(6,12,26,0.8); backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.06); pointer-events:none; }
 .hud-brand { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#f1c40f; letter-spacing:2px; margin-right:auto; }
 .hud-block { display:flex; flex-direction:column; align-items:flex-end; line-height:1; }
 .hud-lbl { font-size:9px; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.35); margin-bottom:2px; }
 .hud-val { font-family:'Bebas Neue',sans-serif; font-size:26px; }
 #v-money { color:#f1c40f; } #v-income { color:#2ecc71; }
-
-#nextCard {
-    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
-    z-index:50; display:none; flex-direction:column; align-items:center;
-    padding:12px 26px; background:rgba(6,12,26,0.85); backdrop-filter:blur(12px);
-    border:1px solid rgba(255,255,255,0.07); border-left:4px solid #f1c40f;
-    border-radius:12px; color:#fff; pointer-events:none; white-space:nowrap; text-align:center;
-}
+#nextCard { position:fixed; bottom:22px; left:50%; transform:translateX(-50%); z-index:50; display:none; flex-direction:column; align-items:center; padding:12px 26px; background:rgba(6,12,26,0.85); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.07); border-left:4px solid #f1c40f; border-radius:12px; color:#fff; pointer-events:none; white-space:nowrap; text-align:center; }
 .nc-lbl { font-size:9px; text-transform:uppercase; letter-spacing:2px; color:rgba(255,255,255,0.35); margin-bottom:3px; }
 .nc-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
 .nc-cost { font-size:12px; color:#f1c40f; margin-top:2px; }
-
-#buyPrompt {
-    position:fixed; bottom:108px; left:50%; transform:translateX(-50%);
-    z-index:50; display:none; padding:11px 30px; background:#f1c40f;
-    color:#1a1a2e; font-family:'Bebas Neue',sans-serif; font-size:22px;
-    letter-spacing:2px; border-radius:40px; pointer-events:none;
-    animation:buyPulse .9s ease-in-out infinite;
-}
+#buyPrompt { position:fixed; bottom:108px; left:50%; transform:translateX(-50%); z-index:50; display:none; padding:11px 30px; background:#f1c40f; color:#1a1a2e; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:2px; border-radius:40px; pointer-events:none; animation:buyPulse .9s ease-in-out infinite; }
 @keyframes buyPulse { 0%,100%{transform:translateX(-50%) scale(1)} 50%{transform:translateX(-50%) scale(1.06)} }
-
-#toast {
-    position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-14px);
-    z-index:50; padding:9px 26px; background:#27ae60; color:#fff;
-    font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px;
-    border-radius:40px; opacity:0; pointer-events:none;
-    transition:opacity .28s ease,transform .28s ease;
-}
+#toast { position:fixed; top:68px; left:50%; transform:translateX(-50%) translateY(-14px); z-index:50; padding:9px 26px; background:#27ae60; color:#fff; font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px; border-radius:40px; opacity:0; pointer-events:none; transition:opacity .28s,transform .28s; }
 #toast.visible { opacity:1; transform:translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -111,7 +62,6 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
 <div id="buyPrompt">Press E to Buy</div>
 <div id="toast"></div>
 
-<!-- Three.js with 3 fallbacks -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
 <script>if(typeof THREE==='undefined'){document.write('<scr'+'ipt src="https://unpkg.com/three@0.140.0/build/three.min.js"><\/scr'+'ipt>');}</script>
 <script>if(typeof THREE==='undefined'){document.write('<scr'+'ipt src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"><\/scr'+'ipt>');}</script>
@@ -121,43 +71,54 @@ canvas { position:fixed; top:0; left:0; width:100%!important; height:100%!import
 
 let scene, cam, ren, clock;
 let player;
-let arrowLine, activePad=null;
+let gpsGroup, activePad=null;
 let wallet=200, income=0;
 let vspeed=0, hspeed=0, jumping=false;
 let gameRunning=false, nearPad=false;
 const KEYS={}, placed=[], padList=[];
+const colliders=[];
 
-// Collision boxes: {minX, maxX, minZ, maxZ, maxY}
-const colliders = [];
+// Player dimensions
+const PLAYER_R = 0.7;  // horizontal radius
+const PLAYER_H = 3.4;  // total height feet-to-head
 
+// Fixed vertical distance the pad floats above its parent object
+const PAD_FLOAT = 1.2;
+
+// All steps — pad positions are intentionally offset AWAY from
+// the parent object so the player can always reach them
 const STEPS=[
-  {id:1,  x:0,   z:0,   cost:0,      label:'Lobby Foundation',   type:'floor', color:0x7f8c8d, inc:5,    w:40, h:0.4, d:40,  need:0},
-  {id:2,  x:12,  z:8,   cost:100,    label:'Reception Desk',     type:'block', color:0x2c3e50, inc:8,    w:10, h:2,   d:3,   need:1},
-  {id:3,  x:14,  z:10,  cost:150,    label:'Reception Computer', type:'block', color:0x1a1a2e, inc:10,   w:2,  h:1.5, d:2,   need:2},
-  {id:4,  x:10,  z:10,  cost:150,    label:'Guest Registry',     type:'block', color:0xf5f5f5, inc:10,   w:2,  h:1.2, d:2,   need:3},
-  {id:5,  x:-6,  z:18,  cost:200,    label:'Entry Palm L',       type:'palm',  color:0x27ae60, inc:2,    w:2,  h:7,   d:2,   need:4},
-  {id:6,  x:6,   z:18,  cost:200,    label:'Entry Palm R',       type:'palm',  color:0x27ae60, inc:2,    w:2,  h:7,   d:2,   need:5},
-  {id:7,  x:-10, z:-8,  cost:300,    label:'Lobby Sofa 1',       type:'block', color:0xc0392b, inc:12,   w:6,  h:1.2, d:3,   need:6},
-  {id:8,  x:-10, z:-2,  cost:300,    label:'Lobby Sofa 2',       type:'block', color:0xc0392b, inc:12,   w:6,  h:1.2, d:3,   need:7},
-  {id:9,  x:0,   z:17,  cost:800,    label:'Glass Front Wall',   type:'block', color:0x81ecec, inc:20,   w:40, h:5,   d:1,   need:8},
-  {id:10, x:0,   z:-40, cost:2500,   label:'Suite 101 Floor',    type:'floor', color:0xecf0f1, inc:50,   w:30, h:0.4, d:30,  need:9},
-  {id:11, x:0,   z:-45, cost:1200,   label:'King Bed Frame',     type:'block', color:0x3e2723, inc:40,   w:10, h:2,   d:12,  need:10},
-  {id:12, x:0,   z:-45, cost:600,    label:'Luxury Mattress',    type:'block', color:0xffffff, inc:30,   w:9,  h:0.7, d:11,  need:11},
-  {id:13, x:0,   z:-42, cost:200,    label:'Silk Pillows',       type:'block', color:0xdfe6e9, inc:10,   w:7,  h:0.5, d:2,   need:12},
-  {id:14, x:-8,  z:-48, cost:400,    label:'Nightstand L',       type:'block', color:0x5d4037, inc:15,   w:3,  h:2,   d:3,   need:13},
-  {id:15, x:8,   z:-48, cost:400,    label:'Nightstand R',       type:'block', color:0x5d4037, inc:15,   w:3,  h:2,   d:3,   need:14},
-  {id:16, x:0,   z:-30, cost:1800,   label:'Suite Smart TV',     type:'block', color:0x111111, inc:80,   w:8,  h:4,   d:1,   need:15},
-  {id:17, x:50,  z:0,   cost:8000,   label:'Pool Deck',          type:'floor', color:0xbdc3c7, inc:200,  w:50, h:0.4, d:60,  need:16},
-  {id:18, x:50,  z:0,   cost:15000,  label:'Pool Water',         type:'floor', color:0x00bcd4, inc:500,  w:30, h:0.3, d:40,  need:17},
-  {id:19, x:38,  z:15,  cost:1000,   label:'Lounge Chair',       type:'block', color:0xffffff, inc:40,   w:3,  h:0.6, d:6,   need:18},
-  {id:20, x:75,  z:25,  cost:1500,   label:'Tropical Ferns',     type:'palm',  color:0x2ecc71, inc:20,   w:3,  h:7,   d:3,   need:19},
-  {id:21, x:75,  z:30,  cost:500,    label:'Decorative Rocks',   type:'block', color:0x7f8c8d, inc:10,   w:3,  h:1.5, d:3,   need:20},
-  {id:22, x:70,  z:-10, cost:10000,  label:'Tiki Bar',           type:'block', color:0xe67e22, inc:400,  w:8,  h:3,   d:8,   need:21},
-  {id:23, x:70,  z:-18, cost:4000,   label:'Tiki Palm',          type:'palm',  color:0x27ae60, inc:100,  w:2,  h:8,   d:2,   need:22},
-  {id:24, x:100, z:0,   cost:40000,  label:'Bridge Support',     type:'block', color:0x7f8c8d, inc:1000, w:15, h:10,  d:15,  need:23},
-  {id:25, x:140, z:0,   cost:80000,  label:'Bridge Roadway',     type:'floor', color:0x2d3436, inc:2500, w:80, h:0.8, d:15,  need:24},
-  {id:26, x:185, z:12,  cost:20000,  label:'Mountain Pine',      type:'palm',  color:0x1b5e20, inc:500,  w:3,  h:12,  d:3,   need:25},
-  {id:27, x:200, z:0,   cost:200000, label:'Mountain Sign',      type:'block', color:0xf1c40f, inc:8000, w:10, h:5,   d:1,   need:26},
+  // Lobby area — pads placed at the EDGE of each object so player can walk up
+  {id:1,  x:0,    z:0,    cost:0,      label:'Lobby Foundation',   type:'floor', color:0x7f8c8d, inc:5,    w:40,  h:0.4,  d:40,   need:0,  padOffX:0,   padOffZ:22},
+  {id:2,  x:12,   z:8,    cost:100,    label:'Reception Desk',     type:'block', color:0x2c3e50, inc:8,    w:10,  h:2,    d:3,    need:1,  padOffX:0,   padOffZ:4},
+  {id:3,  x:14,   z:10,   cost:150,    label:'Reception Computer', type:'block', color:0x1a1a2e, inc:10,   w:2,   h:1.5,  d:2,    need:2,  padOffX:4,   padOffZ:0},
+  {id:4,  x:10,   z:10,   cost:150,    label:'Guest Registry',     type:'block', color:0xf5f5f5, inc:10,   w:2,   h:1.2,  d:2,    need:3,  padOffX:-4,  padOffZ:0},
+  {id:5,  x:-6,   z:18,   cost:200,    label:'Entry Palm L',       type:'palm',  color:0x27ae60, inc:2,    w:2,   h:7,    d:2,    need:4,  padOffX:-5,  padOffZ:0},
+  {id:6,  x:6,    z:18,   cost:200,    label:'Entry Palm R',       type:'palm',  color:0x27ae60, inc:2,    w:2,   h:7,    d:2,    need:5,  padOffX:5,   padOffZ:0},
+  {id:7,  x:-10,  z:-8,   cost:300,    label:'Lobby Sofa 1',       type:'block', color:0xc0392b, inc:12,   w:6,   h:1.2,  d:3,    need:6,  padOffX:-6,  padOffZ:0},
+  {id:8,  x:-10,  z:-2,   cost:300,    label:'Lobby Sofa 2',       type:'block', color:0xc0392b, inc:12,   w:6,   h:1.2,  d:3,    need:7,  padOffX:-6,  padOffZ:0},
+  {id:9,  x:0,    z:17,   cost:800,    label:'Glass Front Wall',   type:'block', color:0x81ecec, inc:20,   w:40,  h:5,    d:1,    need:8,  padOffX:0,   padOffZ:-5},
+  // Suite area
+  {id:10, x:0,    z:-40,  cost:2500,   label:'Suite 101 Floor',    type:'floor', color:0xecf0f1, inc:50,   w:30,  h:0.4,  d:30,   need:9,  padOffX:0,   padOffZ:-16},
+  {id:11, x:0,    z:-45,  cost:1200,   label:'King Bed Frame',     type:'block', color:0x3e2723, inc:40,   w:10,  h:2,    d:12,   need:10, padOffX:8,   padOffZ:0},
+  {id:12, x:0,    z:-45,  cost:600,    label:'Luxury Mattress',    type:'block', color:0xffffff, inc:30,   w:9,   h:0.7,  d:11,   need:11, padOffX:7,   padOffZ:0},
+  {id:13, x:0,    z:-42,  cost:200,    label:'Silk Pillows',       type:'block', color:0xdfe6e9, inc:10,   w:7,   h:0.5,  d:2,    need:12, padOffX:6,   padOffZ:0},
+  {id:14, x:-8,   z:-48,  cost:400,    label:'Nightstand L',       type:'block', color:0x5d4037, inc:15,   w:3,   h:2,    d:3,    need:13, padOffX:-5,  padOffZ:0},
+  {id:15, x:8,    z:-48,  cost:400,    label:'Nightstand R',       type:'block', color:0x5d4037, inc:15,   w:3,   h:2,    d:3,    need:14, padOffX:5,   padOffZ:0},
+  {id:16, x:0,    z:-30,  cost:1800,   label:'Suite Smart TV',     type:'block', color:0x111111, inc:80,   w:8,   h:4,    d:1,    need:15, padOffX:0,   padOffZ:4},
+  // Pool area
+  {id:17, x:50,   z:0,    cost:8000,   label:'Pool Deck',          type:'floor', color:0xbdc3c7, inc:200,  w:50,  h:0.4,  d:60,   need:16, padOffX:0,   padOffZ:-32},
+  {id:18, x:50,   z:0,    cost:15000,  label:'Pool Water',         type:'floor', color:0x00bcd4, inc:500,  w:30,  h:0.3,  d:40,   need:17, padOffX:18,  padOffZ:0},
+  {id:19, x:38,   z:15,   cost:1000,   label:'Lounge Chair',       type:'block', color:0xffffff, inc:40,   w:3,   h:0.6,  d:6,    need:18, padOffX:-5,  padOffZ:0},
+  {id:20, x:75,   z:25,   cost:1500,   label:'Tropical Ferns',     type:'palm',  color:0x2ecc71, inc:20,   w:3,   h:7,    d:3,    need:19, padOffX:5,   padOffZ:0},
+  {id:21, x:75,   z:30,   cost:500,    label:'Decorative Rocks',   type:'block', color:0x7f8c8d, inc:10,   w:3,   h:1.5,  d:3,    need:20, padOffX:5,   padOffZ:0},
+  {id:22, x:70,   z:-10,  cost:10000,  label:'Tiki Bar',           type:'block', color:0xe67e22, inc:400,  w:8,   h:3,    d:8,    need:21, padOffX:7,   padOffZ:0},
+  {id:23, x:70,   z:-18,  cost:4000,   label:'Tiki Palm',          type:'palm',  color:0x27ae60, inc:100,  w:2,   h:8,    d:2,    need:22, padOffX:5,   padOffZ:0},
+  // Bridge
+  {id:24, x:100,  z:0,    cost:40000,  label:'Bridge Support',     type:'block', color:0x7f8c8d, inc:1000, w:15,  h:10,   d:15,   need:23, padOffX:10,  padOffZ:0},
+  {id:25, x:140,  z:0,    cost:80000,  label:'Bridge Roadway',     type:'floor', color:0x2d3436, inc:2500, w:80,  h:0.8,  d:15,   need:24, padOffX:0,   padOffZ:10},
+  {id:26, x:185,  z:12,   cost:20000,  label:'Mountain Pine',      type:'palm',  color:0x1b5e20, inc:500,  w:3,   h:12,   d:3,    need:25, padOffX:6,   padOffZ:0},
+  {id:27, x:200,  z:0,    cost:200000, label:'Mountain Sign',      type:'block', color:0xf1c40f, inc:8000, w:10,  h:5,    d:1,    need:26, padOffX:0,   padOffZ:5},
 ];
 
 function fmtMoney(n){
@@ -201,7 +162,6 @@ function initThree(){
 
     clock=new THREE.Clock();
 
-    // Lights
     scene.add(new THREE.AmbientLight(0xffffff,0.9));
     const sun=new THREE.DirectionalLight(0xfff8e1,1.0);
     sun.position.set(80,150,80);
@@ -214,7 +174,6 @@ function initThree(){
         new THREE.MeshLambertMaterial({color:0x4CAF50})
     );
     ground.rotation.x=-Math.PI/2;
-    ground.position.y=0;
     ground.receiveShadow=true;
     scene.add(ground);
 
@@ -227,14 +186,15 @@ function initThree(){
     ocean.position.y=-0.8;
     scene.add(ocean);
 
-    // GPS arrow — made of multiple box segments so it's clearly visible
-    arrowLine = new THREE.Group();
-    scene.add(arrowLine);
+    // GPS group — rendered on top of everything using depthTest:false
+    gpsGroup=new THREE.Group();
+    // Render last so it draws over all geometry
+    gpsGroup.renderOrder=999;
+    scene.add(gpsGroup);
 
     // Player
     player=new THREE.Group();
     player.position.set(0,0,0);
-
     const body=new THREE.Mesh(
         new THREE.BoxGeometry(1.2,2.0,1.2),
         new THREE.MeshLambertMaterial({color:0x3949AB})
@@ -242,134 +202,192 @@ function initThree(){
     body.position.y=1.4;
     body.castShadow=true;
     player.add(body);
-
     const head=new THREE.Mesh(
         new THREE.BoxGeometry(0.9,0.9,0.9),
         new THREE.MeshLambertMaterial({color:0xFFCC80})
     );
     head.position.y=3.0;
-    head.castShadow=true;
     player.add(head);
-
     scene.add(player);
 
-    // Place first building free
     STEPS[0].bought=true;
     placeObject(STEPS[0]);
     spawnNextPad();
-
     ren.render(scene,cam);
     animate();
 }
 
-// ── GPS dashed line drawn as a row of yellow boxes ──────────────────────────
-function updateGPSArrow(){
-    // Clear old segments
-    while(arrowLine.children.length) arrowLine.remove(arrowLine.children[0]);
+// ── Materials that always render on top (depthTest off) ─────────────────────
+const gpsMat=new THREE.MeshBasicMaterial({
+    color:0xffff00,
+    depthTest:false,   // KEY: draws over all geometry — always visible
+    depthWrite:false,
+    transparent:true,
+    opacity:1.0
+});
+const gpsArrowMat=new THREE.MeshBasicMaterial({
+    color:0xff6600,
+    depthTest:false,
+    depthWrite:false,
+    transparent:true,
+    opacity:1.0
+});
 
+function rebuildGPS(){
+    while(gpsGroup.children.length) gpsGroup.remove(gpsGroup.children[0]);
     if(!activePad) return;
 
-    const from = new THREE.Vector3(player.position.x, 0.25, player.position.z);
-    const to   = new THREE.Vector3(activePad.position.x, 0.25, activePad.position.z);
-    const dir  = new THREE.Vector3().subVectors(to, from);
-    const dist = dir.length();
-    if(dist < 0.5) return;
-    dir.normalize();
+    const fx=player.position.x, fz=player.position.z;
+    const tx=activePad.position.x, tz=activePad.position.z;
+    const dx=tx-fx, dz=tz-fz;
+    const dist=Math.sqrt(dx*dx+dz*dz);
+    if(dist<0.5) return;
 
-    const segLen  = 1.8;
-    const gapLen  = 1.2;
-    const step    = segLen + gapLen;
-    const count   = Math.floor(dist / step);
-    const segGeo  = new THREE.BoxGeometry(0.45, 0.18, segLen);
-    const segMat  = new THREE.MeshBasicMaterial({color:0xffeb3b});
+    const nx=dx/dist, nz=dz/dist;
+    const angle=Math.atan2(nx,nz);
 
-    for(let i=0; i<count; i++){
-        const t = (i + 0.5) * step;
-        const seg = new THREE.Mesh(segGeo, segMat);
-        seg.position.set(
-            from.x + dir.x * t,
-            0.25,
-            from.z + dir.z * t
-        );
-        seg.rotation.y = Math.atan2(dir.x, dir.z);
-        arrowLine.add(seg);
+    // Draw dashed segments floating at Y=8 so they're always above objects
+    // depthTest:false means they render over everything anyway
+    const SEG=2.0, GAP=1.2, STEP=SEG+GAP;
+    const segGeo=new THREE.BoxGeometry(0.6,0.3,SEG);
+    const count=Math.floor((dist-2)/STEP);
+    for(let i=0;i<count;i++){
+        const t=2.0+(i+0.5)*STEP;
+        if(t>=dist-2) break;
+        const seg=new THREE.Mesh(segGeo,gpsMat);
+        seg.position.set(fx+nx*t, 8, fz+nz*t);
+        seg.rotation.y=angle;
+        seg.renderOrder=999;
+        gpsGroup.add(seg);
     }
 
-    // Arrowhead at the pad
-    const arr = new THREE.Mesh(
-        new THREE.ConeGeometry(0.7, 1.6, 6),
-        new THREE.MeshBasicMaterial({color:0xffeb3b})
+    // Bouncing arrow cone above the pad
+    const bob=Math.sin(Date.now()*0.004)*0.5;
+    const arrY=activePad.position.y+4+bob;
+
+    // Vertical pole
+    const poleH=arrY-activePad.position.y;
+    const pole=new THREE.Mesh(
+        new THREE.BoxGeometry(0.2,poleH,0.2),
+        gpsMat
     );
-    arr.position.set(to.x, 0.9, to.z);
-    arr.rotation.y = Math.atan2(dir.x, dir.z);
-    arrowLine.add(arr);
+    pole.position.set(tx, activePad.position.y+poleH/2, tz);
+    pole.renderOrder=999;
+    gpsGroup.add(pole);
+
+    // Cone
+    const arr=new THREE.Mesh(new THREE.ConeGeometry(1.0,2.0,8),gpsArrowMat);
+    arr.position.set(tx,arrY,tz);
+    arr.renderOrder=999;
+    gpsGroup.add(arr);
+
+    // Direction indicator ring on the ground pointing toward pad
+    const ring=new THREE.Mesh(
+        new THREE.TorusGeometry(2,0.25,6,24),
+        gpsArrowMat
+    );
+    ring.rotation.x=-Math.PI/2;
+    ring.position.set(tx,0.2,tz);
+    ring.renderOrder=999;
+    gpsGroup.add(ring);
 }
 
-// ── Collision detection ──────────────────────────────────────────────────────
-// Player is a vertical capsule: feet at player.position.y, radius 0.65
-// Only collide with objects taller than jump height (jumpable threshold = 1.8)
-const PLAYER_RADIUS = 0.65;
-const JUMPABLE_HEIGHT = 1.6; // objects shorter than this can be stepped over freely
+// ── Collision — blocks movement AND jumping into objects ─────────────────────
+// The trick: we check the player's FUTURE position before applying it.
+// We move X and Z separately, testing each axis independently.
+// This gives proper wall-sliding.
+// We also check vertical: if jumping UP into the bottom of an object, stop.
 
-function resolveCollisions(){
-    const px = player.position.x;
-    const pz = player.position.z;
-    const py = player.position.y; // feet y
-
+function testCollision(px, py, pz){
+    // player occupies:
+    //   X: [px-PLAYER_R, px+PLAYER_R]
+    //   Y: [py, py+PLAYER_H]
+    //   Z: [pz-PLAYER_R, pz+PLAYER_R]
     for(const c of colliders){
-        // Only block if object is too tall to walk over AND player isn't above it
-        if(c.maxY <= JUMPABLE_HEIGHT) continue;      // short enough to walk over
-        if(py >= c.maxY - 0.1) continue;             // player jumped over it
-
-        // AABB circle vs rectangle collision
-        const nearX = Math.max(c.minX, Math.min(px, c.maxX));
-        const nearZ = Math.max(c.minZ, Math.min(pz, c.maxZ));
-        const dx = px - nearX;
-        const dz = pz - nearZ;
-        const dist = Math.sqrt(dx*dx + dz*dz);
-
-        if(dist < PLAYER_RADIUS && dist > 0){
-            // Push player out
-            const nx = dx / dist;
-            const nz = dz / dist;
-            player.position.x = nearX + nx * PLAYER_RADIUS;
-            player.position.z = nearZ + nz * PLAYER_RADIUS;
-        }
+        // Check all three axes overlap
+        const overlapX = px+PLAYER_R > c.minX && px-PLAYER_R < c.maxX;
+        const overlapY = py+PLAYER_H > c.minY && py < c.maxY;
+        const overlapZ = pz+PLAYER_R > c.minZ && pz-PLAYER_R < c.maxZ;
+        if(overlapX && overlapY && overlapZ) return true;
     }
+    return false;
+}
+
+function resolveMovement(prevX, prevY, prevZ, newX, newY, newZ){
+    // Try full move
+    if(!testCollision(newX, newY, newZ)){
+        player.position.set(newX, newY, newZ);
+        return;
+    }
+    // Try X only
+    if(!testCollision(newX, prevY, prevZ)){
+        player.position.x=newX;
+        return;
+    }
+    // Try Z only
+    if(!testCollision(prevX, prevY, newZ)){
+        player.position.z=newZ;
+        return;
+    }
+    // Try Y only (vertical — jumping up into ceiling)
+    if(!testCollision(prevX, newY, prevZ)){
+        player.position.y=newY;
+        return;
+    }
+    // Fully blocked — stay put
+    player.position.set(prevX, prevY, prevZ);
+    // Kill vertical speed if blocked vertically
+    if(newY !== prevY) vspeed=0;
 }
 
 function animate(){
     requestAnimationFrame(animate);
     const dt=Math.min(clock.getDelta(),0.05);
 
-    // ── Movement — faster speed ──
-    const tgt=KEYS['w']?12:KEYS['s']?-6:0;
-    hspeed+=(tgt-hspeed)*0.14;
-    player.position.x-=Math.sin(player.rotation.y)*hspeed*dt;
-    player.position.z-=Math.cos(player.rotation.y)*hspeed*dt;
+    const prevX=player.position.x;
+    const prevY=player.position.y;
+    const prevZ=player.position.z;
 
-    if(KEYS['a']) player.rotation.y+=0.055;
-    if(KEYS['d']) player.rotation.y-=0.055;
+    // Movement
+    const tgt=KEYS['w']?16:KEYS['s']?-8:0;
+    hspeed+=(tgt-hspeed)*0.16;
+    let newX=prevX - Math.sin(player.rotation.y)*hspeed*dt;
+    let newZ=prevZ - Math.cos(player.rotation.y)*hspeed*dt;
 
-    // ── Jump — higher ──
+    if(KEYS['a']) player.rotation.y+=0.06;
+    if(KEYS['d']) player.rotation.y-=0.06;
+
+    // Jump
     if(KEYS[' ']&&!jumping){vspeed=11;jumping=true;}
+    let newY=prevY;
     if(jumping){
-        player.position.y+=vspeed*dt;
+        newY=prevY+vspeed*dt;
         vspeed-=26*dt;
-        if(player.position.y<=0){player.position.y=0;jumping=false;vspeed=0;}
+        if(newY<=0){newY=0;jumping=false;vspeed=0;}
     }
 
-    // ── Collision resolution ──
-    resolveCollisions();
+    // Resolve with collision
+    resolveMovement(prevX,prevY,prevZ,newX,newY,newZ);
 
-    // ── Camera ──
+    // If vertical was blocked while going up, kill jump
+    if(jumping && player.position.y < newY - 0.01){
+        vspeed = -1;
+    }
+    // Land check
+    if(jumping && player.position.y <= 0){
+        player.position.y=0;
+        jumping=false;
+        vspeed=0;
+    }
+
+    // Camera
     const ry=player.rotation.y;
     cam.position.x=player.position.x+Math.sin(ry)*32;
     cam.position.y=player.position.y+18;
     cam.position.z=player.position.z+Math.cos(ry)*32;
     cam.lookAt(player.position.x,player.position.y+1.5,player.position.z);
 
-    // ── Pop-in ──
+    // Pop-in
     for(const p of placed){
         if(p.grp.scale.x<1){
             const ns=Math.min(p.grp.scale.x+0.07,1);
@@ -377,14 +395,14 @@ function animate(){
         }
     }
 
-    // ── GPS update every frame ──
-    updateGPSArrow();
+    // GPS — always rebuild
+    rebuildGPS();
 
-    // ── Pad / buy logic ──
+    // Buy logic
     if(activePad){
         const dist=player.position.distanceTo(activePad.position);
         const afford=wallet>=activePad.stepData.cost;
-        nearPad=dist<6;
+        nearPad=dist<7;
         document.getElementById('buyPrompt').style.display=(nearPad&&afford)?'block':'none';
         if(nearPad&&afford&&KEYS['e']){
             KEYS['e']=false;
@@ -401,7 +419,6 @@ function animate(){
 
 function placeObject(s){
     const grp=new THREE.Group();
-
     const mesh=new THREE.Mesh(
         new THREE.BoxGeometry(s.w,s.h,s.d),
         new THREE.MeshLambertMaterial({color:s.color})
@@ -426,14 +443,16 @@ function placeObject(s){
     s.grp=grp;
     placed.push({grp,step:s});
 
-    // Register collider — only for blocks tall enough to matter
-    if(s.type==='block' || s.type==='palm'){
+    // Register collider for ALL non-floor objects
+    // minY=0 (sits on ground), maxY=s.h (top surface)
+    if(s.type!=='floor'){
         colliders.push({
             minX: s.x - s.w/2,
             maxX: s.x + s.w/2,
+            minY: 0,
+            maxY: s.h,
             minZ: s.z - s.d/2,
             maxZ: s.z + s.d/2,
-            maxY: s.h
         });
     }
 }
@@ -452,20 +471,22 @@ function spawnNextPad(){
     padList.length=0;
     activePad=null;
 
-    const next=STEPS.find(s=>
-        !s.bought&&(s.need===0||STEPS.find(x=>x.id===s.need)?.bought)
-    );
+    const next=STEPS.find(s=>!s.bought&&(s.need===0||STEPS.find(x=>x.id===s.need)?.bought));
 
     if(next){
-        // ── Pad sits ON TOP of whatever was previously built there ──
-        const prevStep = STEPS.find(x=>x.id===next.need);
-        const padY = prevStep ? prevStep.h + 0.2 : 0.14;
+        const parent=STEPS.find(x=>x.id===next.need);
+
+        // Pad position: parent object position + offset (clear of the object)
+        // Pad Y: exactly PAD_FLOAT above the parent object's top surface
+        const padX = parent ? parent.x + (next.padOffX||0) : next.x + (next.padOffX||0);
+        const padZ = parent ? parent.z + (next.padOffZ||0) : next.z + (next.padOffZ||0);
+        const padY = parent ? parent.h + PAD_FLOAT : PAD_FLOAT;
 
         const pad=new THREE.Mesh(
-            new THREE.CylinderGeometry(3,3,0.28,32),
-            new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.9})
+            new THREE.CylinderGeometry(2.5,2.5,0.3,32),
+            new THREE.MeshBasicMaterial({color:0xffeb3b,transparent:true,opacity:0.95})
         );
-        pad.position.set(next.x, padY, next.z);
+        pad.position.set(padX, padY, padZ);
         pad.stepData=next;
         scene.add(pad);
         padList.push(pad);
