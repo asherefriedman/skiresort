@@ -9,55 +9,50 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;background:#0a0a0a;font-family:'DM Sans',sans-serif;}
 canvas{position:fixed;top:0;left:0;width:100%!important;height:100%!important;z-index:1;display:block;}
-
-#startScreen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:linear-gradient(170deg,#0a1628 0%,#0d2440 40%,#1a3a5c 70%,#0d2440 100%);}
-#startScreen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,rgba(180,140,80,0.12) 0%,transparent 65%);pointer-events:none;}
-.s-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,26px);color:rgba(180,148,80,0.9);letter-spacing:8px;text-transform:uppercase;margin-bottom:-8px;}
-.s-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,11vw,110px);color:#fff;letter-spacing:5px;line-height:0.9;text-align:center;text-shadow:0 2px 40px rgba(0,0,0,0.6);}
-.s-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(180,148,80,0.8),transparent);margin:4px 0;}
-.s-sub{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:5px;text-transform:uppercase;margin-bottom:20px;}
-#playBtn{padding:16px 56px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;background:transparent;color:#d4a844;border:1px solid rgba(212,168,68,0.6);border-radius:2px;cursor:pointer;transition:all .2s;position:relative;}
-#playBtn::before{content:'';position:absolute;inset:0;background:rgba(212,168,68,0);transition:background .2s;}
+#startScreen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:linear-gradient(170deg,#0a1628 0%,#0d2440 40%,#1a3a5c 70%,#0d2440 100%);}
+.s-logo{font-family:'Bebas Neue',sans-serif;font-size:clamp(14px,2.5vw,22px);color:rgba(212,168,68,0.85);letter-spacing:8px;text-transform:uppercase;}
+.s-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(58px,10vw,105px);color:#fff;letter-spacing:5px;line-height:0.9;text-align:center;text-shadow:0 2px 40px rgba(0,0,0,0.6);}
+.s-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,rgba(212,168,68,0.8),transparent);margin:2px 0;}
+.s-sub{font-size:11px;color:rgba(255,255,255,0.35);letter-spacing:5px;text-transform:uppercase;margin-bottom:18px;}
+#playBtn{padding:15px 52px;font-family:'Bebas Neue',sans-serif;font-size:21px;letter-spacing:4px;background:transparent;color:#d4a844;border:1px solid rgba(212,168,68,0.5);border-radius:2px;cursor:pointer;transition:all .2s;}
 #playBtn:hover{background:rgba(212,168,68,0.1);border-color:#d4a844;letter-spacing:6px;}
-.s-keys{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
-.s-key{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:6px 12px;color:rgba(255,255,255,0.6);font-size:12px;display:flex;align-items:center;gap:5px;letter-spacing:1px;}
-.s-key kbd{background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 6px;font-family:monospace;font-size:11px;}
-
-/* HUD */
-#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:none;align-items:center;gap:0;padding:0 32px;background:rgba(5,10,20,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,68,0.2);pointer-events:none;height:56px;}
-.hud-brand{font-family:'Bebas Neue',sans-serif;font-size:18px;color:rgba(212,168,68,0.9);letter-spacing:4px;margin-right:auto;}
-.hud-divider{width:1px;height:28px;background:rgba(255,255,255,0.08);margin:0 24px;}
+#loadBtn{padding:10px 36px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.12);border-radius:2px;cursor:pointer;transition:all .2s;}
+#loadBtn:hover{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.8);}
+#saveStatus{font-size:11px;color:rgba(212,168,68,0.6);letter-spacing:2px;min-height:14px;}
+.s-keys{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px;}
+.s-key{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:3px;padding:5px 11px;color:rgba(255,255,255,0.55);font-size:11px;display:flex;align-items:center;gap:5px;letter-spacing:1px;}
+.s-key kbd{background:rgba(255,255,255,0.08);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;}
+#hud{position:fixed;top:0;left:0;right:0;z-index:50;display:none;align-items:center;padding:0 28px;background:rgba(4,8,18,0.94);backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,168,68,0.18);pointer-events:none;height:52px;}
+.hud-brand{font-family:'Bebas Neue',sans-serif;font-size:17px;color:rgba(212,168,68,0.85);letter-spacing:4px;margin-right:auto;}
+.hud-div{width:1px;height:26px;background:rgba(255,255,255,0.07);margin:0 20px;}
 .hud-block{display:flex;flex-direction:column;align-items:flex-end;line-height:1;}
-.hud-lbl{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:3px;}
-.hud-val{font-family:'Bebas Neue',sans-serif;font-size:24px;}
+.hud-lbl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.28);margin-bottom:3px;}
+.hud-val{font-family:'Bebas Neue',sans-serif;font-size:23px;}
 #v-money{color:#d4a844;}#v-income{color:#4ecb71;}
-
-#progress{position:fixed;top:56px;left:0;right:0;z-index:50;height:2px;background:rgba(255,255,255,0.05);pointer-events:none;}
+#save-btn{pointer-events:all;padding:5px 14px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;background:rgba(212,168,68,0.12);color:rgba(212,168,68,0.8);border:1px solid rgba(212,168,68,0.3);border-radius:2px;cursor:pointer;margin-left:16px;transition:all .2s;}
+#save-btn:hover{background:rgba(212,168,68,0.22);color:#d4a844;}
+#save-flash{font-size:10px;color:#4ecb71;letter-spacing:2px;opacity:0;transition:opacity .3s;margin-left:8px;}
+#progress{position:fixed;top:52px;left:0;right:0;z-index:50;height:2px;background:rgba(255,255,255,0.05);pointer-events:none;}
 #progress-bar{height:100%;background:linear-gradient(90deg,#d4a844,#e8c96a);width:0%;transition:width .5s;}
-
-/* Next card */
-#nextCard{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:50;display:none;flex-direction:column;align-items:center;padding:14px 28px 12px;background:rgba(5,10,20,0.92);backdrop-filter:blur(16px);border:1px solid rgba(212,168,68,0.2);border-top:2px solid rgba(212,168,68,0.7);border-radius:2px;color:#fff;pointer-events:none;white-space:nowrap;text-align:center;}
-.nc-lbl{font-size:8px;text-transform:uppercase;letter-spacing:3px;color:rgba(212,168,68,0.7);margin-bottom:4px;}
-.nc-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;}
-.nc-cost{font-size:11px;color:rgba(212,168,68,0.8);margin-top:3px;letter-spacing:1px;}
-
-/* Buy prompt */
-#buyPrompt{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);z-index:50;display:none;padding:10px 28px;background:rgba(212,168,68,0.95);color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;border-radius:2px;pointer-events:none;animation:buyPulse 1s ease-in-out infinite;}
-@keyframes buyPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:0.95}50%{transform:translateX(-50%) scale(1.04);opacity:1}}
-
-/* Toast */
-#toast{position:fixed;top:72px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:50;padding:9px 24px;background:rgba(78,203,113,0.95);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;border-radius:2px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;}
+#nextCard{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:50;display:none;flex-direction:column;align-items:center;padding:12px 26px 10px;background:rgba(4,8,18,0.93);backdrop-filter:blur(16px);border:1px solid rgba(212,168,68,0.18);border-top:2px solid rgba(212,168,68,0.65);border-radius:2px;color:#fff;pointer-events:none;white-space:nowrap;text-align:center;}
+.nc-lbl{font-size:7px;text-transform:uppercase;letter-spacing:3px;color:rgba(212,168,68,0.65);margin-bottom:3px;}
+.nc-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;}
+.nc-cost{font-size:11px;color:rgba(212,168,68,0.75);margin-top:2px;letter-spacing:1px;}
+#buyPrompt{position:fixed;bottom:106px;left:50%;transform:translateX(-50%);z-index:50;display:none;padding:9px 26px;background:rgba(212,168,68,0.95);color:#0a0a0a;font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;border-radius:2px;pointer-events:none;animation:buyPulse 1s ease-in-out infinite;}
+@keyframes buyPulse{0%,100%{transform:translateX(-50%) scale(1);opacity:.92}50%{transform:translateX(-50%) scale(1.04);opacity:1}}
+#toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-10px);z-index:50;padding:8px 22px;background:rgba(78,203,113,0.95);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:2px;border-radius:2px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;}
 #toast.visible{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
-
 <div id="startScreen">
     <div class="s-logo">The</div>
     <div class="s-title">GRAND<br>MERIDIAN</div>
     <div class="s-divider"></div>
-    <div class="s-sub">Luxury Resort & Spa</div>
-    <button id="playBtn" onclick="startGame()">BEGIN CONSTRUCTION</button>
+    <div class="s-sub">Luxury Resort &amp; Spa</div>
+    <button id="playBtn" onclick="startGame(false)">NEW GAME</button>
+    <button id="loadBtn" onclick="startGame(true)">CONTINUE SAVE</button>
+    <div id="saveStatus"></div>
     <div class="s-keys">
         <div class="s-key"><kbd>W</kbd><kbd>S</kbd> Move</div>
         <div class="s-key"><kbd>A</kbd><kbd>D</kbd> Turn</div>
@@ -65,16 +60,16 @@ canvas{position:fixed;top:0;left:0;width:100%!important;height:100%!important;z-
         <div class="s-key"><kbd>E</kbd> Buy</div>
     </div>
 </div>
-
 <div id="hud">
     <div class="hud-brand">Grand Meridian</div>
-    <div class="hud-divider"></div>
-    <div class="hud-block"><div class="hud-lbl">Balance</div><div class="hud-val" id="v-money">$200</div></div>
-    <div class="hud-divider"></div>
+    <div class="hud-div"></div>
+    <div class="hud-block"><div class="hud-lbl">Balance</div><div class="hud-val" id="v-money">$500</div></div>
+    <div class="hud-div"></div>
     <div class="hud-block"><div class="hud-lbl">Revenue/sec</div><div class="hud-val" id="v-income">$0</div></div>
+    <button id="save-btn" onclick="saveGame()">SAVE</button>
+    <span id="save-flash">SAVED</span>
 </div>
 <div id="progress"><div id="progress-bar"></div></div>
-
 <div id="nextCard">
     <div class="nc-lbl">Next Construction</div>
     <div class="nc-name" id="nc-name">—</div>
@@ -86,200 +81,199 @@ canvas{position:fixed;top:0;left:0;width:100%!important;height:100%!important;z-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r140/three.min.js"></script>
 <script src="https://unpkg.com/three@0.140.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.140.0/build/three.min.js"></script>
-
 <script>
 'use strict';
-
-// ── globals ───────────────────────────────────────────────────────────────────
 let scene,cam,ren,clock,player;
 let gpsGroup,activePad=null;
-let wallet=200,income=0;
+let wallet=500,income=0;
 let vspeed=0,hspeed=0,jumping=false;
 let gameRunning=false,nearPad=false;
 const KEYS={},placed=[],padList=[],colliders=[];
-const PLAYER_R=0.65, PLAYER_H=3.2, PAD_FLOAT=1.0;
+const PLAYER_R=0.65,PLAYER_H=3.2,PAD_FLOAT=1.0;
 
-// ── materials (shared, realistic palette) ─────────────────────────────────────
-// Created lazily after THREE loads
-let MAT={};
-function initMaterials(){
-    const m=(c,r=0.7,met=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:met});
-    MAT={
-        // Structural
-        concrete:    m(0xcec8c0,0.9),
-        concreteDk:  m(0xa8a09a,0.85),
-        marble:      m(0xf2efea,0.15,0.05),
-        marbleGray:  m(0xd8d4ce,0.2,0.05),
-        marbleDk:    m(0xc0bab2,0.25),
-        plaster:     m(0xece8e0,0.95),
-        plasterWarm: m(0xe8e0d4,0.92),
-        // Wood
-        oakLight:    m(0xc4a06c,0.8),
-        oakMid:      m(0x9c7840,0.75),
-        oakDk:       m(0x785030,0.72),
-        walnut:      m(0x5a3820,0.68),
-        ebony:       m(0x1a1210,0.65),
-        // Metal
-        brushedSteel:m(0xa8b4bc,0.35,0.8),
-        chrome:      m(0xd0dce4,0.15,0.95),
-        brass:       m(0xc8a040,0.3,0.7),
-        darkMetal:   m(0x3a4048,0.4,0.7),
-        // Fabric
-        cream:       m(0xf0ece0,0.95),
-        linen:       m(0xe4ddd0,0.98),
-        navyFabric:  m(0x1e2d4a,0.96),
-        tealFabric:  m(0x1a4a50,0.95),
-        charcoalFab: m(0x282c32,0.97),
-        burgundy:    m(0x6a1e28,0.94),
-        warmGray:    m(0x8a8480,0.92),
-        // Glass
-        glassBlue:   m(0x90c8e0,0.05,0.1),
-        glassClear:  m(0xd0e8f0,0.02,0.05),
-        // Nature
-        grass:       m(0x5a9e5a,0.95),
-        darkGrass:   m(0x3a7a3a,0.97),
-        palmGreen:   m(0x2a7a38,0.9),
-        trunk:       m(0x7a5828,0.85),
-        // Misc
-        gold:        m(0xc8980c,0.2,0.8),
-        goldLight:   m(0xe0b040,0.25,0.75),
-        offWhite:    m(0xf5f2ec,0.9),
-        white:       m(0xffffff,0.3,0.02),
-        black:       m(0x0e0e0e,0.4),
-        charcoal:    m(0x1e2228,0.45),
-        poolBlue:    m(0x0090b8,0.05,0.1),
-        tileCream:   m(0xe8e0d4,0.4),
-        tileGray:    m(0xb8b0a8,0.45),
-        // Path
-        path:        m(0xd8cfc0,0.88),
-        pathDk:      m(0xb8b0a4,0.9),
+// ── SAVE/LOAD via localStorage (works on Chromebooks, no login) ───────────────
+const SAVE_KEY='grand_meridian_v2';
+function saveGame(){
+    try{
+        const data={wallet:Math.floor(wallet),income:Math.floor(income),
+            bought:STEPS.filter(s=>s.bought).map(s=>s.id),
+            px:Math.round(player?player.position.x:0),
+            pz:Math.round(player?player.position.z:0),ts:Date.now()};
+        localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+        const fl=document.getElementById('save-flash');
+        fl.style.opacity='1';
+        setTimeout(()=>fl.style.opacity='0',1800);
+    }catch(e){console.warn('Save failed:',e);}
+}
+function loadSave(){
+    try{const r=localStorage.getItem(SAVE_KEY);return r?JSON.parse(r):null;}
+    catch(e){return null;}
+}
+function hasSave(){
+    try{const d=loadSave();return !!(d&&d.bought&&d.bought.length>0);}
+    catch(e){return false;}
+}
+window.addEventListener('DOMContentLoaded',()=>{
+    if(hasSave()){
+        const d=loadSave();
+        const ts=new Date(d.ts);
+        document.getElementById('saveStatus').textContent=
+            'SAVE — '+d.bought.length+' BUILDINGS — '+ts.toLocaleDateString();
+        document.getElementById('loadBtn').style.color='rgba(212,168,68,0.9)';
+        document.getElementById('loadBtn').style.borderColor='rgba(212,168,68,0.4)';
+    } else {
+        document.getElementById('loadBtn').style.opacity='0.3';
+        document.getElementById('loadBtn').style.pointerEvents='none';
+        document.getElementById('saveStatus').textContent='NO SAVE FOUND';
+    }
+});
+setInterval(()=>{if(gameRunning)saveGame();},60000);
+window.addEventListener('beforeunload',()=>{if(gameRunning)saveGame();});
+
+// ── Materials ─────────────────────────────────────────────────────────────────
+let M={};
+function initMats(){
+    const s=(c,r=0.75,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+    M={
+        concrete:s(0xc0bab2,0.88),concreteDk:s(0x9a9490,0.85),stoneLight:s(0xb4aea8,0.84),stone:s(0x8a8278,0.86),slate:s(0x4a5060,0.82),
+        marble:s(0xf0ece4,0.12,0.04),marbleGray:s(0xd0cbc4,0.18,0.04),
+        plaster:s(0xece8de,0.94),plasterWm:s(0xe6dfd0,0.92),offWhite:s(0xf2ece0,0.88),
+        oakLt:s(0xbe9050,0.78),oakMd:s(0x906028,0.75),oakDk:s(0x683818,0.72),walnut:s(0x4e2e14,0.68),ebony:s(0x161210,0.62),
+        steel:s(0x9ab0bc,0.3,0.85),chrome:s(0xd0dce8,0.12,0.96),brass:s(0xb08820,0.28,0.75),darkMet:s(0x2e3840,0.4,0.72),
+        cream:s(0xf0e8d0,0.95),linen:s(0xdcd0b4,0.97),ivory:s(0xf6eed8,0.93),
+        navyFab:s(0x18263e,0.96),tealFab:s(0x0e3e3e,0.95),charFab:s(0x22262e,0.97),
+        burg:s(0x640c18,0.94),sage:s(0x485848,0.9),warmGray:s(0x686058,0.92),
+        glassBlue:s(0x70b0d0,0.06,0.08),glassClear:s(0xbcd8e8,0.04,0.05),
+        grass:s(0x489040,0.95),palmGn:s(0x267028,0.9),trunk:s(0x6c4e1e,0.85),
+        poolBlue:s(0x0078a8,0.04,0.08),poolTile:s(0x98b8c8,0.45),
+        gold:s(0xb88c10,0.2,0.82),goldLt:s(0xd0a228,0.22,0.78),
+        white:s(0xf8f8f6,0.28,0.02),black:s(0x0c0e10,0.42),charcoal:s(0x1c2028,0.44),
+        path:s(0xc2b8a4,0.88),
+        // Distinctly visible accent colors
+        cobalt:s(0x1428a0,0.88),          // bright cobalt for pool chairs
+        terracotta:s(0xb04030,0.85),      // terracotta umbrellas
+        burgundyFab:s(0x7a1020,0.94),     // burgundy accents
     };
+    M.brushedSteel=M.steel;
+    M.concreteLt=M.stoneLight;
+    M.concreteDk2=M.concreteDk;
 }
 
-// ── build steps ───────────────────────────────────────────────────────────────
-// type: floor | wall | block | palm | custom
-// wall has: doorW, doorH (gap dimensions)
-// ox,oz: pad offset from parent center
+// ── Steps ─────────────────────────────────────────────────────────────────────
 const STEPS=[
-// ══ GRAND LOBBY ══════════════════════════════════════════════════════════════
-{id:1,  x:0,   z:0,   cost:0,     label:'Lobby Foundation Slab',  type:'floor', mat:'concrete',   inc:5,    w:60,h:0.7, d:60,  need:0,  ox:0,  oz:34},
-{id:2,  x:0,   z:0,   cost:100,   label:'Marble Lobby Floor',     type:'floor', mat:'marble',     inc:12,   w:58,h:0.25,d:58,  need:1,  ox:0,  oz:33},
-{id:3,  x:0,   z:28,  cost:300,   label:'Glass Entry Facade',     type:'wall',  mat:'glassBlue',  inc:25,   w:60,h:8,  d:0.5, need:2,  ox:0,  oz:-10, doorW:6,doorH:6.5},
-{id:4,  x:-29, z:0,   cost:250,   label:'Left Lobby Wall',        type:'wall',  mat:'plasterWarm',inc:20,   w:0.5,h:8,d:58,  need:3,  ox:5,  oz:0,   doorW:5,doorH:6.5},
-{id:5,  x:29,  z:0,   cost:250,   label:'Right Lobby Wall',       type:'wall',  mat:'plasterWarm',inc:20,   w:0.5,h:8,d:58,  need:4,  ox:-5, oz:0,   doorW:5,doorH:6.5},
-{id:6,  x:0,   z:-28, cost:250,   label:'Back Lobby Wall',        type:'wall',  mat:'plasterWarm',inc:20,   w:60,h:8, d:0.5, need:5,  ox:0,  oz:7,   doorW:5,doorH:6.5},
-{id:7,  x:0,   z:16,  cost:500,   label:'Reception Counter',      type:'custom',mat:'walnut',     inc:30,   w:20,h:1.3,d:2.5, need:6,  ox:14, oz:0,   custom:'reception'},
-{id:8,  x:3,   z:16,  cost:200,   label:'Computer Terminals',     type:'block', mat:'darkMetal',  inc:15,   w:6, h:0.8, d:0.4, need:7,  ox:14, oz:0},
-{id:9,  x:-20, z:10,  cost:400,   label:'Lobby Seating A',        type:'custom',mat:'navyFabric', inc:25,   w:8, h:1,   d:3,   need:8,  ox:-9, oz:0,   custom:'sofa'},
-{id:10, x:-20, z:3,   cost:400,   label:'Lobby Seating B',        type:'custom',mat:'navyFabric', inc:25,   w:8, h:1,   d:3,   need:9,  ox:-9, oz:0,   custom:'sofa'},
-{id:11, x:-20, z:6.5, cost:250,   label:'Marble Coffee Table',    type:'custom',mat:'marbleGray', inc:18,   w:4, h:0.5, d:1.8, need:10, ox:-9, oz:0,   custom:'table'},
-{id:12, x:20,  z:10,  cost:400,   label:'Lobby Seating C',        type:'custom',mat:'tealFabric', inc:25,   w:8, h:1,   d:3,   need:11, ox:9,  oz:0,   custom:'sofa'},
-{id:13, x:20,  z:3,   cost:400,   label:'Lobby Seating D',        type:'custom',mat:'tealFabric', inc:25,   w:8, h:1,   d:3,   need:12, ox:9,  oz:0,   custom:'sofa'},
-{id:14, x:20,  z:6.5, cost:250,   label:'Side Coffee Table',      type:'custom',mat:'oakMid',     inc:18,   w:4, h:0.5, d:1.8, need:13, ox:9,  oz:0,   custom:'table'},
-{id:15, x:0,   z:-16, cost:600,   label:'Grand Piano',            type:'custom',mat:'ebony',      inc:55,   w:5, h:1.4, d:4,   need:14, ox:8,  oz:0,   custom:'piano'},
-{id:16, x:-22, z:-20, cost:350,   label:'Lobby Planter L',        type:'palm',  mat:'palmGreen',  inc:15,   w:2, h:6,   d:2,   need:15, ox:-5, oz:0},
-{id:17, x:22,  z:-20, cost:350,   label:'Lobby Planter R',        type:'palm',  mat:'palmGreen',  inc:15,   w:2, h:6,   d:2,   need:16, ox:5,  oz:0},
-{id:18, x:0,   z:0,   cost:800,   label:'Coffered Ceiling',       type:'custom',mat:'plaster',    inc:20,   w:60,h:0.6, d:60,  need:17, ox:0,  oz:33,  custom:'ceiling'},
-{id:19, x:0,   z:0,   cost:1200,  label:'Chandelier Array',       type:'custom',mat:'brass',      inc:30,   w:60,h:1,   d:60,  need:18, ox:0,  oz:33,  custom:'chandeliers'},
-
-// ══ HOTEL SUITE WING ════════════════════════════════════════════════════════
-{id:20, x:0,   z:-74, cost:5000,  label:'Suite Wing Foundation',  type:'floor', mat:'concrete',   inc:100,  w:36,h:0.7, d:36,  need:19, ox:0,  oz:-22},
-{id:21, x:0,   z:-74, cost:800,   label:'Suite Hardwood Floor',   type:'floor', mat:'oakLight',   inc:60,   w:34,h:0.2, d:34,  need:20, ox:0,  oz:-21},
-{id:22, x:-17, z:-74, cost:600,   label:'Suite Left Wall',        type:'wall',  mat:'plasterWarm',inc:25,   w:0.5,h:7,d:36,  need:21, ox:5,  oz:0,   doorW:4,doorH:6},
-{id:23, x:17,  z:-74, cost:600,   label:'Suite Right Wall',       type:'wall',  mat:'plasterWarm',inc:25,   w:0.5,h:7,d:36,  need:22, ox:-5, oz:0,   doorW:4,doorH:6},
-{id:24, x:0,   z:-56, cost:600,   label:'Suite Entry Wall',       type:'wall',  mat:'plasterWarm',inc:25,   w:36,h:7, d:0.5, need:23, ox:0,  oz:-7,  doorW:4,doorH:6},
-{id:25, x:0,   z:-92, cost:600,   label:'Suite Back Wall',        type:'wall',  mat:'plasterWarm',inc:25,   w:36,h:7, d:0.5, need:24, ox:0,  oz:7,   doorW:4,doorH:6},
-{id:26, x:0,   z:-80, cost:2500,  label:'King Bed Frame',         type:'custom',mat:'walnut',     inc:80,   w:14,h:1.2,d:16,  need:25, ox:12, oz:0,   custom:'bedframe'},
-{id:27, x:0,   z:-80, cost:1200,  label:'Premium Mattress',       type:'custom',mat:'cream',      inc:45,   w:13,h:1.0,d:15,  need:26, ox:12, oz:0,   custom:'mattress'},
-{id:28, x:0,   z:-70, cost:350,   label:'Goose Down Pillows',     type:'custom',mat:'white',      inc:18,   w:10,h:0.5,d:3,   need:27, ox:12, oz:0,   custom:'pillows'},
-{id:29, x:-11, z:-84, cost:800,   label:'Nightstand Left',        type:'custom',mat:'walnut',     inc:25,   w:3.5,h:1.6,d:3.5, need:28, ox:-9, oz:0,  custom:'nightstand'},
-{id:30, x:11,  z:-84, cost:800,   label:'Nightstand Right',       type:'custom',mat:'walnut',     inc:25,   w:3.5,h:1.6,d:3.5, need:29, ox:9,  oz:0,  custom:'nightstand'},
-{id:31, x:-11, z:-84, cost:450,   label:'Bedside Lamp Left',      type:'custom',mat:'brass',      inc:15,   w:1,  h:2.8, d:1,   need:30, ox:-9, oz:0,  custom:'lamp'},
-{id:32, x:11,  z:-84, cost:450,   label:'Bedside Lamp Right',     type:'custom',mat:'brass',      inc:15,   w:1,  h:2.8, d:1,   need:31, ox:9,  oz:0,  custom:'lamp'},
-{id:33, x:0,   z:-60, cost:3000,  label:'Wall-mounted TV',        type:'custom',mat:'black',      inc:120,  w:14, h:5,   d:0.3, need:32, ox:0,  oz:5,  custom:'tv'},
-{id:34, x:-13, z:-67, cost:900,   label:'Armchair',               type:'custom',mat:'charcoalFab',inc:35,   w:4,  h:1.8, d:4,   need:33, ox:-9, oz:0,  custom:'armchair'},
-{id:35, x:13,  z:-67, cost:900,   label:'Writing Desk',           type:'custom',mat:'walnut',     inc:35,   w:7,  h:2,   d:3,   need:34, ox:9,  oz:0,  custom:'desk'},
-{id:36, x:0,   z:-96, cost:2000,  label:'Marble Bathroom Floor',  type:'floor', mat:'marbleGray', inc:45,   w:18, h:0.25,d:14,  need:35, ox:0,  oz:-10},
-{id:37, x:4,   z:-100,cost:1400,  label:'Freestanding Tub',       type:'custom',mat:'white',      inc:70,   w:8,  h:2,   d:4.5, need:36, ox:9,  oz:0,  custom:'bathtub'},
-{id:38, x:-5,  z:-98, cost:700,   label:'Double Vanity',          type:'custom',mat:'marble',     inc:28,   w:5,  h:2,   d:2,   need:37, ox:-9, oz:0,  custom:'vanity'},
-{id:39, x:-5,  z:-94, cost:400,   label:'Toilet',                 type:'custom',mat:'white',      inc:18,   w:2,  h:2,   d:2.5, need:38, ox:-9, oz:0,  custom:'toilet'},
-{id:40, x:0,   z:-74, cost:1500,  label:'Suite Ceiling & Crown',  type:'floor', mat:'plaster',    inc:25,   w:36, h:0.4, d:36,  need:39, ox:0,  oz:-21},
-
-// ══ POOL & SPA ══════════════════════════════════════════════════════════════
-{id:41, x:88,  z:0,   cost:15000, label:'Pool Terrace Foundation',type:'floor', mat:'tileCream',  inc:350,  w:68, h:0.6, d:80,  need:40, ox:0,  oz:-45},
-{id:42, x:88,  z:0,   cost:25000, label:'Infinity Pool',          type:'custom',mat:'poolBlue',   inc:800,  w:42, h:0.8, d:50,  need:41, ox:25, oz:0,  custom:'pool'},
-{id:43, x:88,  z:0,   cost:3000,  label:'Pool Coping & Edge',     type:'floor', mat:'marble',     inc:80,   w:46, h:0.3, d:54,  need:42, ox:25, oz:0},
-{id:44, x:67,  z:20,  cost:1800,  label:'Teak Lounger A',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:43, ox:-7, oz:0,  custom:'lounger'},
-{id:45, x:67,  z:9,   cost:1800,  label:'Teak Lounger B',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:44, ox:-7, oz:0,  custom:'lounger'},
-{id:46, x:67,  z:-2,  cost:1800,  label:'Teak Lounger C',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:45, ox:-7, oz:0,  custom:'lounger'},
-{id:47, x:67,  z:-13, cost:1800,  label:'Teak Lounger D',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:46, ox:-7, oz:0,  custom:'lounger'},
-{id:48, x:109, z:20,  cost:1800,  label:'Teak Lounger E',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:47, ox:7,  oz:0,  custom:'lounger'},
-{id:49, x:109, z:6,   cost:1800,  label:'Teak Lounger F',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:48, ox:7,  oz:0,  custom:'lounger'},
-{id:50, x:109, z:-8,  cost:1800,  label:'Teak Lounger G',         type:'custom',mat:'oakDk',      inc:60,   w:2.5,h:0.6, d:8,   need:49, ox:7,  oz:0,  custom:'lounger'},
-{id:51, x:67,  z:15,  cost:1200,  label:'Pool Umbrella A',        type:'custom',mat:'cream',      inc:30,   w:0.4,h:5,   d:0.4, need:50, ox:-7, oz:0,  custom:'umbrella'},
-{id:52, x:67,  z:-7,  cost:1200,  label:'Pool Umbrella B',        type:'custom',mat:'cream',      inc:30,   w:0.4,h:5,   d:0.4, need:51, ox:-7, oz:0,  custom:'umbrella'},
-{id:53, x:109, z:12,  cost:1200,  label:'Pool Umbrella C',        type:'custom',mat:'cream',      inc:30,   w:0.4,h:5,   d:0.4, need:52, ox:7,  oz:0,  custom:'umbrella'},
-{id:54, x:109, z:-4,  cost:1200,  label:'Pool Umbrella D',        type:'custom',mat:'cream',      inc:30,   w:0.4,h:5,   d:0.4, need:53, ox:7,  oz:0,  custom:'umbrella'},
-{id:55, x:88,  z:-46, cost:18000, label:'Pool Bar & Pavilion',    type:'custom',mat:'walnut',     inc:700,  w:16, h:3.5, d:6,   need:54, ox:0,  oz:-9, custom:'bar'},
-{id:56, x:88,  z:-40, cost:3500,  label:'Bar Seating',            type:'custom',mat:'oakMid',     inc:100,  w:14, h:2,   d:1.8, need:55, ox:0,  oz:5,  custom:'barstools'},
-{id:57, x:70,  z:-38, cost:2800,  label:'Pool Palm A',            type:'palm',  mat:'palmGreen',  inc:70,   w:2,  h:10,  d:2,   need:56, ox:-6, oz:0},
-{id:58, x:106, z:-38, cost:2800,  label:'Pool Palm B',            type:'palm',  mat:'palmGreen',  inc:70,   w:2,  h:10,  d:2,   need:57, ox:6,  oz:0},
-{id:59, x:70,  z:40,  cost:2800,  label:'Pool Palm C',            type:'palm',  mat:'palmGreen',  inc:70,   w:2,  h:10,  d:2,   need:58, ox:-6, oz:0},
-{id:60, x:106, z:40,  cost:2800,  label:'Pool Palm D',            type:'palm',  mat:'palmGreen',  inc:70,   w:2,  h:10,  d:2,   need:59, ox:6,  oz:0},
-{id:61, x:88,  z:48,  cost:8000,  label:'Jacuzzi Spa',            type:'custom',mat:'marble',     inc:300,  w:10, h:2,   d:10,  need:60, ox:9,  oz:0,  custom:'jacuzzi'},
-
-// ══ FINE DINING RESTAURANT ══════════════════════════════════════════════════
-{id:62, x:-90, z:0,   cost:22000, label:'Restaurant Foundation',  type:'floor', mat:'concrete',   inc:600,  w:56, h:0.7, d:56,  need:61, ox:0,  oz:-33},
-{id:63, x:-90, z:0,   cost:3000,  label:'Herringbone Oak Floor',  type:'floor', mat:'oakMid',     inc:80,   w:54, h:0.2, d:54,  need:62, ox:0,  oz:-32},
-{id:64, x:-62, z:0,   cost:900,   label:'Restaurant Front Wall',  type:'wall',  mat:'plasterWarm',inc:30,   w:0.5,h:8,d:56,  need:63, ox:5,  oz:0,   doorW:5,doorH:7},
-{id:65, x:-118,z:0,   cost:900,   label:'Restaurant Back Wall',   type:'wall',  mat:'plasterWarm',inc:30,   w:0.5,h:8,d:56,  need:64, ox:-5, oz:0,   doorW:5,doorH:7},
-{id:66, x:-90, z:28,  cost:900,   label:'Restaurant Side Wall A', type:'wall',  mat:'plasterWarm',inc:30,   w:56, h:8, d:0.5, need:65, ox:0,  oz:-7,  doorW:5,doorH:7},
-{id:67, x:-90, z:-28, cost:900,   label:'Restaurant Side Wall B', type:'wall',  mat:'plasterWarm',inc:30,   w:56, h:8, d:0.5, need:66, ox:0,  oz:7,   doorW:5,doorH:7},
-{id:68, x:-80, z:10,  cost:2800,  label:'Dining Table A',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:67, ox:7,  oz:0,  custom:'diningtable'},
-{id:69, x:-80, z:-4,  cost:2800,  label:'Dining Table B',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:68, ox:7,  oz:0,  custom:'diningtable'},
-{id:70, x:-92, z:10,  cost:2800,  label:'Dining Table C',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:69, ox:-8, oz:0,  custom:'diningtable'},
-{id:71, x:-92, z:-4,  cost:2800,  label:'Dining Table D',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:70, ox:-8, oz:0,  custom:'diningtable'},
-{id:72, x:-104,z:10,  cost:2800,  label:'Dining Table E',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:71, ox:-9, oz:0,  custom:'diningtable'},
-{id:73, x:-104,z:-4,  cost:2800,  label:'Dining Table F',         type:'custom',mat:'walnut',     inc:90,   w:5,  h:1.8, d:5,   need:72, ox:-9, oz:0,  custom:'diningtable'},
-{id:74, x:-90, z:-22, cost:14000, label:'Exhibition Kitchen',     type:'custom',mat:'brushedSteel',inc:500, w:26, h:3.5, d:7,   need:73, ox:0,  oz:-9, custom:'kitchen'},
-{id:75, x:-90, z:-22, cost:4000,  label:'Kitchen Pass Counter',   type:'custom',mat:'marble',     inc:150,  w:24, h:0.3, d:6.8, need:74, ox:0,  oz:8,  custom:'counter'},
-{id:76, x:-90, z:22,  cost:8000,  label:'Wine & Cocktail Bar',    type:'custom',mat:'walnut',     inc:400,  w:20, h:3.2, d:5,   need:75, ox:0,  oz:-8, custom:'bar'},
-{id:77, x:-90, z:22,  cost:3000,  label:'Bar Stools',             type:'custom',mat:'brushedSteel',inc:100, w:18, h:2.2, d:2,   need:76, ox:0,  oz:6,  custom:'barstools'},
-{id:78, x:-72, z:0,   cost:2000,  label:'Feature Palm A',         type:'palm',  mat:'palmGreen',  inc:40,   w:2,  h:7,   d:2,   need:77, ox:5,  oz:0},
-{id:79, x:-108,z:0,   cost:2000,  label:'Feature Palm B',         type:'palm',  mat:'palmGreen',  inc:40,   w:2,  h:7,   d:2,   need:78, ox:-5, oz:0},
-{id:80, x:-90, z:0,   cost:2000,  label:'Restaurant Ceiling',     type:'floor', mat:'plaster',    inc:30,   w:56, h:0.4, d:56,  need:79, ox:0,  oz:-32},
-
-// ══ BRIDGE ══════════════════════════════════════════════════════════════════
-{id:81, x:0,   z:-140,cost:70000, label:'Bridge Abutment',        type:'custom',mat:'concreteLight',inc:1500,w:24,h:2,  d:28,  need:80, ox:0,  oz:-18, custom:'abutment'},
-{id:82, x:-10, z:-172,cost:110000,label:'Pylon Tower Left',       type:'custom',mat:'concreteLight',inc:2500,w:4, h:40, d:4,   need:81, ox:-9, oz:0,  custom:'pylon'},
-{id:83, x:10,  z:-172,cost:110000,label:'Pylon Tower Right',      type:'custom',mat:'concreteLight',inc:2500,w:4, h:40, d:4,   need:82, ox:9,  oz:0,  custom:'pylon'},
-{id:84, x:0,   z:-172,cost:60000, label:'Pylon Cross Beam',       type:'block', mat:'concreteLight',inc:900, w:26,h:2.5,d:2.5, need:83, ox:-10,oz:0},
-{id:85, x:0,   z:-172,cost:130000,label:'Bridge Deck',            type:'floor', mat:'concreteLight',inc:4000,w:22,h:1.5,d:140, need:84, ox:16, oz:0},
-{id:86, x:-10, z:-172,cost:30000, label:'Parapet Left',           type:'block', mat:'concreteLight',inc:600, w:1, h:3,  d:140, need:85, ox:-13,oz:0},
-{id:87, x:10,  z:-172,cost:30000, label:'Parapet Right',          type:'block', mat:'concreteLight',inc:600, w:1, h:3,  d:140, need:86, ox:13, oz:0},
-{id:88, x:-10, z:-142,cost:18000, label:'Bridge Lamp Post L A',   type:'custom',mat:'darkMetal',   inc:250, w:0.6,h:6, d:0.6, need:87, ox:-12,oz:0,  custom:'lamppost'},
-{id:89, x:10,  z:-142,cost:18000, label:'Bridge Lamp Post R A',   type:'custom',mat:'darkMetal',   inc:250, w:0.6,h:6, d:0.6, need:88, ox:12, oz:0,  custom:'lamppost'},
-{id:90, x:-10, z:-200,cost:18000, label:'Bridge Lamp Post L B',   type:'custom',mat:'darkMetal',   inc:250, w:0.6,h:6, d:0.6, need:89, ox:-12,oz:0,  custom:'lamppost'},
-{id:91, x:10,  z:-200,cost:18000, label:'Bridge Lamp Post R B',   type:'custom',mat:'darkMetal',   inc:250, w:0.6,h:6, d:0.6, need:90, ox:12, oz:0,  custom:'lamppost'},
-
-// ══ MOUNTAIN LODGE ══════════════════════════════════════════════════════════
-{id:92, x:0,   z:-280,cost:300000,label:'Mountain Base Slab',     type:'floor', mat:'concreteLight',inc:7000,w:100,h:1, d:100, need:91, ox:0,  oz:-58},
-{id:93, x:0,   z:-300,cost:100000,label:'Lodge Structure',        type:'wall',  mat:'oakDk',       inc:3000, w:50,h:14,d:50,  need:92, ox:30, oz:0,  doorW:7,doorH:9},
-{id:94, x:0,   z:-300,cost:55000, label:'Lodge Interior Floor',   type:'floor', mat:'walnut',      inc:1200, w:48,h:0.3,d:48,  need:93, ox:0,  oz:0},
-{id:95, x:0,   z:-300,cost:70000, label:'A-Frame Roof',           type:'custom',mat:'ebony',       inc:2500, w:52,h:6, d:52,  need:94, ox:30, oz:0,  custom:'aroof'},
-{id:96, x:-18, z:-294,cost:15000, label:'Stone Fireplace',        type:'custom',mat:'concreteLight',inc:800, w:5, h:8, d:5,   need:95, ox:-10,oz:0,  custom:'fireplace'},
-{id:97, x:0,   z:-294,cost:12000, label:'Lodge Sectional Sofa',   type:'custom',mat:'burgundy',    inc:700,  w:12,h:1.8,d:5,  need:96, ox:9,  oz:0,  custom:'sofa'},
-{id:98, x:0,   z:-290,cost:5000,  label:'Reclaimed Wood Table',   type:'custom',mat:'oakDk',       inc:400,  w:6, h:1.5, d:3,  need:97, ox:9,  oz:0,  custom:'table'},
-{id:99, x:18,  z:-294,cost:9000,  label:'Lodge Bar',              type:'custom',mat:'walnut',       inc:500,  w:9, h:3,   d:4,  need:98, ox:11, oz:0,  custom:'bar'},
-{id:100,x:-28, z:-284,cost:12000, label:'Ski Equipment Wall',     type:'custom',mat:'darkMetal',    inc:450,  w:8, h:5,   d:1.5,need:99, ox:-10,oz:0, custom:'skiwall'},
-{id:101,x:-40, z:-310,cost:11000, label:'Alpine Pine A',          type:'palm',  mat:'palmGreen',    inc:280,  w:4, h:18,  d:4,  need:100,ox:-9, oz:0},
-{id:102,x:40,  z:-310,cost:11000, label:'Alpine Pine B',          type:'palm',  mat:'palmGreen',    inc:280,  w:4, h:18,  d:4,  need:101,ox:9,  oz:0},
-{id:103,x:-24, z:-328,cost:11000, label:'Alpine Pine C',          type:'palm',  mat:'palmGreen',    inc:280,  w:4, h:18,  d:4,  need:102,ox:-9, oz:0},
-{id:104,x:24,  z:-328,cost:11000, label:'Alpine Pine D',          type:'palm',  mat:'palmGreen',    inc:280,  w:4, h:18,  d:4,  need:103,ox:9,  oz:0},
-{id:105,x:0,   z:-268,cost:800000,label:'Grand Meridian Arch',    type:'custom',mat:'goldLight',    inc:30000,w:20,h:8,  d:3,  need:104,ox:0,  oz:8,  custom:'arch'},
+// LOBBY
+{id:1,  x:0,   z:0,   cost:0,     label:'Lobby Foundation Slab',  type:'floor', mat:'concrete',  inc:5,   w:60,h:0.7,d:60,  need:0,  ox:0,  oz:34},
+{id:2,  x:0,   z:0,   cost:100,   label:'Marble Lobby Floor',     type:'floor', mat:'marble',    inc:12,  w:58,h:0.22,d:58, need:1,  ox:0,  oz:33},
+{id:3,  x:0,   z:28,  cost:300,   label:'Glass Entry Facade',     type:'wall',  mat:'glassBlue', inc:25,  w:60,h:8,d:0.5,  need:2,  ox:0,  oz:-10,doorW:6,doorH:6.5},
+{id:4,  x:-29, z:0,   cost:250,   label:'Left Lobby Wall',        type:'wall',  mat:'plasterWm', inc:20,  w:0.5,h:8,d:58,  need:3,  ox:5,  oz:0,  doorW:5,doorH:6.5},
+{id:5,  x:29,  z:0,   cost:250,   label:'Right Lobby Wall',       type:'wall',  mat:'plasterWm', inc:20,  w:0.5,h:8,d:58,  need:4,  ox:-5, oz:0,  doorW:5,doorH:6.5},
+{id:6,  x:0,   z:-28, cost:250,   label:'Back Lobby Wall',        type:'wall',  mat:'plasterWm', inc:20,  w:60,h:8,d:0.5,  need:5,  ox:0,  oz:7,  doorW:5,doorH:6.5},
+{id:7,  x:0,   z:16,  cost:500,   label:'Reception Counter',      type:'custom',mat:'walnut',    inc:30,  w:20,h:1.3,d:2.5, need:6,  ox:14, oz:0,  custom:'reception'},
+{id:8,  x:3,   z:16,  cost:200,   label:'Computer Terminals',     type:'custom',mat:'charcoal',  inc:15,  w:6, h:0.8,d:0.4, need:7,  ox:14, oz:0,  custom:'monitors'},
+{id:9,  x:-18, z:8,   cost:400,   label:'Lobby Sofa Left A',      type:'custom',mat:'navyFab',   inc:25,  w:8, h:1,  d:3,   need:8,  ox:-10,oz:0,  custom:'sofa'},
+{id:10, x:-18, z:1,   cost:400,   label:'Lobby Sofa Left B',      type:'custom',mat:'navyFab',   inc:25,  w:8, h:1,  d:3,   need:9,  ox:-10,oz:0,  custom:'sofa'},
+{id:11, x:-18, z:4.5, cost:250,   label:'Coffee Table Left',      type:'custom',mat:'marbleGray',inc:18,  w:3.5,h:0.45,d:1.6,need:10,ox:-10,oz:0,  custom:'coffeetable'},
+{id:12, x:18,  z:8,   cost:400,   label:'Lobby Sofa Right A',     type:'custom',mat:'tealFab',   inc:25,  w:8, h:1,  d:3,   need:11, ox:10, oz:0,  custom:'sofa'},
+{id:13, x:18,  z:1,   cost:400,   label:'Lobby Sofa Right B',     type:'custom',mat:'tealFab',   inc:25,  w:8, h:1,  d:3,   need:12, ox:10, oz:0,  custom:'sofa'},
+{id:14, x:18,  z:4.5, cost:250,   label:'Coffee Table Right',     type:'custom',mat:'marbleGray',inc:18,  w:3.5,h:0.45,d:1.6,need:13,ox:10, oz:0,  custom:'coffeetable'},
+{id:15, x:0,   z:-16, cost:600,   label:'Grand Piano',            type:'custom',mat:'ebony',     inc:55,  w:5, h:1.4,d:4.2, need:14, ox:8,  oz:0,  custom:'piano'},
+{id:16, x:-22, z:-20, cost:350,   label:'Lobby Planter Left',     type:'palm',  mat:'palmGn',    inc:15,  w:2, h:6,  d:2,   need:15, ox:-5, oz:0},
+{id:17, x:22,  z:-20, cost:350,   label:'Lobby Planter Right',    type:'palm',  mat:'palmGn',    inc:15,  w:2, h:6,  d:2,   need:16, ox:5,  oz:0},
+{id:18, x:0,   z:0,   cost:800,   label:'Coffered Ceiling',       type:'custom',mat:'plaster',   inc:20,  w:60,h:0.5,d:60,  need:17, ox:0,  oz:33, custom:'ceiling'},
+{id:19, x:0,   z:0,   cost:1200,  label:'Chandelier Array',       type:'custom',mat:'brass',     inc:30,  w:60,h:1,  d:60,  need:18, ox:0,  oz:33, custom:'chandeliers'},
+// SUITE
+{id:20, x:0,   z:-72, cost:5000,  label:'Suite Wing Slab',        type:'floor', mat:'concrete',  inc:100, w:38,h:0.7,d:38,  need:19, ox:0,  oz:-23},
+{id:21, x:0,   z:-72, cost:800,   label:'Suite Hardwood Floor',   type:'floor', mat:'oakLt',     inc:60,  w:36,h:0.22,d:36, need:20, ox:0,  oz:-22},
+{id:22, x:-18, z:-72, cost:600,   label:'Suite Wall Left',        type:'wall',  mat:'plasterWm', inc:25,  w:0.5,h:7,d:38,  need:21, ox:5,  oz:0,  doorW:4,doorH:6},
+{id:23, x:18,  z:-72, cost:600,   label:'Suite Wall Right',       type:'wall',  mat:'plasterWm', inc:25,  w:0.5,h:7,d:38,  need:22, ox:-5, oz:0,  doorW:4,doorH:6},
+{id:24, x:0,   z:-53, cost:600,   label:'Suite Entry Wall',       type:'wall',  mat:'plasterWm', inc:25,  w:38,h:7,d:0.5,  need:23, ox:0,  oz:-7, doorW:4,doorH:6},
+{id:25, x:0,   z:-91, cost:600,   label:'Suite Back Wall',        type:'wall',  mat:'plasterWm', inc:25,  w:38,h:7,d:0.5,  need:24, ox:0,  oz:7,  doorW:4,doorH:6},
+{id:26, x:0,   z:-78, cost:2500,  label:'King Bed Frame',         type:'custom',mat:'walnut',    inc:80,  w:14,h:1.2,d:16,  need:25, ox:13, oz:0,  custom:'bedframe'},
+{id:27, x:0,   z:-78, cost:1200,  label:'Premium Mattress',       type:'custom',mat:'linen',     inc:45,  w:13,h:1.0,d:15,  need:26, ox:13, oz:0,  custom:'mattress'},
+{id:28, x:0,   z:-68, cost:350,   label:'Down Pillows',           type:'custom',mat:'ivory',     inc:18,  w:10,h:0.5,d:2.8, need:27, ox:13, oz:0,  custom:'pillows'},
+{id:29, x:-11, z:-82, cost:800,   label:'Nightstand Left',        type:'custom',mat:'walnut',    inc:25,  w:3.5,h:1.6,d:3.5,need:28, ox:-9, oz:0,  custom:'nightstand'},
+{id:30, x:11,  z:-82, cost:800,   label:'Nightstand Right',       type:'custom',mat:'walnut',    inc:25,  w:3.5,h:1.6,d:3.5,need:29, ox:9,  oz:0,  custom:'nightstand'},
+{id:31, x:-11, z:-82, cost:450,   label:'Bedside Lamp Left',      type:'custom',mat:'brass',     inc:15,  w:1,  h:2.8,d:1,   need:30, ox:-9, oz:0,  custom:'lamp'},
+{id:32, x:11,  z:-82, cost:450,   label:'Bedside Lamp Right',     type:'custom',mat:'brass',     inc:15,  w:1,  h:2.8,d:1,   need:31, ox:9,  oz:0,  custom:'lamp'},
+{id:33, x:0,   z:-58, cost:3000,  label:'Wall-Mounted TV',        type:'custom',mat:'black',     inc:120, w:14,h:5,  d:0.3,  need:32, ox:0,  oz:6,  custom:'tv'},
+{id:34, x:-14, z:-64, cost:900,   label:'Suite Armchair',         type:'custom',mat:'charFab',   inc:35,  w:4, h:1.8,d:4,    need:33, ox:-9, oz:0,  custom:'armchair'},
+{id:35, x:14,  z:-64, cost:900,   label:'Writing Desk',           type:'custom',mat:'walnut',    inc:35,  w:7, h:2,  d:3,    need:34, ox:9,  oz:0,  custom:'desk'},
+{id:36, x:0,   z:-96, cost:2000,  label:'Marble Bathroom Floor',  type:'floor', mat:'marbleGray',inc:45,  w:18,h:0.25,d:12,  need:35, ox:0,  oz:-9},
+{id:37, x:4,   z:-100,cost:1400,  label:'Freestanding Bathtub',   type:'custom',mat:'white',     inc:70,  w:8, h:2,  d:4.5,  need:36, ox:9,  oz:0,  custom:'bathtub'},
+{id:38, x:-5,  z:-98, cost:700,   label:'Double Vanity',          type:'custom',mat:'marble',    inc:28,  w:5, h:2,  d:2,    need:37, ox:-9, oz:0,  custom:'vanity'},
+{id:39, x:-5,  z:-93, cost:400,   label:'Toilet',                 type:'custom',mat:'white',     inc:18,  w:2, h:2,  d:2.5,  need:38, ox:-9, oz:0,  custom:'toilet'},
+// POOL
+{id:40, x:88,  z:0,   cost:15000, label:'Pool Terrace Slab',      type:'floor', mat:'poolTile',  inc:350, w:70,h:0.6,d:82,  need:39, ox:0,  oz:-46},
+{id:41, x:88,  z:0,   cost:25000, label:'Infinity Pool',          type:'custom',mat:'poolBlue',  inc:800, w:42,h:1.0,d:50,  need:40, ox:26, oz:0,  custom:'pool'},
+{id:42, x:88,  z:0,   cost:3000,  label:'White Marble Coping',    type:'floor', mat:'marble',    inc:80,  w:46,h:0.3,d:54,  need:41, ox:26, oz:0},
+// Loungers — COBALT BLUE on teak (very visible against cream/gray deck)
+{id:43, x:67,  z:22,  cost:1800,  label:'Lounger A',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:42, ox:-7, oz:0,  custom:'lounger'},
+{id:44, x:67,  z:11,  cost:1800,  label:'Lounger B',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:43, ox:-7, oz:0,  custom:'lounger'},
+{id:45, x:67,  z:0,   cost:1800,  label:'Lounger C',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:44, ox:-7, oz:0,  custom:'lounger'},
+{id:46, x:67,  z:-11, cost:1800,  label:'Lounger D',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:45, ox:-7, oz:0,  custom:'lounger'},
+{id:47, x:109, z:22,  cost:1800,  label:'Lounger E',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:46, ox:7,  oz:0,  custom:'lounger'},
+{id:48, x:109, z:8,   cost:1800,  label:'Lounger F',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:47, ox:7,  oz:0,  custom:'lounger'},
+{id:49, x:109, z:-6,  cost:1800,  label:'Lounger G',              type:'custom',mat:'cobalt',    inc:60,  w:2.5,h:0.6,d:8,  need:48, ox:7,  oz:0,  custom:'lounger'},
+// Umbrellas — terracotta (highly visible against sky and deck)
+{id:50, x:67,  z:16,  cost:1200,  label:'Umbrella A',             type:'custom',mat:'terracotta',inc:30,  w:0.4,h:5,  d:0.4, need:49, ox:-7, oz:0,  custom:'umbrella'},
+{id:51, x:67,  z:-6,  cost:1200,  label:'Umbrella B',             type:'custom',mat:'terracotta',inc:30,  w:0.4,h:5,  d:0.4, need:50, ox:-7, oz:0,  custom:'umbrella'},
+{id:52, x:109, z:14,  cost:1200,  label:'Umbrella C',             type:'custom',mat:'terracotta',inc:30,  w:0.4,h:5,  d:0.4, need:51, ox:7,  oz:0,  custom:'umbrella'},
+{id:53, x:109, z:-2,  cost:1200,  label:'Umbrella D',             type:'custom',mat:'terracotta',inc:30,  w:0.4,h:5,  d:0.4, need:52, ox:7,  oz:0,  custom:'umbrella'},
+{id:54, x:88,  z:-46, cost:18000, label:'Pool Bar',               type:'custom',mat:'walnut',    inc:700, w:16,h:3.5,d:6,   need:53, ox:0,  oz:-9, custom:'bar'},
+{id:55, x:88,  z:-40, cost:3500,  label:'Bar Stools',             type:'custom',mat:'steel',     inc:100, w:14,h:2,  d:1.8,  need:54, ox:0,  oz:5,  custom:'barstools'},
+{id:56, x:68,  z:-38, cost:2800,  label:'Pool Palm SW',           type:'palm',  mat:'palmGn',    inc:70,  w:2, h:10, d:2,    need:55, ox:-6, oz:0},
+{id:57, x:108, z:-38, cost:2800,  label:'Pool Palm SE',           type:'palm',  mat:'palmGn',    inc:70,  w:2, h:10, d:2,    need:56, ox:6,  oz:0},
+{id:58, x:68,  z:38,  cost:2800,  label:'Pool Palm NW',           type:'palm',  mat:'palmGn',    inc:70,  w:2, h:10, d:2,    need:57, ox:-6, oz:0},
+{id:59, x:108, z:38,  cost:2800,  label:'Pool Palm NE',           type:'palm',  mat:'palmGn',    inc:70,  w:2, h:10, d:2,    need:58, ox:6,  oz:0},
+{id:60, x:88,  z:48,  cost:8000,  label:'Jacuzzi Spa',            type:'custom',mat:'marble',    inc:300, w:10,h:2,  d:10,   need:59, ox:9,  oz:0,  custom:'jacuzzi'},
+// RESTAURANT
+{id:61, x:-90, z:0,   cost:22000, label:'Restaurant Foundation',  type:'floor', mat:'concrete',  inc:600, w:56,h:0.7,d:56,  need:60, ox:0,  oz:-33},
+{id:62, x:-90, z:0,   cost:3000,  label:'Herringbone Oak Floor',  type:'floor', mat:'oakMd',     inc:80,  w:54,h:0.22,d:54, need:61, ox:0,  oz:-32},
+{id:63, x:-62, z:0,   cost:900,   label:'Restaurant Wall Front',  type:'wall',  mat:'plasterWm', inc:30,  w:0.5,h:8,d:56,  need:62, ox:5,  oz:0,  doorW:5,doorH:7},
+{id:64, x:-118,z:0,   cost:900,   label:'Restaurant Wall Back',   type:'wall',  mat:'plasterWm', inc:30,  w:0.5,h:8,d:56,  need:63, ox:-5, oz:0,  doorW:5,doorH:7},
+{id:65, x:-90, z:28,  cost:900,   label:'Restaurant Wall North',  type:'wall',  mat:'plasterWm', inc:30,  w:56,h:8,d:0.5,  need:64, ox:0,  oz:-7, doorW:5,doorH:7},
+{id:66, x:-90, z:-28, cost:900,   label:'Restaurant Wall South',  type:'wall',  mat:'plasterWm', inc:30,  w:56,h:8,d:0.5,  need:65, ox:0,  oz:7,  doorW:5,doorH:7},
+{id:67, x:-80, z:12,  cost:2800,  label:'Dining Table A',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:66, ox:8,  oz:0,  custom:'diningtable'},
+{id:68, x:-80, z:-2,  cost:2800,  label:'Dining Table B',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:67, ox:8,  oz:0,  custom:'diningtable'},
+{id:69, x:-92, z:12,  cost:2800,  label:'Dining Table C',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:68, ox:-9, oz:0,  custom:'diningtable'},
+{id:70, x:-92, z:-2,  cost:2800,  label:'Dining Table D',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:69, ox:-9, oz:0,  custom:'diningtable'},
+{id:71, x:-104,z:12,  cost:2800,  label:'Dining Table E',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:70, ox:-10,oz:0,  custom:'diningtable'},
+{id:72, x:-104,z:-2,  cost:2800,  label:'Dining Table F',         type:'custom',mat:'walnut',    inc:90,  w:5, h:1.8,d:5,   need:71, ox:-10,oz:0,  custom:'diningtable'},
+{id:73, x:-90, z:-22, cost:14000, label:'Exhibition Kitchen',     type:'custom',mat:'steel',     inc:500, w:26,h:3.5,d:7,   need:72, ox:0,  oz:-9, custom:'kitchen'},
+{id:74, x:-90, z:-22, cost:4000,  label:'Kitchen Pass Counter',   type:'custom',mat:'marble',    inc:150, w:24,h:0.3,d:6.8, need:73, ox:0,  oz:8,  custom:'counter'},
+{id:75, x:-90, z:22,  cost:8000,  label:'Wine Bar',               type:'custom',mat:'walnut',    inc:400, w:20,h:3.2,d:5,   need:74, ox:0,  oz:-9, custom:'bar'},
+{id:76, x:-90, z:22,  cost:3000,  label:'Bar Stools',             type:'custom',mat:'steel',     inc:100, w:18,h:2.2,d:2,   need:75, ox:0,  oz:6,  custom:'barstools'},
+{id:77, x:-73, z:0,   cost:2000,  label:'Restaurant Palm A',      type:'palm',  mat:'palmGn',    inc:40,  w:2, h:7,  d:2,   need:76, ox:5,  oz:0},
+{id:78, x:-107,z:0,   cost:2000,  label:'Restaurant Palm B',      type:'palm',  mat:'palmGn',    inc:40,  w:2, h:7,  d:2,   need:77, ox:-5, oz:0},
+// BRIDGE
+{id:79, x:0,   z:-140,cost:70000, label:'Bridge Abutment',        type:'custom',mat:'stoneLight',inc:1500,w:24,h:2,  d:28,  need:78, ox:0,  oz:-18,custom:'abutment'},
+{id:80, x:-10, z:-172,cost:110000,label:'Pylon Tower Left',       type:'custom',mat:'stoneLight',inc:2500,w:4, h:40, d:4,   need:79, ox:-9, oz:0,  custom:'pylon'},
+{id:81, x:10,  z:-172,cost:110000,label:'Pylon Tower Right',      type:'custom',mat:'stoneLight',inc:2500,w:4, h:40, d:4,   need:80, ox:9,  oz:0,  custom:'pylon'},
+{id:82, x:0,   z:-172,cost:60000, label:'Pylon Cross Beam',       type:'block', mat:'stoneLight',inc:900, w:26,h:2.5,d:2.5, need:81, ox:-10,oz:0},
+{id:83, x:0,   z:-172,cost:130000,label:'Bridge Deck',            type:'floor', mat:'slate',     inc:4000,w:22,h:1.5,d:140, need:82, ox:16, oz:0},
+{id:84, x:-10, z:-172,cost:30000, label:'Bridge Parapet Left',    type:'block', mat:'stoneLight',inc:600, w:1, h:3,  d:140, need:83, ox:-13,oz:0},
+{id:85, x:10,  z:-172,cost:30000, label:'Bridge Parapet Right',   type:'block', mat:'stoneLight',inc:600, w:1, h:3,  d:140, need:84, ox:13, oz:0},
+{id:86, x:-10, z:-142,cost:18000, label:'Bridge Lamp A Left',     type:'custom',mat:'darkMet',   inc:250, w:0.6,h:6, d:0.6, need:85, ox:-12,oz:0,  custom:'lamppost'},
+{id:87, x:10,  z:-142,cost:18000, label:'Bridge Lamp A Right',    type:'custom',mat:'darkMet',   inc:250, w:0.6,h:6, d:0.6, need:86, ox:12, oz:0,  custom:'lamppost'},
+{id:88, x:-10, z:-200,cost:18000, label:'Bridge Lamp B Left',     type:'custom',mat:'darkMet',   inc:250, w:0.6,h:6, d:0.6, need:87, ox:-12,oz:0,  custom:'lamppost'},
+{id:89, x:10,  z:-200,cost:18000, label:'Bridge Lamp B Right',    type:'custom',mat:'darkMet',   inc:250, w:0.6,h:6, d:0.6, need:88, ox:12, oz:0,  custom:'lamppost'},
+// MOUNTAIN LODGE
+{id:90, x:0,   z:-280,cost:300000,label:'Mountain Base Slab',     type:'floor', mat:'concrete',  inc:7000,w:100,h:1, d:100, need:89, ox:0,  oz:-58},
+{id:91, x:0,   z:-300,cost:100000,label:'Lodge Structure',        type:'wall',  mat:'oakDk',     inc:3000,w:50,h:14,d:50,  need:90, ox:30, oz:0,  doorW:7,doorH:9},
+{id:92, x:0,   z:-300,cost:55000, label:'Lodge Interior Floor',   type:'floor', mat:'walnut',    inc:1200,w:48,h:0.3,d:48, need:91, ox:0,  oz:0},
+{id:93, x:0,   z:-300,cost:70000, label:'A-Frame Roof',           type:'custom',mat:'ebony',     inc:2500,w:52,h:6, d:52,  need:92, ox:30, oz:0,  custom:'aroof'},
+{id:94, x:-18, z:-294,cost:15000, label:'Stone Fireplace',        type:'custom',mat:'stone',     inc:800, w:5, h:8, d:5,   need:93, ox:-10,oz:0,  custom:'fireplace'},
+{id:95, x:0,   z:-294,cost:12000, label:'Lodge Sectional Sofa',   type:'custom',mat:'burg',      inc:700, w:12,h:1.8,d:5,  need:94, ox:10, oz:0,  custom:'sofa'},
+{id:96, x:0,   z:-289,cost:5000,  label:'Reclaimed Wood Table',   type:'custom',mat:'oakDk',     inc:400, w:6, h:1.5,d:3,  need:95, ox:10, oz:0,  custom:'coffeetable'},
+{id:97, x:18,  z:-294,cost:9000,  label:'Lodge Bar',              type:'custom',mat:'walnut',    inc:500, w:9, h:3,  d:4,  need:96, ox:11, oz:0,  custom:'bar'},
+{id:98, x:-28, z:-284,cost:12000, label:'Ski Equipment Wall',     type:'custom',mat:'darkMet',   inc:450, w:8, h:5,  d:1.5,need:97, ox:-10,oz:0,  custom:'skiwall'},
+{id:99, x:-42, z:-312,cost:11000, label:'Alpine Pine A',          type:'palm',  mat:'palmGn',    inc:280, w:4, h:18, d:4,  need:98, ox:-9, oz:0},
+{id:100,x:42,  z:-312,cost:11000, label:'Alpine Pine B',          type:'palm',  mat:'palmGn',    inc:280, w:4, h:18, d:4,  need:99, ox:9,  oz:0},
+{id:101,x:-24, z:-328,cost:11000, label:'Alpine Pine C',          type:'palm',  mat:'palmGn',    inc:280, w:4, h:18, d:4,  need:100,ox:-9, oz:0},
+{id:102,x:24,  z:-328,cost:11000, label:'Alpine Pine D',          type:'palm',  mat:'palmGn',    inc:280, w:4, h:18, d:4,  need:101,ox:9,  oz:0},
+{id:103,x:0,   z:-268,cost:800000,label:'Grand Meridian Arch',    type:'custom',mat:'goldLt',    inc:30000,w:20,h:8, d:3,  need:102,ox:0,  oz:8,  custom:'arch'},
 ];
 
-// ── helpers ───────────────────────────────────────────────────────────────────
 function fmtMoney(n){
     n=Math.floor(n);
     if(n>=1e6)return'$'+(n/1e6).toFixed(1)+'M';
@@ -298,179 +292,124 @@ function updateProgress(){
     document.getElementById('progress-bar').style.width=((done/STEPS.length)*100)+'%';
 }
 
-// ── startGame ────────────────────────────────────────────────────────────────
-function startGame(){
+function startGame(doLoad){
     document.getElementById('startScreen').style.display='none';
     document.getElementById('hud').style.display='flex';
     document.getElementById('nextCard').style.display='flex';
     gameRunning=true;
-    initThree();
+    initThree(doLoad);
 }
 
-// ── THREE init ────────────────────────────────────────────────────────────────
-function initThree(){
-    initMaterials();
-
+function initThree(doLoad){
+    initMats();
     scene=new THREE.Scene();
-    scene.background=new THREE.Color(0x7ab8d4);
-    scene.fog=new THREE.FogExp2(0x9ac8e0,0.0012);
-
+    scene.background=new THREE.Color(0x68a8c4);
+    scene.fog=new THREE.FogExp2(0x86b8d0,0.0011);
     cam=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,0.1,3000);
-    cam.position.set(0,22,52);
-    cam.lookAt(0,0,0);
-
+    cam.position.set(0,22,52); cam.lookAt(0,0,0);
     ren=new THREE.WebGLRenderer({antialias:true});
     ren.setPixelRatio(Math.min(devicePixelRatio,2));
     ren.setSize(innerWidth,innerHeight);
     ren.shadowMap.enabled=true;
     ren.shadowMap.type=THREE.PCFSoftShadowMap;
     ren.toneMapping=THREE.ACESFilmicToneMapping;
-    ren.toneMappingExposure=1.1;
+    ren.toneMappingExposure=1.05;
     document.body.appendChild(ren.domElement);
     clock=new THREE.Clock();
 
-    // Sky gradient via hemisphere
-    scene.add(new THREE.HemisphereLight(0xc8e0f8,0x8a9060,0.6));
-
-    // Sun
-    const sun=new THREE.DirectionalLight(0xfff8e8,1.4);
-    sun.position.set(120,220,100);
-    sun.castShadow=true;
+    scene.add(new THREE.HemisphereLight(0xb0d4ee,0x789050,0.55));
+    const sun=new THREE.DirectionalLight(0xfff2d8,1.35);
+    sun.position.set(120,220,100); sun.castShadow=true;
     sun.shadow.mapSize.set(4096,4096);
     sun.shadow.camera.left=-500; sun.shadow.camera.right=500;
-    sun.shadow.camera.top=500;   sun.shadow.camera.bottom=-500;
-    sun.shadow.camera.far=1200;
-    sun.shadow.bias=-0.0002;
+    sun.shadow.camera.top=500; sun.shadow.camera.bottom=-500;
+    sun.shadow.camera.far=1200; sun.shadow.bias=-0.0002;
     scene.add(sun);
+    const fill=new THREE.DirectionalLight(0x88b0d8,0.3);
+    fill.position.set(-100,80,-60); scene.add(fill);
 
-    // Fill
-    const fill=new THREE.DirectionalLight(0xa8c8e8,0.35);
-    fill.position.set(-100,80,-60);
-    scene.add(fill);
-
-    // Ground — realistic grass with subtle variation
-    const ground=new THREE.Mesh(
-        new THREE.PlaneGeometry(5000,5000,1,1),
-        MAT.grass
-    );
-    ground.rotation.x=-Math.PI/2;
-    ground.receiveShadow=true;
-    scene.add(ground);
+    const ground=new THREE.Mesh(new THREE.PlaneGeometry(5000,5000),M.grass);
+    ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
 
     // Paths
-    const pathMat=MAT.path;
-    [
-        [0,-42,12,56],   // lobby to suite
-        [58,0,56,10],    // lobby to pool
-        [-58,0,56,10],   // lobby to restaurant
-        [0,-110,12,30],  // suite to bridge approach
-    ].forEach(([x,z,w,d])=>{
-        const p=new THREE.Mesh(new THREE.PlaneGeometry(w,d),pathMat);
-        p.rotation.x=-Math.PI/2; p.position.set(x,0.05,z); p.receiveShadow=true;
-        scene.add(p);
+    [[0,-42,12,60],[58,0,60,10],[-58,0,60,10],[0,-118,12,38]].forEach(([x,z,w,d])=>{
+        const p=new THREE.Mesh(new THREE.PlaneGeometry(w,d),M.path);
+        p.rotation.x=-Math.PI/2; p.position.set(x,0.05,z); p.receiveShadow=true; scene.add(p);
     });
+    const ocean=new THREE.Mesh(new THREE.PlaneGeometry(30000,30000),
+        new THREE.MeshStandardMaterial({color:0x065878,roughness:0.04,metalness:0.08}));
+    ocean.rotation.x=-Math.PI/2; ocean.position.y=-1.5; scene.add(ocean);
 
-    // Ocean
-    const ocean=new THREE.Mesh(
-        new THREE.PlaneGeometry(30000,30000),
-        new THREE.MeshStandardMaterial({color:0x0a5880,roughness:0.05,metalness:0.1})
-    );
-    ocean.rotation.x=-Math.PI/2; ocean.position.y=-1.5;
-    scene.add(ocean);
+    gpsGroup=new THREE.Group(); gpsGroup.renderOrder=999; scene.add(gpsGroup);
 
-    // GPS
-    gpsGroup=new THREE.Group();
-    gpsGroup.renderOrder=999;
-    scene.add(gpsGroup);
+    player=buildPlayer(); player.position.set(0,0,0); scene.add(player);
 
-    // Player — realistic Roblox-style blocky character
-    player=new THREE.Group();
-    player.position.set(0,0,0);
+    if(doLoad){
+        const sv=loadSave();
+        if(sv){
+            wallet=sv.wallet; income=sv.income;
+            player.position.set(sv.px||0,0,sv.pz||0);
+            STEPS.forEach(s=>{
+                if(sv.bought.includes(s.id)){
+                    s.bought=true; placeObject(s);
+                    if(s.grp) s.grp.scale.setScalar(1);
+                }
+            });
+            showToast('Save loaded — '+sv.bought.length+' buildings restored');
+        }
+    } else {
+        STEPS[0].bought=true; placeObject(STEPS[0]);
+        if(STEPS[0].grp) STEPS[0].grp.scale.setScalar(1);
+    }
 
-    const pMats={
-        shirt: new THREE.MeshStandardMaterial({color:0x1a2a4a,roughness:0.9}),
-        pants: new THREE.MeshStandardMaterial({color:0x0a0f1a,roughness:0.9}),
-        skin:  new THREE.MeshStandardMaterial({color:0xe8c090,roughness:0.85}),
-        shoe:  new THREE.MeshStandardMaterial({color:0x1a1410,roughness:0.7}),
-        hair:  new THREE.MeshStandardMaterial({color:0x2a1808,roughness:0.9}),
-    };
-
-    // Shoes
-    [-0.38,0.38].forEach(ox=>{
-        const shoe=new THREE.Mesh(new THREE.BoxGeometry(0.6,0.35,0.9),pMats.shoe);
-        shoe.position.set(ox,0.175,0.1); shoe.castShadow=true; player.add(shoe);
-    });
-    // Legs
-    [-0.38,0.38].forEach(ox=>{
-        const leg=new THREE.Mesh(new THREE.BoxGeometry(0.55,1.3,0.55),pMats.pants);
-        leg.position.set(ox,0.85+0.35,0); leg.castShadow=true; player.add(leg);
-    });
-    // Torso
-    const torso=new THREE.Mesh(new THREE.BoxGeometry(1.35,1.5,0.75),pMats.shirt);
-    torso.position.set(0,2.45,0); torso.castShadow=true; player.add(torso);
-    // Arms
-    [-0.88,0.88].forEach(ox=>{
-        const arm=new THREE.Mesh(new THREE.BoxGeometry(0.42,1.3,0.42),pMats.shirt);
-        arm.position.set(ox,2.35,0); arm.castShadow=true; player.add(arm);
-        const hand=new THREE.Mesh(new THREE.BoxGeometry(0.38,0.36,0.38),pMats.skin);
-        hand.position.set(ox,1.6,0); player.add(hand);
-    });
-    // Head
-    const head=new THREE.Mesh(new THREE.BoxGeometry(1.0,1.0,1.0),pMats.skin);
-    head.position.set(0,3.5,0); head.castShadow=true; player.add(head);
-    // Hair
-    const hair=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.5,1.02),pMats.hair);
-    hair.position.set(0,3.9,0); player.add(hair);
-    // Eyes (small dark boxes)
-    [-0.22,0.22].forEach(ox=>{
-        const eye=new THREE.Mesh(new THREE.BoxGeometry(0.16,0.14,0.05),
-            new THREE.MeshStandardMaterial({color:0x101820}));
-        eye.position.set(ox,3.46,0.51); player.add(eye);
-    });
-
-    scene.add(player);
-
-    STEPS[0].bought=true;
-    placeObject(STEPS[0]);
-    spawnNextPad();
-    updateProgress();
-    ren.render(scene,cam);
-    animate();
+    spawnNextPad(); updateProgress();
+    ren.render(scene,cam); animate();
 }
 
-// ── GPS — single dashed line, depthTest:false ─────────────────────────────────
-const gpsMat=new THREE.MeshBasicMaterial({color:0xffe040,depthTest:false,depthWrite:false,transparent:true,opacity:0.95});
+function buildPlayer(){
+    const grp=new THREE.Group();
+    const skin=new THREE.MeshStandardMaterial({color:0xe8c090,roughness:0.85});
+    const shirt=new THREE.MeshStandardMaterial({color:0x1a2a48,roughness:0.9});
+    const pants=new THREE.MeshStandardMaterial({color:0x0e1520,roughness:0.9});
+    const shoe=new THREE.MeshStandardMaterial({color:0x181410,roughness:0.7});
+    const hair=new THREE.MeshStandardMaterial({color:0x281808,roughness:0.9});
+    const mk=(g,m,x,y,z)=>{const me=new THREE.Mesh(g,m);me.position.set(x,y,z);me.castShadow=true;grp.add(me);return me;};
+    [-0.38,0.38].forEach(ox=>mk(new THREE.BoxGeometry(0.58,0.3,0.86),shoe,ox,0.15,0.08));
+    [-0.37,0.37].forEach(ox=>mk(new THREE.BoxGeometry(0.54,1.28,0.54),pants,ox,1.04,0));
+    mk(new THREE.BoxGeometry(1.36,1.52,0.76),shirt,0,2.44,0);
+    [-0.9,0.9].forEach(ox=>{mk(new THREE.BoxGeometry(0.42,1.28,0.42),shirt,ox,2.32,0);mk(new THREE.BoxGeometry(0.38,0.34,0.38),skin,ox,1.6,0);});
+    mk(new THREE.BoxGeometry(1.02,1.02,1.02),skin,0,3.5,0);
+    mk(new THREE.BoxGeometry(1.06,0.46,1.04),hair,0,3.9,0);
+    [-0.22,0.22].forEach(ox=>{const e=new THREE.Mesh(new THREE.BoxGeometry(0.15,0.13,0.04),new THREE.MeshStandardMaterial({color:0x101820}));e.position.set(ox,3.46,0.52);grp.add(e);});
+    return grp;
+}
 
+const gpsMat=new THREE.MeshBasicMaterial({color:0xffe040,depthTest:false,depthWrite:false,transparent:true,opacity:0.95});
 function rebuildGPS(){
-    while(gpsGroup.children.length) gpsGroup.remove(gpsGroup.children[0]);
-    if(!activePad) return;
-    const fx=player.position.x, fz=player.position.z;
-    const tx=activePad.position.x, tz=activePad.position.z;
-    const dx=tx-fx, dz=tz-fz;
+    while(gpsGroup.children.length)gpsGroup.remove(gpsGroup.children[0]);
+    if(!activePad)return;
+    const fx=player.position.x,fz=player.position.z;
+    const tx=activePad.position.x,tz=activePad.position.z;
+    const dx=tx-fx,dz=tz-fz;
     const dist=Math.sqrt(dx*dx+dz*dz);
-    if(dist<1) return;
-    const nx=dx/dist, nz=dz/dist;
-    const angle=Math.atan2(nx,nz);
+    if(dist<1)return;
+    const nx=dx/dist,nz=dz/dist,angle=Math.atan2(nx,nz);
     const SEG=2.0,GAP=1.2,STEP=SEG+GAP;
-    const geo=new THREE.BoxGeometry(0.4,0.22,SEG);
+    const geo=new THREE.BoxGeometry(0.42,0.22,SEG);
     const n=Math.floor((dist-3)/STEP);
     for(let i=0;i<n;i++){
         const t=3+(i+0.5)*STEP;
-        if(t>=dist-2) break;
+        if(t>=dist-2)break;
         const seg=new THREE.Mesh(geo,gpsMat);
         seg.position.set(fx+nx*t,0.9,fz+nz*t);
-        seg.rotation.y=angle;
-        seg.renderOrder=999;
+        seg.rotation.y=angle; seg.renderOrder=999;
         gpsGroup.add(seg);
     }
 }
 
-// ── collision ─────────────────────────────────────────────────────────────────
 function testAABB(px,py,pz){
     for(const c of colliders){
-        if(px+PLAYER_R>c.minX&&px-PLAYER_R<c.maxX&&
-           py+PLAYER_H>c.minY&&py<c.maxY&&
-           pz+PLAYER_R>c.minZ&&pz-PLAYER_R<c.maxZ) return true;
+        if(px+PLAYER_R>c.minX&&px-PLAYER_R<c.maxX&&py+PLAYER_H>c.minY&&py<c.maxY&&pz+PLAYER_R>c.minZ&&pz-PLAYER_R<c.maxZ)return true;
     }
     return false;
 }
@@ -480,631 +419,365 @@ function resolveMovement(ox,oy,oz,nx,ny,nz){
     if(!testAABB(ox,oy,nz)){player.position.z=nz;return;}
     if(!testAABB(ox,ny,oz)){player.position.y=ny;return;}
     player.position.set(ox,oy,oz);
-    if(ny!==oy) vspeed=0;
+    if(ny!==oy)vspeed=0;
 }
 
-// ── animate ───────────────────────────────────────────────────────────────────
 function animate(){
     requestAnimationFrame(animate);
     const dt=Math.min(clock.getDelta(),0.05);
     const ox=player.position.x,oy=player.position.y,oz=player.position.z;
-
-    const tgt=KEYS['w']?16:KEYS['s']?-8:0;
+    const tgt=KEYS['w']?18:KEYS['s']?-9:0;
     hspeed+=(tgt-hspeed)*0.16;
     let nx=ox-Math.sin(player.rotation.y)*hspeed*dt;
     let nz=oz-Math.cos(player.rotation.y)*hspeed*dt;
-    if(KEYS['a']) player.rotation.y+=0.06;
-    if(KEYS['d']) player.rotation.y-=0.06;
-
-    if(KEYS[' ']&&!jumping){vspeed=11;jumping=true;}
+    if(KEYS['a'])player.rotation.y+=0.06;
+    if(KEYS['d'])player.rotation.y-=0.06;
+    if(KEYS[' ']&&!jumping){vspeed=12;jumping=true;}
     let ny=oy;
-    if(jumping){
-        ny=oy+vspeed*dt; vspeed-=26*dt;
-        if(ny<=0){ny=0;jumping=false;vspeed=0;}
-    }
+    if(jumping){ny=oy+vspeed*dt;vspeed-=28*dt;if(ny<=0){ny=0;jumping=false;vspeed=0;}}
     resolveMovement(ox,oy,oz,nx,ny,nz);
-    if(jumping&&player.position.y<ny-0.01) vspeed=-1;
+    if(jumping&&player.position.y<ny-0.01)vspeed=-1;
     if(jumping&&player.position.y<=0){player.position.y=0;jumping=false;vspeed=0;}
-
     const ry=player.rotation.y;
     cam.position.x=player.position.x+Math.sin(ry)*30;
     cam.position.y=player.position.y+17;
     cam.position.z=player.position.z+Math.cos(ry)*30;
     cam.lookAt(player.position.x,player.position.y+2,player.position.z);
-
-    for(const p of placed){
-        if(p.grp.scale.x<1){
-            const ns=Math.min(p.grp.scale.x+0.055,1);
-            p.grp.scale.setScalar(ns);
-        }
-    }
+    for(const p of placed){if(p.grp.scale.x<1){const ns=Math.min(p.grp.scale.x+0.055,1);p.grp.scale.setScalar(ns);}}
     rebuildGPS();
-
     if(activePad){
         const d=player.position.distanceTo(activePad.position);
         const afford=wallet>=activePad.stepData.cost;
         nearPad=d<7;
         document.getElementById('buyPrompt').style.display=(nearPad&&afford)?'block':'none';
         if(nearPad&&afford&&KEYS['e']){KEYS['e']=false;doBuy(activePad.stepData);}
-    } else {
-        document.getElementById('buyPrompt').style.display='none';
-    }
-
+    } else {document.getElementById('buyPrompt').style.display='none';}
     ren.render(scene,cam);
     document.getElementById('v-money').textContent=fmtMoney(wallet);
     document.getElementById('v-income').textContent=fmtMoney(income)+'/s';
 }
 
-// ── placeObject ───────────────────────────────────────────────────────────────
-function getMat(name){
-    return MAT[name]||MAT.plaster;
-}
+function getMat(n){return M[n]||M.plaster;}
+function addCol(wx,wz,ww,wh,wd){colliders.push({minX:wx-ww/2,maxX:wx+ww/2,minY:0,maxY:wh,minZ:wz-wd/2,maxZ:wz+wd/2});}
 
 function placeObject(s){
     const grp=new THREE.Group();
     const mat=getMat(s.mat);
-
-    if(s.type==='wall'){
-        buildWall(grp,s);
-    } else if(s.type==='palm'){
-        buildPalm(grp,s,mat);
-        if(s.type!=='floor'){
-            colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        }
-    } else if(s.type==='custom'){
-        buildCustom(grp,s,mat);
-    } else {
-        // floor or block
+    if(s.type==='wall'){buildWall(grp,s);}
+    else if(s.type==='palm'){buildPalm(grp,s,mat);addCol(s.x,s.z,s.w*0.55,s.h,s.d*0.55);}
+    else if(s.type==='custom'){buildCustom(grp,s,mat);}
+    else{
         const mesh=new THREE.Mesh(new THREE.BoxGeometry(s.w,s.h,s.d),mat);
-        mesh.position.y=s.h/2;
-        mesh.castShadow=true; mesh.receiveShadow=true;
-        grp.add(mesh);
-        if(s.type!=='floor'){
-            colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        }
+        mesh.position.y=s.h/2; mesh.castShadow=true; mesh.receiveShadow=true; grp.add(mesh);
+        if(s.type!=='floor')addCol(s.x,s.z,s.w,s.h,s.d);
     }
-
-    grp.position.set(s.x,0,s.z);
-    grp.scale.setScalar(0.01);
-    scene.add(grp);
-    s.grp=grp;
-    placed.push({grp,step:s});
+    grp.position.set(s.x,0,s.z); grp.scale.setScalar(0.01);
+    scene.add(grp); s.grp=grp; placed.push({grp,step:s});
 }
 
-// ── buildWall — FIXED door logic ──────────────────────────────────────────────
-// Key fix: segments are positioned RELATIVE to group center (which sits at s.x,s.z)
-// so we do NOT add s.x/s.z again — the group handles world position.
+// WALL — fixed door position
 function buildWall(grp,s){
     const mat=getMat(s.mat);
-    const frameMat=MAT.brass;
-    const isZ=s.w>s.d;          // wall runs along X if w>d, along Z otherwise
-    const len=isZ?s.w:s.d;      // full wall length
-    const thk=isZ?s.d:s.w;      // wall thickness
-    const H=s.h;
-    const dw=s.doorW||4;
-    const dh=s.doorH||6;
-    const dc=0;                  // door center offset along wall (always centred)
+    const isZ=s.w>s.d;
+    const len=isZ?s.w:s.d,thk=isZ?s.d:s.w;
+    const H=s.h,dw=s.doorW||4,dh=s.doorH||6;
+    const leftLen=len/2-dw/2, rightLen=len/2-dw/2, aboveH=H-dh;
 
+    function seg(lx,lz,sw,sh,sd){
+        if(sw<0.05||sd<0.05)return;
+        const m=new THREE.Mesh(isZ?new THREE.BoxGeometry(sw,sh,sd):new THREE.BoxGeometry(sd,sh,sw),mat);
+        m.position.set(isZ?lx:0,sh/2,isZ?0:lx); m.castShadow=true; m.receiveShadow=true; grp.add(m);
+    }
     // Left panel
-    const leftLen=(len/2+dc-dw/2);
     if(leftLen>0.05){
-        const seg=new THREE.Mesh(
-            isZ?new THREE.BoxGeometry(leftLen,H,thk):new THREE.BoxGeometry(thk,H,leftLen),
-            mat
-        );
-        // Position: left edge of wall to right edge of left panel
-        seg.position.set(
-            isZ?(-len/2+leftLen/2):0,
-            H/2,
-            isZ?0:(-len/2+leftLen/2)
-        );
-        seg.castShadow=true; seg.receiveShadow=true;
-        grp.add(seg);
-        // collider
-        colliders.push(isZ?
-            {minX:s.x-len/2,           maxX:s.x-len/2+leftLen, minY:0,maxY:H, minZ:s.z-thk/2,maxZ:s.z+thk/2}:
-            {minX:s.x-thk/2,           maxX:s.x+thk/2,         minY:0,maxY:H, minZ:s.z-len/2,maxZ:s.z-len/2+leftLen}
-        );
+        seg(-len/2+leftLen/2,0,leftLen,H,thk);
+        if(isZ)addCol(s.x-len/2+leftLen/2,s.z,leftLen,H,thk);
+        else   addCol(s.x,s.z-len/2+leftLen/2,thk,H,leftLen);
     }
-
     // Right panel
-    const rightLen=(len/2-dc-dw/2);
     if(rightLen>0.05){
-        const seg=new THREE.Mesh(
-            isZ?new THREE.BoxGeometry(rightLen,H,thk):new THREE.BoxGeometry(thk,H,rightLen),
-            mat
-        );
-        seg.position.set(
-            isZ?(len/2-rightLen/2):0,
-            H/2,
-            isZ?0:(len/2-rightLen/2)
-        );
-        seg.castShadow=true; seg.receiveShadow=true;
-        grp.add(seg);
-        colliders.push(isZ?
-            {minX:s.x+len/2-rightLen,  maxX:s.x+len/2,         minY:0,maxY:H, minZ:s.z-thk/2,maxZ:s.z+thk/2}:
-            {minX:s.x-thk/2,           maxX:s.x+thk/2,         minY:0,maxY:H, minZ:s.z+len/2-rightLen,maxZ:s.z+len/2}
-        );
+        seg(len/2-rightLen/2,0,rightLen,H,thk);
+        if(isZ)addCol(s.x+len/2-rightLen/2,s.z,rightLen,H,thk);
+        else   addCol(s.x,s.z+len/2-rightLen/2,thk,H,rightLen);
     }
-
-    // Above-door lintel — sits from dh to H, ONLY above the door gap
-    const aboveH=H-dh;
+    // Lintel — y = dh to H
     if(aboveH>0.05){
-        const seg=new THREE.Mesh(
-            isZ?new THREE.BoxGeometry(dw,aboveH,thk):new THREE.BoxGeometry(thk,aboveH,dw),
-            mat
-        );
-        // Y: bottom of lintel = dh, top = H → centre = dh + aboveH/2
-        seg.position.set(
-            isZ?dc:0,
-            dh+aboveH/2,   // ← THIS is the fix: explicit Y, not derived from H/2
-            isZ?0:dc
-        );
-        seg.castShadow=true; seg.receiveShadow=true;
-        grp.add(seg);
-        // lintel collider (only from dh upward)
-        colliders.push(isZ?
-            {minX:s.x+dc-dw/2, maxX:s.x+dc+dw/2, minY:dh,maxY:H, minZ:s.z-thk/2,maxZ:s.z+thk/2}:
-            {minX:s.x-thk/2,   maxX:s.x+thk/2,   minY:dh,maxY:H, minZ:s.z+dc-dw/2,maxZ:s.z+dc+dw/2}
-        );
+        const lm=new THREE.Mesh(isZ?new THREE.BoxGeometry(dw,aboveH,thk):new THREE.BoxGeometry(thk,aboveH,dw),mat);
+        lm.position.set(0,dh+aboveH/2,0); lm.castShadow=true; lm.receiveShadow=true; grp.add(lm);
+        if(isZ)colliders.push({minX:s.x-dw/2,maxX:s.x+dw/2,minY:dh,maxY:H,minZ:s.z-thk/2,maxZ:s.z+thk/2});
+        else   colliders.push({minX:s.x-thk/2,maxX:s.x+thk/2,minY:dh,maxY:H,minZ:s.z-dw/2,maxZ:s.z+dw/2});
     }
-
-    // Door frame — gold trim
-    const ft=0.18;
-    const mkF=(x,y,z,fw,fh,fd)=>{
-        const m=new THREE.Mesh(new THREE.BoxGeometry(fw,fh,fd),frameMat);
-        m.position.set(x,y,z); grp.add(m);
-    };
+    // Door frame
+    const ft=0.17,fm=M.brass;
+    const mkf=(x,y,z,fw,fh,fd)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(fw,fh,fd),fm);m.position.set(x,y,z);grp.add(m);};
     if(isZ){
-        mkF(dc,          dh,          0, dw+ft*2, ft,       thk+0.1); // top bar
-        mkF(dc-dw/2-ft/2,dh/2,        0, ft,       dh,       thk+0.1); // left post
-        mkF(dc+dw/2+ft/2,dh/2,        0, ft,       dh,       thk+0.1); // right post
+        mkf(0,dh,0,dw+ft*2,ft,thk+0.1);
+        mkf(-dw/2-ft/2,dh/2,0,ft,dh,thk+0.1);
+        mkf(dw/2+ft/2,dh/2,0,ft,dh,thk+0.1);
     } else {
-        mkF(0, dh,           dc,          thk+0.1, ft,       dw+ft*2);
-        mkF(0, dh/2, dc-dw/2-ft/2,       thk+0.1, dh,       ft);
-        mkF(0, dh/2, dc+dw/2+ft/2,       thk+0.1, dh,       ft);
+        mkf(0,dh,0,thk+0.1,ft,dw+ft*2);
+        mkf(0,dh/2,-dw/2-ft/2,thk+0.1,dh,ft);
+        mkf(0,dh/2,dw/2+ft/2,thk+0.1,dh,ft);
     }
 }
 
-// ── buildPalm ─────────────────────────────────────────────────────────────────
 function buildPalm(grp,s,mat){
-    // Realistic tapered trunk
-    const trunkH=s.h*0.72;
-    const trunk=new THREE.Mesh(
-        new THREE.CylinderGeometry(0.15,0.3,trunkH,10),
-        MAT.trunk
-    );
-    trunk.position.y=trunkH/2; trunk.castShadow=true; grp.add(trunk);
-
-    // Frond layers
-    const isAlpine=s.h>12;
-    const frondMat=mat;
-    if(isAlpine){
-        // Conical pine layers
-        [0,2,4,6,8].forEach((yo,i)=>{
-            const r=(s.h*0.28)*(1-i*0.16);
-            const cone=new THREE.Mesh(
-                new THREE.ConeGeometry(r,s.h*0.22,10),
-                frondMat
-            );
-            cone.position.y=trunkH*0.5+yo*(s.h*0.08);
-            cone.castShadow=true; grp.add(cone);
+    const th=s.h*0.7;
+    const trunk=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.27,th,10),M.trunk);
+    trunk.position.y=th/2; trunk.castShadow=true; grp.add(trunk);
+    if(s.h>12){
+        [0,1.8,3.4,5.0,6.4].forEach((yo,i)=>{
+            const r=(s.w*0.33)*(1-i*0.15);
+            const c=new THREE.Mesh(new THREE.ConeGeometry(r,s.h*0.21,10),mat);
+            c.position.y=th*0.45+yo*(s.h*0.09); c.castShadow=true; grp.add(c);
         });
     } else {
-        // Palm fronds
-        [0,1.0,1.8].forEach((yo,i)=>{
-            const r=(s.w*1.1)*(1-i*0.2);
-            const layer=new THREE.Mesh(
-                new THREE.CylinderGeometry(r*0.3,r,0.5+i*0.1,8),
-                frondMat
-            );
-            layer.position.y=trunkH-0.4+yo;
-            layer.castShadow=true; grp.add(layer);
+        [0,0.9,1.7].forEach((yo,i)=>{
+            const r=(s.w*1.05)*(1-i*0.22);
+            const l=new THREE.Mesh(new THREE.CylinderGeometry(r*0.26,r,0.5,8),mat);
+            l.position.y=th-0.3+yo; l.castShadow=true; grp.add(l);
         });
     }
 }
 
-// ── buildCustom — detailed multi-part objects ─────────────────────────────────
 function buildCustom(grp,s,mat){
-    const add=(geo,m,x,y,z,rx=0,ry=0,rz=0)=>{
-        const mesh=new THREE.Mesh(geo,m||mat);
-        mesh.position.set(x,y,z);
-        mesh.rotation.set(rx,ry,rz);
-        mesh.castShadow=true; mesh.receiveShadow=true;
-        grp.add(mesh); return mesh;
-    };
+    const add=(geo,m,x,y,z)=>{const me=new THREE.Mesh(geo,m||mat);me.position.set(x,y,z);me.castShadow=true;me.receiveShadow=true;grp.add(me);return me;};
     const box=(w,h,d)=>new THREE.BoxGeometry(w,h,d);
-    const cyl=(r,h,s=12)=>new THREE.CylinderGeometry(r,r,h,s);
+    const cyl=(r,h,sg=10)=>new THREE.CylinderGeometry(r,r,h,sg);
+    const sph=(r,sg=10)=>new THREE.SphereGeometry(r,sg,sg);
 
     switch(s.custom){
-
     case 'reception':
-        // Main desk body
-        add(box(s.w,s.h,s.d),MAT.walnut,0,s.h/2,0);
-        // Marble top
-        add(box(s.w+0.1,0.12,s.d+0.1),MAT.marble,0,s.h+0.06,0);
-        // Front panel detail
-        add(box(s.w-0.4,s.h-0.3,0.08),MAT.oakMid,0,s.h/2-0.15,s.d/2+0.04);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h+0.12,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'sofa':
-        // Base
-        add(box(s.w,0.6,s.d),mat,0,0.3,0);
-        // Back
-        add(box(s.w,0.9,0.35),mat,0,0.9,-s.d/2+0.2);
-        // Seat cushions (lighter)
-        const cushMat=new THREE.MeshStandardMaterial({color:0x2a3558,roughness:0.95});
-        [-s.w/4,s.w/4].forEach(ox=>add(box(s.w/2-0.12,0.22,s.d-0.55),cushMat,ox,0.71,0.1));
-        // Armrests
-        [-s.w/2+0.15,s.w/2-0.15].forEach(ox=>add(box(0.28,0.75,s.d),mat,ox,0.55,0));
-        // Legs
-        [[-s.w/2+0.3,s.d/2-0.3],[s.w/2-0.3,s.d/2-0.3],[-s.w/2+0.3,-s.d/2+0.3],[s.w/2-0.3,-s.d/2+0.3]]
-            .forEach(([lx,lz])=>add(box(0.12,0.22,0.12),MAT.brass,lx,0.11,lz));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:1.4,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'table':
-        // Tabletop
-        add(box(s.w,0.1,s.d),mat,0,s.h,0);
-        // Apron
-        add(box(s.w-0.3,0.12,0.08),mat,0,s.h-0.1,s.d/2-0.05);
-        add(box(s.w-0.3,0.12,0.08),mat,0,s.h-0.1,-s.d/2+0.05);
-        // Legs
-        [[s.w/2-0.2,s.d/2-0.2],[-(s.w/2-0.2),s.d/2-0.2],[s.w/2-0.2,-(s.d/2-0.2)],[-(s.w/2-0.2),-(s.d/2-0.2)]]
-            .forEach(([lx,lz])=>add(box(0.1,s.h,0.1),mat,lx,s.h/2,lz));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.walnut,0,s.h/2,0);
+        add(box(s.w+0.1,0.1,s.d+0.1),M.marble,0,s.h+0.05,0);
+        add(box(s.w-0.5,s.h-0.4,0.06),M.oakLt,0,s.h/2-0.1,s.d/2+0.04);
+        add(box(4,0.75,0.04),M.gold,0,s.h*0.78,s.d/2+0.07);
+        addCol(s.x,s.z,s.w,s.h+0.1,s.d); break;
+    case 'monitors':
+        [-1.5,0,1.5].forEach(ox=>{add(box(1.6,1.1,0.06),M.charcoal,ox,s.h,0);add(box(0.14,0.4,0.12),M.darkMet,ox,s.h-0.65,0);}); break;
+    case 'sofa':{
+        add(box(s.w,0.55,s.d),mat,0,0.28,0);
+        add(box(s.w,0.95,0.32),mat,0,0.95,-s.d/2+0.18);
+        const lighterC=new THREE.MeshStandardMaterial({color:adjustColor(getMat(s.mat).color.getHex(),1.18),roughness:0.96});
+        const nc=Math.round(s.w/2);
+        const cw=(s.w-0.28)/nc;
+        for(let i=0;i<nc;i++) add(box(cw-0.1,0.24,s.d-0.5),lighterC,-s.w/2+0.14+cw/2+i*cw,0.69,0.08);
+        [-s.w/2+0.14,s.w/2-0.14].forEach(ox=>add(box(0.26,0.78,s.d),mat,ox,0.55,0));
+        [[-s.w/2+0.27,s.d/2-0.27],[s.w/2-0.27,s.d/2-0.27],[-s.w/2+0.27,-s.d/2+0.27],[s.w/2-0.27,-s.d/2+0.27]]
+            .forEach(([lx,lz])=>add(cyl(0.055,0.22),M.brass,lx,0.11,lz));
+        addCol(s.x,s.z,s.w,1.5,s.d); break;}
+    case 'coffeetable':
+        add(box(s.w,0.08,s.d),mat,0,s.h,0);
+        add(box(s.w+0.04,0.04,s.d+0.04),M.brass,0,s.h+0.06,0);
+        [[s.w/2-0.15,s.d/2-0.15],[-(s.w/2-0.15),s.d/2-0.15],[s.w/2-0.15,-(s.d/2-0.15)],[-(s.w/2-0.15),-(s.d/2-0.15)]]
+            .forEach(([lx,lz])=>add(box(0.08,s.h,0.08),mat,lx,s.h/2,lz));
+        addCol(s.x,s.z,s.w,s.h+0.12,s.d); break;
     case 'piano':
         add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        // Lid
-        add(box(s.w-0.1,0.06,s.d/2),mat,0,s.h+0.03,-s.d/4);
-        // Keys strip
-        add(box(s.w-0.6,0.06,0.5),MAT.white,0,s.h+0.03,s.d/2-0.4);
-        // Pedals
-        [-0.2,0,0.2].forEach(px=>add(box(0.08,0.04,0.25),MAT.chrome,px,0.04,s.d/2+0.1));
-        // Legs
-        [[-s.w/2+0.2,s.d/2-0.3],[s.w/2-0.2,s.d/2-0.3],[0,-s.d/2+0.3]]
-            .forEach(([lx,lz])=>add(cyl(0.08,s.h*0.7),mat,lx,s.h*0.35,lz));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w-0.08,0.05,s.d/2),mat,0,s.h+0.025,-s.d/4);
+        add(box(s.w-0.7,0.04,0.48),M.white,0,s.h+0.02,s.d/2-0.38);
+        [-0.2,0,0.2].forEach(px=>add(cyl(0.03,0.22),M.chrome,px,0.04,s.d/2+0.08));
+        [[-s.w/2+0.18,s.d/2-0.28],[s.w/2-0.18,s.d/2-0.28],[0,-s.d/2+0.28]]
+            .forEach(([lx,lz])=>add(cyl(0.07,s.h*0.68),mat,lx,s.h*0.34,lz));
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'ceiling':
-        // Main ceiling slab
-        add(box(s.w,s.h,s.d),MAT.plaster,0,7.5,0);
-        // Coffered beams grid
-        for(let xi=-2;xi<=2;xi++){
-            add(box(0.2,0.25,s.d-2),MAT.plasterWarm,xi*10,7.1,0);
-        }
-        for(let zi=-2;zi<=2;zi++){
-            add(box(s.w-2,0.25,0.2),MAT.plasterWarm,0,7.1,zi*10);
-        }
+        add(box(s.w,s.h,s.d),M.plaster,0,7.4,0);
+        for(let xi=-2;xi<=2;xi++) add(box(0.18,0.22,s.d-2.5),M.plasterWm,xi*10,7.0,0);
+        for(let zi=-2;zi<=2;zi++) add(box(s.w-2.5,0.22,0.18),M.plasterWm,0,7.0,zi*10);
         break;
-
     case 'chandeliers':
-        // 3x3 grid of chandeliers
         [-18,0,18].forEach(cx=>[-18,0,18].forEach(cz=>{
-            // Drop rod
-            add(cyl(0.04,1.5),MAT.brass,cx,6.5,cz);
-            // Main body
-            add(cyl(0.6,0.3,16),MAT.brass,cx,5.7,cz);
-            // Crystal ring (lighter sphere)
-            add(new THREE.SphereGeometry(0.8,16,8),MAT.goldLight,cx,5.5,cz);
-            // Arms
-            for(let a=0;a<6;a++){
-                const angle=a*Math.PI/3;
-                add(cyl(0.02,1),MAT.brass,cx+Math.cos(angle)*0.5,5.5,cz+Math.sin(angle)*0.5,0,angle,Math.PI/2);
-            }
-        }));
-        break;
-
+            add(cyl(0.03,1.4),M.brass,cx,6.6,cz);
+            add(new THREE.CylinderGeometry(0.55,0.55,0.28,14),M.brass,cx,5.8,cz);
+            add(sph(0.7,14),M.goldLt,cx,5.6,cz);
+            for(let a=0;a<6;a++){const ang=a*Math.PI/3;const arm=add(box(0.85,0.03,0.06),M.brass,cx+Math.cos(ang)*0.44,5.6,cz+Math.sin(ang)*0.44);arm.rotation.y=ang;}
+        })); break;
     case 'bedframe':
-        // Base
-        add(box(s.w,0.3,s.d),mat,0,0.15,0);
-        // Headboard
-        add(box(s.w,s.h*2.5,0.25),mat,0,s.h*1.25,-s.d/2+0.15);
-        // Headboard panel
-        add(box(s.w-0.6,s.h*2-0.3,0.1),MAT.cream,0,s.h*1.1,-s.d/2+0.32);
-        // Footboard
-        add(box(s.w,s.h*0.8,0.2),mat,0,s.h*0.4,s.d/2-0.1);
-        // Side rails
-        [-s.w/2+0.12,s.w/2-0.12].forEach(ox=>add(box(0.22,0.2,s.d),mat,ox,0.35,0));
-        // Legs
-        [[-s.w/2+0.2,-s.d/2+0.2],[s.w/2-0.2,-s.d/2+0.2],[-s.w/2+0.2,s.d/2-0.2],[s.w/2-0.2,s.d/2-0.2]]
-            .forEach(([lx,lz])=>add(box(0.2,0.35,0.2),mat,lx,0.17,lz));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h*3,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,0.28,s.d),mat,0,0.14,0);
+        add(box(s.w,s.h*2.8,0.22),mat,0,s.h*1.4,-s.d/2+0.13);
+        add(box(s.w-0.5,s.h*2.2,0.1),M.navyFab,0,s.h*1.22,-s.d/2+0.27);
+        add(box(s.w,s.h*0.9,0.18),mat,0,s.h*0.45,s.d/2-0.09);
+        [-s.w/2+0.1,s.w/2-0.1].forEach(ox=>add(box(0.2,0.18,s.d),mat,ox,0.32,0));
+        [[-s.w/2+0.17,-s.d/2+0.17],[s.w/2-0.17,-s.d/2+0.17],[-s.w/2+0.17,s.d/2-0.17],[s.w/2-0.17,s.d/2-0.17]]
+            .forEach(([lx,lz])=>add(box(0.18,0.32,0.18),mat,lx,0.16,lz));
+        addCol(s.x,s.z,s.w,s.h*3,s.d); break;
     case 'mattress':
-        add(box(s.w,s.h,s.d),MAT.linen,0,0.3+s.h/2,0);
-        // Piping detail
-        add(box(s.w+0.05,0.06,s.d+0.05),MAT.cream,0,0.3+s.h+0.03,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:1.3+s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.linen,0,0.4+s.h/2,0);
+        add(box(s.w+0.04,0.04,s.d+0.04),M.cream,0,0.4+s.h+0.02,0);
+        addCol(s.x,s.z,s.w,0.4+s.h*1.5,s.d); break;
     case 'pillows':
-        [-3,-1,1,3].forEach(ox=>{
-            add(box(1.8,0.55,1.2),MAT.white,ox,2.35+0.27,0);
-            // Pillow crease
-            add(box(1.6,0.05,0.04),MAT.cream,ox,2.35+0.55,0);
-        });
-        break;
-
+        [-2.8,-0.95,0.95,2.8].forEach(ox=>{add(box(1.7,0.52,1.12),M.ivory,ox,2.4+0.26,0);add(box(1.5,0.04,0.04),M.cream,ox,2.4+0.52,0);}); break;
     case 'nightstand':
         add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        add(box(s.w+0.06,0.06,s.d+0.06),MAT.marble,0,s.h+0.03,0);
-        // Drawer
-        add(box(s.w-0.3,0.35,0.06),MAT.oakLight,0,s.h/2,s.d/2+0.04);
-        add(new THREE.SphereGeometry(0.05,8,8),MAT.brass,0,s.h/2,s.d/2+0.1);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w+0.06,0.06,s.d+0.06),M.marble,0,s.h+0.03,0);
+        add(box(s.w-0.3,0.32,0.06),M.oakLt,0,s.h/2,s.d/2+0.04);
+        add(sph(0.05,6),M.brass,0,s.h/2,s.d/2+0.1);
+        addCol(s.x,s.z,s.w,s.h+0.06,s.d); break;
     case 'lamp':
-        add(cyl(0.06,s.h*0.65),MAT.brass,0,s.h*0.33,0);
-        add(new THREE.SphereGeometry(0.12,8,8),MAT.brass,0,0.1,0);
-        // Shade
-        add(new THREE.ConeGeometry(0.38,0.45,16,1,true),
-            new THREE.MeshStandardMaterial({color:0xf0e8d0,roughness:0.9,side:THREE.DoubleSide}),
-            0,s.h*0.78,0);
-        colliders.push({minX:s.x-0.4,maxX:s.x+0.4,minY:0,maxY:s.h,minZ:s.z-0.4,maxZ:s.z+0.4});
-        break;
-
+        add(cyl(0.05,s.h*0.64),M.brass,0,s.h*0.32,0);
+        add(sph(0.1,8),M.brass,0,0.08,0);
+        add(new THREE.ConeGeometry(0.36,0.42,14,1,true),new THREE.MeshStandardMaterial({color:0xf0e8d0,roughness:0.9,side:THREE.DoubleSide}),0,s.h*0.76,0);
+        addCol(s.x,s.z,0.4,s.h,0.4); break;
     case 'tv':
-        // Screen
-        add(box(s.w,s.h,0.12),MAT.black,0,s.h/2,0);
-        // Screen face (slightly lighter)
-        add(box(s.w-0.3,s.h-0.3,0.02),MAT.charcoal,0,s.h/2,0.07);
-        // Wall mount bracket
-        add(box(1.5,0.3,0.3),MAT.darkMetal,0,s.h/2+0.06,0.2);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-0.2,maxZ:s.z+0.2});
-        break;
-
-    case 'armchair':
-        add(box(s.w,0.55,s.d),mat,0,0.28,0);
-        add(box(s.w,s.h,0.3),mat,0,s.h/2,-s.d/2+0.2);
-        [-s.w/2+0.18,s.w/2-0.18].forEach(ox=>add(box(0.3,s.h*0.5,s.d),mat,ox,s.h*0.25,0));
-        add(box(s.w-0.6,0.25,s.d-0.5),
-            new THREE.MeshStandardMaterial({color:0x343840,roughness:0.97}),0,0.68,0.1);
-        [[-s.w/2+0.25,s.d/2-0.25],[s.w/2-0.25,s.d/2-0.25],[-s.w/2+0.25,-s.d/2+0.25],[s.w/2-0.25,-s.d/2+0.25]]
-            .forEach(([lx,lz])=>add(box(0.1,0.2,0.1),MAT.darkMetal,lx,0.1,lz));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,0.1),M.black,0,s.h/2,0);
+        add(box(s.w-0.28,s.h-0.28,0.02),M.charcoal,0,s.h/2,0.06);
+        add(box(1.4,0.28,0.28),M.darkMet,0,s.h/2,0.2);
+        addCol(s.x,s.z,s.w,s.h,0.18); break;
+    case 'armchair':{
+        add(box(s.w,0.52,s.d),mat,0,0.26,0);
+        add(box(s.w,s.h,0.28),mat,0,s.h/2,-s.d/2+0.18);
+        [-s.w/2+0.16,s.w/2-0.16].forEach(ox=>add(box(0.28,s.h*0.48,s.d),mat,ox,s.h*0.24,0));
+        const cMat=new THREE.MeshStandardMaterial({color:adjustColor(getMat(s.mat).color.getHex(),1.14),roughness:0.97});
+        add(box(s.w-0.62,0.22,s.d-0.48),cMat,0,0.64,0.08);
+        [[-s.w/2+0.22,s.d/2-0.22],[s.w/2-0.22,s.d/2-0.22],[-s.w/2+0.22,-s.d/2+0.22],[s.w/2-0.22,-s.d/2+0.22]]
+            .forEach(([lx,lz])=>add(box(0.09,0.18,0.09),M.darkMet,lx,0.09,lz));
+        addCol(s.x,s.z,s.w,s.h,s.d); break;}
     case 'desk':
-        add(box(s.w,0.08,s.d),mat,0,s.h,0);
-        add(box(s.w+0.04,0.04,s.d+0.04),MAT.chrome,0,s.h+0.06,0);
-        [[-s.w/2+0.12,s.d/2-0.12],[s.w/2-0.12,s.d/2-0.12]]
-            .forEach(([lx,lz])=>add(box(0.15,s.h,0.15),mat,lx,s.h/2,lz));
-        add(box(s.w-0.3,s.h,0.15),mat,0,s.h/2,-s.d/2+0.12);
-        // Monitor
-        add(box(2.2,1.4,0.06),MAT.black,0,s.h+0.8,-s.d/2+0.55);
-        add(box(0.2,0.5,0.15),MAT.darkMetal,0,s.h+0.08,-s.d/2+0.52);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,0.07,s.d),mat,0,s.h,0);
+        add(box(s.w+0.04,0.04,s.d+0.04),M.chrome,0,s.h+0.055,0);
+        [[-s.w/2+0.11,s.d/2-0.11],[s.w/2-0.11,s.d/2-0.11]].forEach(([lx,lz])=>add(box(0.14,s.h,0.14),mat,lx,s.h/2,lz));
+        add(box(s.w-0.25,s.h,0.14),mat,0,s.h/2,-s.d/2+0.1);
+        add(box(2.1,1.35,0.06),M.black,0,s.h+0.76,-s.d/2+0.52);
+        add(box(0.18,0.45,0.14),M.darkMet,0,s.h+0.08,-s.d/2+0.5);
+        addCol(s.x,s.z,s.w,s.h+0.07,s.d); break;
     case 'bathtub':
-        // Outer shell
-        add(box(s.w,s.h,s.d),MAT.white,0,s.h/2,0);
-        // Inner cavity (slightly smaller, dark)
-        add(box(s.w-0.3,s.h-0.25,s.d-0.3),
-            new THREE.MeshStandardMaterial({color:0xe8f4f8,roughness:0.05,metalness:0.05}),
-            0,s.h/2+0.12,0);
-        // Rim
-        add(box(s.w+0.12,0.06,s.d+0.12),MAT.chrome,0,s.h+0.03,0);
-        // Feet
-        [[-s.w/2+0.3,s.d/2-0.3],[s.w/2-0.3,s.d/2-0.3],[-s.w/2+0.3,-s.d/2+0.3],[s.w/2-0.3,-s.d/2+0.3]]
-            .forEach(([lx,lz])=>add(new THREE.SphereGeometry(0.15,8,8),MAT.chrome,lx,0.12,lz));
-        // Faucet
-        add(cyl(0.04,0.5),MAT.chrome,-s.w/2+0.5,s.h+0.3,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.white,0,s.h/2,0);
+        add(box(s.w-0.28,s.h-0.22,s.d-0.28),new THREE.MeshStandardMaterial({color:0xd6eef4,roughness:0.04,metalness:0.04}),0,s.h/2+0.1,0);
+        add(box(s.w+0.1,0.06,s.d+0.1),M.chrome,0,s.h+0.03,0);
+        [[-s.w/2+0.26,s.d/2-0.26],[s.w/2-0.26,s.d/2-0.26],[-s.w/2+0.26,-s.d/2+0.26],[s.w/2-0.26,-s.d/2+0.26]]
+            .forEach(([lx,lz])=>add(sph(0.14,7),M.chrome,lx,0.1,lz));
+        add(cyl(0.038,0.48),M.chrome,-s.w/2+0.46,s.h+0.28,0);
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'vanity':
-        add(box(s.w,s.h-0.5,s.d),MAT.walnut,0,(s.h-0.5)/2,0);
-        add(box(s.w,0.06,s.d),MAT.marble,0,s.h-0.5,0);
-        // Sinks
-        [-0.7,0.7].forEach(ox=>{
-            add(box(0.8,0.08,0.6),MAT.white,ox,s.h-0.44,0);
-            add(cyl(0.03,0.25),MAT.chrome,ox,s.h,0);
-        });
-        // Mirror
-        add(box(s.w-0.1,1.8,0.04),MAT.glassClear,0,s.h+1.0,-s.d/2-0.02);
-        add(box(s.w+0.06,1.86,0.06),MAT.chrome,0,s.h+1.0,-s.d/2-0.05);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h-0.48,s.d),M.walnut,0,(s.h-0.48)/2,0);
+        add(box(s.w,0.06,s.d),M.marble,0,s.h-0.48,0);
+        [-0.7,0.7].forEach(ox=>{add(box(0.76,0.07,0.56),M.white,ox,s.h-0.41,0);add(cyl(0.028,0.22),M.chrome,ox,s.h+0.02,0);});
+        add(box(s.w-0.08,1.72,0.04),M.glassClear,0,s.h+0.92,-s.d/2-0.02);
+        add(box(s.w+0.05,1.77,0.06),M.chrome,0,s.h+0.92,-s.d/2-0.05);
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'toilet':
-        add(box(s.w,0.45,s.d*0.7),MAT.white,0,0.22,-0.1);
-        add(box(s.w-0.1,0.12,s.d),MAT.white,0,0.51,0.08);
-        add(box(s.w-0.15,0.4,s.d*0.45),MAT.white,0,0.7,s.d/2-0.15);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:1.1,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,0.44,s.d*0.68),M.white,0,0.22,-0.1);
+        add(box(s.w-0.08,0.1,s.d),M.white,0,0.5,0.08);
+        add(box(s.w-0.14,0.38,s.d*0.44),M.white,0,0.68,s.d/2-0.14);
+        addCol(s.x,s.z,s.w,1.1,s.d); break;
     case 'pool':
-        // Pool surround
-        add(box(s.w,0.5,s.d),MAT.marble,0,0.25,0);
-        // Water surface
-        add(box(s.w-0.6,0.05,s.d-0.6),MAT.poolBlue,0,0.48,0);
-        // Lane lines
-        for(let li=-1;li<=1;li++){
-            add(box(0.06,0.04,s.d-0.8),MAT.white,li*(s.w/3),0.5,0);
-        }
-        colliders.push({minX:s.x-s.w/2,maxX:s.x-s.w/2+0.3,minY:0,maxY:0.5,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        colliders.push({minX:s.x+s.w/2-0.3,maxX:s.x+s.w/2,minY:0,maxY:0.5,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'lounger':
-        // Frame
-        add(box(s.w,0.1,s.d),MAT.oakDk,0,0.3,0);
-        // Slats
-        for(let i=0;i<8;i++) add(box(s.w-0.1,0.06,0.14),MAT.oakLight,0,0.37,(-s.d/2+0.3)+i*(s.d-0.6)/7);
-        // Cushion
-        add(box(s.w-0.1,0.15,s.d-0.2),MAT.cream,0,0.45,0);
-        // Legs
-        [0.9,-0.9].forEach(oz=>[-s.w/2+0.1,s.w/2-0.1].forEach(ox=>add(cyl(0.04,0.28),MAT.brushedSteel,ox,0.14,oz)));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:0.62,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'umbrella':
-        // Pole
-        add(cyl(0.04,s.h),MAT.brushedSteel,0,s.h/2,0);
-        // Canopy ribs
-        for(let i=0;i<8;i++){
-            const a=i*Math.PI/4;
-            const rib=add(box(2.5,0.04,0.08),MAT.cream,Math.cos(a)*1.1,s.h-0.2,Math.sin(a)*1.1);
-            rib.rotation.y=a;
-        }
-        // Canopy fabric (disk)
-        add(new THREE.CylinderGeometry(2.4,2.4,0.06,16),MAT.cream,0,s.h-0.15,0);
-        colliders.push({minX:s.x-0.2,maxX:s.x+0.2,minY:0,maxY:s.h,minZ:s.z-0.2,maxZ:s.z+0.2});
-        break;
-
+        add(box(s.w,0.55,s.d),M.poolTile,0,0.28,0);
+        add(box(s.w-0.55,0.06,s.d-0.55),M.poolBlue,0,0.52,0);
+        for(let li=-1;li<=1;li++) add(box(0.05,0.04,s.d-0.8),M.white,li*(s.w/3.1),0.54,0);
+        add(box(s.w-1,0.3,1.2),M.marble,0,0.15,s.d/2+0.6);
+        addCol(s.x-s.w/2,s.z,0.3,0.55,s.d);
+        addCol(s.x+s.w/2,s.z,0.3,0.55,s.d); break;
+    case 'lounger':{
+        // Teak slat frame
+        add(box(s.w,0.09,s.d),M.oakDk,0,0.29,0);
+        for(let i=0;i<9;i++) add(box(s.w-0.08,0.055,0.12),M.oakLt,0,0.35,(-s.d/2+0.22)+i*(s.d-0.44)/8);
+        // Cobalt cushion — very visible against cream deck
+        add(box(s.w-0.1,0.14,s.d-0.18),mat,0,0.43,0);
+        // Ivory head pillow
+        add(box(s.w-0.22,0.12,0.58),M.ivory,0,0.43,-s.d/2+0.46);
+        [0.82,-0.82].forEach(oz=>[-s.w/2+0.08,s.w/2-0.08].forEach(ox=>add(cyl(0.04,0.26),M.steel,ox,0.13,oz)));
+        addCol(s.x,s.z,s.w,0.58,s.d); break;}
+    case 'umbrella':{
+        add(cyl(0.04,s.h),M.steel,0,s.h/2,0);
+        add(new THREE.CylinderGeometry(2.35,2.35,0.06,16),mat,0,s.h-0.14,0);
+        for(let i=0;i<8;i++){const ang=i*Math.PI/4;const rib=add(box(2.2,0.04,0.07),mat,Math.cos(ang)*1.02,s.h-0.12,Math.sin(ang)*1.02);rib.rotation.y=ang;}
+        addCol(s.x,s.z,0.18,s.h,0.18); break;}
     case 'bar':
-        // Main bar body
         add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        // Top
-        add(box(s.w+0.15,0.08,s.d+0.15),MAT.marble,0,s.h+0.04,0);
-        // Front panel detail
-        add(box(s.w-0.4,s.h-0.4,0.08),MAT.oakLight,0,s.h/2-0.1,s.d/2+0.05);
-        // Bottle shelf (back)
-        add(box(s.w-1,0.06,0.25),MAT.oakMid,0,s.h*0.7,-s.d/2+0.15);
-        add(box(s.w-1,0.06,0.25),MAT.oakMid,0,s.h*0.45,-s.d/2+0.15);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h+0.08,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'barstools':
-        const stoolW=s.w/Math.round(s.w/1.8);
-        const count=Math.round(s.w/1.8);
-        for(let i=0;i<count;i++){
-            const ox=-s.w/2+stoolW/2+i*stoolW;
-            add(cyl(0.04,1.8),MAT.brushedSteel,ox,0.9,0);
-            add(new THREE.CylinderGeometry(0.32,0.28,0.14,12),MAT.warmGray,ox,1.86,0);
+        add(box(s.w+0.14,0.08,s.d+0.14),M.marble,0,s.h+0.04,0);
+        add(box(s.w-0.42,s.h-0.38,0.07),M.oakLt,0,s.h/2-0.1,s.d/2+0.04);
+        add(box(s.w-1,0.06,0.22),M.oakMd,0,s.h*0.72,-s.d/2+0.14);
+        add(box(s.w-1,0.06,0.22),M.oakMd,0,s.h*0.46,-s.d/2+0.14);
+        addCol(s.x,s.z,s.w,s.h+0.08,s.d); break;
+    case 'barstools':{
+        const n=Math.round(s.w/1.75),sw=s.w/n;
+        for(let i=0;i<n;i++){
+            const ox=-s.w/2+sw/2+i*sw;
+            add(cyl(0.038,1.82),M.steel,ox,0.91,0);
+            add(new THREE.CylinderGeometry(0.3,0.26,0.13,12),M.warmGray,ox,1.87,0);
         }
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:2,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'diningtable':
-        // Top
+        addCol(s.x,s.z,s.w,2.0,s.d); break;}
+    case 'diningtable':{
         add(box(s.w,0.1,s.d),mat,0,s.h,0);
-        add(box(s.w+0.05,0.04,s.d+0.05),MAT.brass,0,s.h+0.07,0);
-        // Pedestal
-        add(cyl(0.18,s.h),MAT.walnut,0,s.h/2,0);
-        add(box(s.w-1.5,0.12,0.18),MAT.walnut,0,0.1,0);
-        add(box(0.18,0.12,s.d-1.5),MAT.walnut,0,0.1,0);
-        // Chairs implied by small blocks
-        [[0,s.d/2+0.5],[0,-s.d/2-0.5],[s.w/2+0.5,0],[-s.w/2-0.5,0]].forEach(([cx,cz])=>{
-            add(box(1.2,0.08,1.2),MAT.linen,cx,s.h-0.08,cz);
-            add(box(1.2,1.0,0.12),MAT.charcoalFab,cx,s.h+0.42,cz+(cz>0?-0.54:cz<0?0.54:0));
+        add(box(s.w+0.05,0.04,s.d+0.05),M.brass,0,s.h+0.07,0);
+        add(box(s.w-0.3,0.02,s.d-0.3),M.offWhite,0,s.h+0.12,0);
+        add(cyl(0.16,s.h),mat,0,s.h/2,0);
+        add(box(s.w-1.5,0.1,0.16),mat,0,0.08,0);
+        add(box(0.16,0.1,s.d-1.5),mat,0,0.08,0);
+        // Chairs: ivory seat, charcoal back
+        [[0,s.d/2+0.52],[0,-s.d/2-0.52],[s.w/2+0.52,0],[-s.w/2-0.52,0]].forEach(([cx,cz],idx)=>{
+            add(box(1.15,0.07,1.15),M.ivory,cx,s.h-0.07,cz);
+            const backZ=cz+(cz>0?-0.52:cz<0?0.52:0);
+            const back=add(box(1.15,0.95,0.1),M.charFab,cx,s.h+0.4,backZ);
+            back.rotation.y=idx>=2?Math.PI/2:0;
+            [[-0.44,0.44],[0.44,0.44],[-0.44,-0.44],[0.44,-0.44]].forEach(([lx,lz2])=>add(box(0.07,s.h-0.07,0.07),M.darkMet,cx+lx,(s.h-0.07)/2,cz+lz2));
         });
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        addCol(s.x,s.z,s.w,s.h+0.12,s.d); break;}
     case 'kitchen':
-        add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        // Equipment details
-        add(box(s.w-0.5,0.06,s.d-0.4),MAT.chrome,0,s.h+0.03,0);
-        [-6,-2,2,6].forEach(ox=>add(cyl(0.18,0.08,8),MAT.brushedSteel,ox,s.h+0.07,0));
-        [-s.w/2+2,-s.w/2+8].forEach(ox=>add(box(4,s.h*0.5,s.d-0.4),MAT.darkMetal,ox,s.h*0.25,0));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.steel,0,s.h/2,0);
+        add(box(s.w-0.45,0.06,s.d-0.38),M.chrome,0,s.h+0.03,0);
+        [-6,-2,2,6].forEach(ox=>add(new THREE.CylinderGeometry(0.17,0.18,0.07,8),M.steel,ox,s.h+0.07,0));
+        [-s.w/2+2,-s.w/2+8].forEach(ox=>add(box(3.8,s.h*0.48,s.d-0.38),M.darkMet,ox,s.h*0.24,0));
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'counter':
-        add(box(s.w,0.08,s.d),MAT.marble,0,0.04,0);
-        add(box(s.w+0.06,0.04,s.d+0.06),MAT.chrome,0,0.1,0);
-        break;
-
+        add(box(s.w,0.07,s.d),M.marble,0,0.04,0);
+        add(box(s.w+0.06,0.04,s.d+0.06),M.chrome,0,0.09,0); break;
     case 'jacuzzi':
-        // Surround
-        add(box(s.w,s.h,s.d),MAT.marble,0,s.h/2,0);
-        // Water
-        add(box(s.w-0.5,0.1,s.d-0.5),MAT.poolBlue,0,s.h-0.05,0);
-        // Jets
-        for(let a=0;a<6;a++){
-            const ang=a*Math.PI/3;
-            add(cyl(0.06,0.15),MAT.chrome,(s.w/2-0.35)*Math.cos(ang),s.h*0.7,(s.d/2-0.35)*Math.sin(ang));
-        }
-        // Steps
-        add(box(s.w+1,0.35,0.8),MAT.marbleGray,0,0.17,s.d/2+0.4);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.marble,0,s.h/2,0);
+        add(box(s.w-0.45,0.08,s.d-0.45),M.poolBlue,0,s.h-0.04,0);
+        for(let a=0;a<6;a++){const ang=a*Math.PI/3;add(cyl(0.055,0.13),M.chrome,(s.w/2-0.32)*Math.cos(ang),s.h*0.68,(s.d/2-0.32)*Math.sin(ang));}
+        add(box(s.w+0.9,0.32,0.75),M.marbleGray,0,0.16,s.d/2+0.38);
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'abutment':
-        add(box(s.w,s.h,s.d),MAT.concreteLight,0,s.h/2,0);
-        // Bearings
-        [-6,6].forEach(ox=>add(box(3,0.4,3),MAT.darkMetal,ox,s.h+0.2,0));
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.stoneLight,0,s.h/2,0);
+        [-6,6].forEach(ox=>add(box(2.8,0.36,2.8),M.darkMet,ox,s.h+0.18,0));
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'pylon':
-        // Shaft
-        add(box(s.w,s.h,s.d),MAT.concreteLight,0,s.h/2,0);
-        // Crosshead
-        add(box(s.w+2,1.5,s.d+2),MAT.concreteLight,0,s.h+0.75,0);
-        // Cable anchors
-        for(let i=0;i<6;i++) add(box(0.2,0.2,0.2),MAT.darkMetal,s.w/2+0.1,s.h-i*5,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h+1.5,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.stoneLight,0,s.h/2,0);
+        add(box(s.w+1.8,1.4,s.d+1.8),M.stoneLight,0,s.h+0.7,0);
+        for(let i=0;i<5;i++) add(box(0.18,0.18,0.18),M.darkMet,s.w/2+0.1,s.h-i*7,0);
+        addCol(s.x,s.z,s.w,s.h+1.4,s.d); break;
     case 'lamppost':
-        add(cyl(0.1,s.h),MAT.darkMetal,0,s.h/2,0);
-        add(box(1.2,0.1,0.1),MAT.darkMetal,0.5,s.h-0.1,0);
-        add(new THREE.SphereGeometry(0.2,8,8),MAT.goldLight,1.1,s.h-0.05,0);
-        colliders.push({minX:s.x-0.15,maxX:s.x+0.15,minY:0,maxY:s.h,minZ:s.z-0.15,maxZ:s.z+0.15});
-        break;
-
+        add(cyl(0.1,s.h),M.darkMet,0,s.h/2,0);
+        add(box(1.1,0.09,0.09),M.darkMet,0.5,s.h-0.1,0);
+        add(sph(0.18,8),M.goldLt,1.1,s.h-0.06,0);
+        addCol(s.x,s.z,0.14,s.h,0.14); break;
     case 'fireplace':
-        // Stone surround
-        add(box(s.w,s.h,s.d),MAT.concreteLight,0,s.h/2,0);
-        // Firebox opening
-        add(box(s.w-0.6,s.h*0.45,0.2),MAT.black,0,s.h*0.23,s.d/2+0.11);
-        // Mantel shelf
-        add(box(s.w+0.4,0.2,s.d+0.3),MAT.oakDk,0,s.h*0.68+0.1,0);
-        // Chimney flue
-        add(box(s.w-1,s.h*0.35,s.d-1),MAT.concreteLight,0,s.h*0.82,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
+        add(box(s.w,s.h,s.d),M.stone,0,s.h/2,0);
+        add(box(s.w-0.55,s.h*0.44,0.18),M.black,0,s.h*0.22,s.d/2+0.1);
+        add(box(s.w+0.38,0.18,s.d+0.28),M.oakDk,0,s.h*0.68,0);
+        add(box(s.w-0.95,s.h*0.32,s.d-0.9),M.concreteDk,0,s.h*0.82,0);
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'skiwall':
         add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        // Ski pairs
-        for(let i=0;i<3;i++) add(box(0.08,s.h-0.8,0.12),MAT.burgundy,(i-1)*2,s.h/2+0.1,s.d/2+0.07);
-        // Poles
-        for(let i=0;i<4;i++) add(cyl(0.035,s.h-1.2),MAT.brushedSteel,(i-1.5)*1.3,s.h/2,s.d/2+0.1);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
-        break;
-
-    case 'arch':
-        // Two pillars
-        [-s.w/2+0.8,s.w/2-0.8].forEach(ox=>{
-            add(box(1.5,s.h,1.5),mat,ox,s.h/2,0);
-        });
-        // Arch span
-        add(box(s.w,1.2,1.5),mat,0,s.h-0.6,0);
-        // Hotel name plate
-        add(box(s.w-3.5,1.8,0.15),MAT.gold,0,s.h-1.5,0.8);
-        // Decorative top
-        add(new THREE.SphereGeometry(0.6,12,8),mat,0,s.h+0.6,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x-s.w/2+1.5,minY:0,maxY:s.h,minZ:s.z-0.8,maxZ:s.z+0.8});
-        colliders.push({minX:s.x+s.w/2-1.5,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-0.8,maxZ:s.z+0.8});
-        break;
-
+        for(let i=0;i<3;i++) add(box(0.07,s.h-0.75,0.11),M.burg,  (i-1)*2,s.h/2+0.08,s.d/2+0.07);
+        for(let i=0;i<4;i++) add(cyl(0.032,s.h-1.1),M.steel,(i-1.5)*1.25,s.h/2,s.d/2+0.1);
+        addCol(s.x,s.z,s.w,s.h,s.d); break;
     case 'aroof':
-        add(box(s.w,0.5,s.d),mat,0,s.h,0);
-        // Ridge beam
-        add(box(0.4,0.6,s.d),mat,0,s.h+0.55,0);
-        // Eave trim
-        add(box(s.w+0.6,0.25,0.25),MAT.oakLight,0,s.h+0.1,s.d/2);
-        add(box(s.w+0.6,0.25,0.25),MAT.oakLight,0,s.h+0.1,-s.d/2);
-        break;
-
+        add(box(s.w,0.45,s.d),mat,0,s.h,0);
+        add(box(0.38,0.55,s.d),mat,0,s.h+0.5,0);
+        add(box(s.w+0.55,0.22,0.22),M.oakLt,0,s.h+0.08,s.d/2);
+        add(box(s.w+0.55,0.22,0.22),M.oakLt,0,s.h+0.08,-s.d/2); break;
+    case 'arch':
+        [-s.w/2+0.7,s.w/2-0.7].forEach(ox=>add(box(1.4,s.h,1.4),mat,ox,s.h/2,0));
+        add(box(s.w,1.1,1.4),mat,0,s.h-0.55,0);
+        add(box(s.w-3.2,1.65,0.14),M.gold,0,s.h-1.45,0.75);
+        add(sph(0.55,12),mat,0,s.h+0.55,0);
+        addCol(s.x-s.w/2,s.z,1.4,s.h,1.4);
+        addCol(s.x+s.w/2,s.z,1.4,s.h,1.4); break;
     default:
         add(box(s.w,s.h,s.d),mat,0,s.h/2,0);
-        colliders.push({minX:s.x-s.w/2,maxX:s.x+s.w/2,minY:0,maxY:s.h,minZ:s.z-s.d/2,maxZ:s.z+s.d/2});
+        addCol(s.x,s.z,s.w,s.h,s.d);
     }
 }
 
-// ── buy / pad ────────────────────────────────────────────────────────────────
+function adjustColor(hex,factor){
+    const r=Math.min(255,Math.floor(((hex>>16)&0xff)*factor));
+    const g=Math.min(255,Math.floor(((hex>>8)&0xff)*factor));
+    const b=Math.min(255,Math.floor((hex&0xff)*factor));
+    return (r<<16)|(g<<8)|b;
+}
+
 function doBuy(s){
     wallet-=s.cost; s.bought=true; income+=s.inc;
     placeObject(s); showToast('✅  '+s.label);
@@ -1112,39 +785,31 @@ function doBuy(s){
 }
 
 function spawnNextPad(){
-    padList.forEach(p=>scene.remove(p));
-    padList.length=0; activePad=null;
+    padList.forEach(p=>scene.remove(p)); padList.length=0; activePad=null;
     const next=STEPS.find(s=>!s.bought&&(s.need===0||STEPS.find(x=>x.id===s.need)?.bought));
     if(next){
         const parent=STEPS.find(x=>x.id===next.need);
         const padX=parent?parent.x+(next.ox||0):next.x+(next.ox||0);
         const padZ=parent?parent.z+(next.oz||0):next.z+(next.oz||0);
-        const padY=(parent?parent.h:0)+PAD_FLOAT;
-        const pad=new THREE.Mesh(
-            new THREE.CylinderGeometry(2.2,2.2,0.22,32),
-            new THREE.MeshBasicMaterial({color:0xffe040,transparent:true,opacity:0.9})
-        );
-        pad.position.set(padX,padY,padZ);
-        pad.stepData=next; scene.add(pad);
-        padList.push(pad); activePad=pad;
+        const padY=(parent&&parent.type!=='floor'?parent.h:0)+PAD_FLOAT;
+        const pad=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,0.2,32),
+            new THREE.MeshBasicMaterial({color:0xffe040,transparent:true,opacity:0.9}));
+        pad.position.set(padX,padY,padZ); pad.stepData=next;
+        scene.add(pad); padList.push(pad); activePad=pad;
         document.getElementById('nc-name').textContent=next.label;
         document.getElementById('nc-cost').textContent=next.cost===0?'COMPLIMENTARY':fmtMoney(next.cost);
     } else {
         document.getElementById('nc-name').textContent='GRAND MERIDIAN COMPLETE';
         document.getElementById('nc-cost').textContent='';
         showToast('🎉 The Grand Meridian is open!');
+        saveGame();
     }
 }
 
 setInterval(()=>{if(gameRunning)wallet+=income;},1000);
 window.addEventListener('keydown',e=>{if(e.key===' ')e.preventDefault();KEYS[e.key.toLowerCase()]=true;});
 window.addEventListener('keyup',e=>{KEYS[e.key.toLowerCase()]=false;});
-window.addEventListener('resize',()=>{
-    if(!cam||!ren)return;
-    cam.aspect=innerWidth/innerHeight;
-    cam.updateProjectionMatrix();
-    ren.setSize(innerWidth,innerHeight);
-});
+window.addEventListener('resize',()=>{if(!cam||!ren)return;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();ren.setSize(innerWidth,innerHeight);});
 </script>
 </body>
 </html>
